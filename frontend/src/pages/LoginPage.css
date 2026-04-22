@@ -1,0 +1,329 @@
+.cpLogin {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: clamp(18px, 4vw, 44px);
+  color: rgba(255, 255, 255, 0.92);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica,
+    Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  background: radial-gradient(1200px 800px at 20% 15%, rgba(0, 255, 209, 0.10), transparent 60%),
+    radial-gradient(900px 700px at 85% 70%, rgba(255, 0, 221, 0.10), transparent 55%),
+    radial-gradient(700px 520px at 45% 105%, rgba(74, 122, 255, 0.10), transparent 60%),
+    linear-gradient(180deg, #070812 0%, #05040b 45%, #060416 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.cpLogin *,
+.cpLogin *::before,
+.cpLogin *::after {
+  box-sizing: border-box;
+}
+
+.cpBackgroundGrid {
+  position: absolute;
+  inset: -40%;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 64px 64px;
+  transform: rotate(-12deg);
+  opacity: 0.18;
+  pointer-events: none;
+  filter: blur(0.2px);
+  mask-image: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.9), transparent 70%);
+}
+
+.cpGlowOrbs {
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  opacity: 0.7;
+  background:
+    radial-gradient(280px 220px at 20% 30%, rgba(0, 255, 209, 0.22), transparent 60%),
+    radial-gradient(260px 220px at 70% 40%, rgba(255, 0, 221, 0.18), transparent 60%),
+    radial-gradient(320px 260px at 55% 75%, rgba(74, 122, 255, 0.18), transparent 60%);
+  filter: blur(10px);
+  animation: cpDrift 16s ease-in-out infinite;
+}
+
+@keyframes cpDrift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2.5%, -1.5%, 0) scale(1.03);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cpGlowOrbs {
+    animation: none;
+  }
+}
+
+.cpShell {
+  width: min(980px, 100%);
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: clamp(18px, 3vw, 40px);
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 860px) {
+  .cpShell {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cpHero {
+  display: grid;
+  gap: 12px;
+  padding: 6px 2px;
+}
+
+.cpTitle {
+  margin: 0;
+  font-size: clamp(34px, 3.4vw, 52px);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.95), rgba(184, 255, 247, 0.92) 45%, rgba(255, 179, 245, 0.90));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 18px rgba(0, 255, 209, 0.08));
+}
+
+.cpSubtitle {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 14px;
+  line-height: 1.55;
+  max-width: 56ch;
+}
+
+.cpPill {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+}
+
+.cpDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(0, 255, 209, 0.95);
+  box-shadow: 0 0 16px rgba(0, 255, 209, 0.55);
+}
+
+.cpPillText {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.cpCard {
+  width: min(440px, 100%);
+  border-radius: 18px;
+  padding: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow:
+    0 18px 60px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(0, 255, 209, 0.10) inset;
+  position: relative;
+  overflow: hidden;
+}
+
+.cpCard::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  background:
+    radial-gradient(420px 220px at 20% 0%, rgba(0, 255, 209, 0.18), transparent 60%),
+    radial-gradient(360px 220px at 110% 30%, rgba(255, 0, 221, 0.16), transparent 60%);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.cpCardInner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 12px;
+}
+
+.cpCardTitleRow {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.cpCardTitle {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.cpCardHint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.70);
+}
+
+.cpForm {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+}
+
+.cpField {
+  display: grid;
+  gap: 8px;
+}
+
+.cpLabel {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.cpInput {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(5, 6, 18, 0.55);
+  color: rgba(255, 255, 255, 0.92);
+  padding: 12px 12px;
+  outline: none;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.cpInput::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.cpInput:focus-visible {
+  border-color: rgba(0, 255, 209, 0.55);
+  box-shadow:
+    0 0 0 4px rgba(0, 255, 209, 0.12),
+    0 0 30px rgba(0, 255, 209, 0.10);
+}
+
+.cpActions {
+  display: grid;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.cpButton {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  color: rgba(9, 10, 20, 0.98);
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  background: linear-gradient(90deg, rgba(0, 255, 209, 0.95), rgba(74, 122, 255, 0.95), rgba(255, 0, 221, 0.88));
+  box-shadow:
+    0 14px 40px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.12) inset,
+    0 0 36px rgba(0, 255, 209, 0.18);
+  transition: transform 140ms ease, filter 180ms ease, box-shadow 180ms ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.cpButton::after {
+  content: "";
+  position: absolute;
+  inset: -40% -20%;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.35), transparent 65%);
+  transform: translateX(-30%) rotate(12deg);
+  opacity: 0.55;
+  pointer-events: none;
+  transition: transform 260ms ease, opacity 260ms ease;
+}
+
+.cpButton:hover {
+  transform: translateY(-1px);
+  filter: saturate(1.05);
+  box-shadow:
+    0 18px 60px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.14) inset,
+    0 0 44px rgba(255, 0, 221, 0.18);
+}
+
+.cpButton:hover::after {
+  transform: translateX(10%) rotate(12deg);
+  opacity: 0.65;
+}
+
+.cpButton:active {
+  transform: translateY(0px) scale(0.995);
+}
+
+.cpButton:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 4px rgba(0, 255, 209, 0.18),
+    0 14px 40px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.12) inset;
+}
+
+.cpButton[disabled] {
+  cursor: not-allowed;
+  filter: grayscale(0.25) brightness(0.85);
+  opacity: 0.9;
+}
+
+.cpError {
+  margin: 0;
+  border-radius: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 77, 122, 0.25);
+  background: rgba(255, 77, 122, 0.10);
+  color: rgba(255, 210, 223, 0.92);
+}
+
+.cpDetails {
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 10px 12px;
+}
+
+.cpDetails summary {
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 13px;
+}
+
+.cpDetails ul {
+  margin: 10px 0 0 18px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
