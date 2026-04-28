@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import java.time.Instant;
+import java.util.List;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,18 +26,35 @@ public class JwtService {
   }
 
   public String createToken(String subject) {
+    return createToken(subject, List.of());
+  }
+
+  public String createToken(String subject, List<String> roles) {
     Instant now = Instant.now();
     Instant expiresAt = now.plusSeconds(expiresSeconds);
 
-    return JWT.create()
+    var builder =
+        JWT.create()
         .withSubject(subject)
         .withIssuedAt(Date.from(now))
-        .withExpiresAt(Date.from(expiresAt))
-        .sign(algorithm);
+        .withExpiresAt(Date.from(expiresAt));
+
+    if (roles != null && !roles.isEmpty()) {
+      builder.withClaim("roles", roles);
+    }
+
+    return builder.sign(algorithm);
   }
 
   public String verifyAndGetSubject(String token) throws JWTVerificationException {
     return verifier.verify(token).getSubject();
+  }
+
+  public List<String> verifyAndGetRoles(String token) throws JWTVerificationException {
+    var claim = verifier.verify(token).getClaim("roles");
+    if (claim == null || claim.isNull()) return List.of();
+    List<String> roles = claim.asList(String.class);
+    return roles == null ? List.of() : roles;
   }
 }
 

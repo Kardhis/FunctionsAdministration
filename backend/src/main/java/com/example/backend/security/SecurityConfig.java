@@ -22,12 +22,18 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             auth ->
                 auth
+                    .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**")
+                        .permitAll()
                     .requestMatchers("/health", "/actuator/health")
                         .permitAll()
                     .requestMatchers("/auth/login", "/auth/logout")
                         .permitAll()
-                    .requestMatchers("/auth/me", "/api/**")
+                    .requestMatchers("/auth/me")
                         .authenticated()
+                    .requestMatchers("/api/admin/**")
+                        .hasRole("ADMIN")
+                    .requestMatchers("/api/**")
+                        .hasAnyRole("ADMIN", "USER")
                     .anyRequest()
                         .permitAll())
         .exceptionHandling(

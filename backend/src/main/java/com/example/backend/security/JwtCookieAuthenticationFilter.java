@@ -9,9 +9,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -37,8 +39,14 @@ public class JwtCookieAuthenticationFilter extends OncePerRequestFilter {
       if (token != null && !token.isBlank()) {
         try {
           String subject = jwtService.verifyAndGetSubject(token);
+          List<String> roles = jwtService.verifyAndGetRoles(token);
+          var authorities =
+              roles.stream()
+                  .filter(r -> r != null && !r.isBlank())
+                  .map(r -> new SimpleGrantedAuthority("ROLE_" + r))
+                  .toList();
           var auth =
-              new UsernamePasswordAuthenticationToken(subject, null, java.util.List.of());
+              new UsernamePasswordAuthenticationToken(subject, null, authorities);
           auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
           SecurityContextHolder.getContext().setAuthentication(auth);
         } catch (JWTVerificationException ex) {
