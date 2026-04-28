@@ -1,0 +1,147 @@
+import { useEffect, useMemo } from 'react'
+import { useForm } from 'react-hook-form'
+import Card from '../../../components/Card.jsx'
+import Button from '../../../components/Button.jsx'
+import Badge from '../../../components/Badge.jsx'
+import { habitEntryCreateResolver } from '../store/habitAppStore.js'
+import { computeDurationMinutes, formatDurationHuman, todayLocalDateString } from '../domain/time.js'
+
+const defaultValues = {
+  habitId: '',
+  date: todayLocalDateString(),
+  startTime: '09:00',
+  endTime: '09:30',
+  notes: '',
+}
+
+export default function HabitEntryCreateModal({ open, habits, onClose, onCreated }) {
+  const activeHabits = useMemo(() => (Array.isArray(habits) ? habits.filter((h) => h?.active) : []), [habits])
+
+  const form = useForm({
+    resolver: habitEntryCreateResolver,
+    defaultValues,
+    mode: 'onChange',
+  })
+
+  useEffect(() => {
+    if (!open) return
+    form.reset(defaultValues)
+  }, [form, open])
+
+  useEffect(() => {
+    if (!open) return
+    function onKeyDown(e) {
+      if (e.key === 'Escape') onClose?.()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [open, onClose])
+
+  const watchStart = form.watch('startTime')
+  const watchEnd = form.watch('endTime')
+  const watchDate = form.watch('date')
+
+  const previewMinutes = useMemo(() => {
+    try {
+      return computeDurationMinutes({ date: watchDate, startTime: watchStart, endTime: watchEnd })
+    } catch {
+      return 0
+    }
+  }, [watchDate, watchEnd, watchStart])
+
+  if (!open) return null
+
+  return (
+    <div className="fixed inset-0 z-50">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" onClick={() => onClose?.()} />
+      <div className="relative mx-auto flex min-h-[100svh] max-w-2xl items-center justify-center px-4 py-10">
+        <Card className="w-full p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-text">Crear</p>
+              <p className="mt-1 text-xl font-semibold text-text-h">Nuevo registro</p>
+              <p className="mt-1 text-sm text-text">Selecciona un hábito activo y registra una ventana de tiempo.</p>
+            </div>
+            <Button variant="ghost" type="button" onClick={() => onClose?.()} aria-label="Cerrar">
+              ✕
+            </Button>
+          </div>
+
+          <form
+            className="mt-5 space-y-4"
+            onSubmit={form.handleSubmit(async (values) => {
+              const res = await onCreated?.({ ...values, notes: values.notes ?? '' })
+              if (res?.ok) {
+                form.reset(defaultValues)
+                onClose?.()
+              }
+            })}
+          >
+            <label className="block">
+              <span className="text-sm font-medium text-text-h">Hábito (activo)</span>
+              <select
+                className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40"
+                {...form.register('habitId')}
+              >
+                <option value="" disabled>
+                  Selecciona…
+                </option>
+                {activeHabits.map((h) => (
+                  <option key={h.id} value={h.id}>
+                    {h.icon ? `${h.icon} ` : ''}
+                    {h.name}
+                  </option>
+                ))}
+              </select>
+              {form.formState.errors.habitId ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.habitId.message}</p> : null}
+              {!activeHabits.length ? <p className="mt-2 text-xs text-text">No hay hábitos activos. Activa uno para poder registrar.</p> : null}
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-medium text-text-h">Fecha</span>
+              <input type="date" className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" {...form.register('date')} />
+              {form.formState.errors.date ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.date.message}</p> : null}
+            </label>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <label className="block">
+                <span className="text-sm font-medium text-text-h">Inicio (24h)</span>
+                <input type="time" className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" {...form.register('startTime')} />
+                {form.formState.errors.startTime ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.startTime.message}</p> : null}
+              </label>
+              <label className="block">
+                <span className="text-sm font-medium text-text-h">Fin (24h)</span>
+                <input type="time" className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" {...form.register('endTime')} />
+                {form.formState.errors.endTime ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.endTime.message}</p> : null}
+              </label>
+            </div>
+
+            <div className="rounded-2xl border border-border bg-bg/60 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-semibold text-text-h">Duración</p>
+                <Badge tone="neutral">auto</Badge>
+              </div>
+              <p className="mt-2 text-2xl font-semibold text-text-h">{formatDurationHuman(previewMinutes)}</p>
+              <p className="mt-1 text-xs text-text">{previewMinutes} minutos</p>
+            </div>
+
+            <label className="block">
+              <span className="text-sm font-medium text-text-h">Nota (opcional)</span>
+              <textarea rows={3} className="mt-2 w-full resize-none rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" {...form.register('notes')} />
+            </label>
+
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+              <Button type="button" variant="ghost" onClick={() => onClose?.()}>
+                Cancelar
+              </Button>
+              <Button type="submit" variant="primary" disabled={!activeHabits.length}>
+                Registrar
+              </Button>
+            </div>
+          </form>
+        </Card>
+      </div>
+    </div>
+  )
+}
+

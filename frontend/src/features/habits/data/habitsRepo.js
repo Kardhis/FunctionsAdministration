@@ -1,29 +1,32 @@
-import { openHabitsDB } from './habitsDb.js'
+import { apiFetch } from '../../../data/api.js'
 
 export async function listHabits() {
-  const db = await openHabitsDB()
-  return db.getAll('habits')
+  return apiFetch('/api/habits')
 }
 
 export async function getHabit(id) {
-  const db = await openHabitsDB()
-  return db.get('habits', id)
+  const all = await listHabits()
+  return all.find((h) => h.id === id) ?? null
 }
 
 export async function putHabit(habit) {
-  const db = await openHabitsDB()
-  await db.put('habits', habit)
-  return habit
+  if (!habit?.id) throw new Error('Habit id is required')
+  try {
+    // create (POST) first; if it already exists, fall back to update (PUT)
+    return await apiFetch('/api/habits', { method: 'POST', body: habit })
+  } catch (e) {
+    if (e && e.status === 409) {
+      return apiFetch(`/api/habits/${encodeURIComponent(habit.id)}`, { method: 'PUT', body: habit })
+    }
+    throw e
+  }
 }
 
 export async function deleteHabit(id) {
-  const db = await openHabitsDB()
-  await db.delete('habits', id)
+  await apiFetch(`/api/habits/${encodeURIComponent(id)}`, { method: 'DELETE' })
 }
 
 export async function clearHabits() {
-  const db = await openHabitsDB()
-  const tx = db.transaction('habits', 'readwrite')
-  await tx.store.clear()
-  await tx.done
+  const habits = await listHabits()
+  await Promise.all(habits.map((h) => deleteHabit(h.id)))
 }

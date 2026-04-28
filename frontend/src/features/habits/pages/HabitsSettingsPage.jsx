@@ -4,7 +4,7 @@ import Card from '../../../components/Card.jsx'
 import Button from '../../../components/Button.jsx'
 import Badge from '../../../components/Badge.jsx'
 import { useHabitAppStore } from '../store/habitAppStore.js'
-import { listReminders, putReminder } from '../data/remindersRepo.js'
+import { listReminders } from '../data/remindersRepo.js'
 import { toIsoNow } from '../domain/time.js'
 
 function downloadTextFile({ filename, text, mime }) {
@@ -33,18 +33,7 @@ export default function HabitsSettingsPage() {
 
   const exportPayload = useMemo(() => ({ exportedAt: toIsoNow(), habits, entries }), [entries, habits])
 
-  async function seedReminderStub() {
-    const r = {
-      id: crypto.randomUUID?.() ?? `rm_${Date.now()}`,
-      habitId: habits[0]?.id ?? null,
-      title: 'Recordatorio (stub)',
-      schedule: { kind: 'daily', time: '09:30' },
-      enabled: false,
-      createdAt: toIsoNow(),
-    }
-    await putReminder(r)
-    setReminders(await listReminders())
-  }
+  async function seedReminderStub() {}
 
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -128,7 +117,7 @@ export default function HabitsSettingsPage() {
             <p className="text-sm font-semibold text-text-h">Recordatorios (base)</p>
             <p className="mt-1 text-sm text-text">Estructura persistida para evolucionar a notificaciones reales.</p>
           </div>
-          <Button variant="primary" type="button" onClick={seedReminderStub} disabled={!habits.length}>
+          <Button variant="primary" type="button" onClick={seedReminderStub} disabled>
             Añadir stub
           </Button>
         </div>

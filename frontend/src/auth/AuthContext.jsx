@@ -6,6 +6,7 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [status, setStatus] = useState('loading') // loading | authenticated | unauthenticated
   const [user, setUser] = useState(null)
+  const [roles, setRoles] = useState([])
 
   const refresh = useCallback(async () => {
     try {
@@ -22,10 +23,12 @@ export function AuthProvider({ children }) {
 
       const data = await res.json().catch(() => ({}))
       setUser(data?.user ?? null)
+      setRoles(Array.isArray(data?.roles) ? data.roles : [])
       setStatus('authenticated')
       return true
     } catch {
       setUser(null)
+      setRoles([])
       setStatus('unauthenticated')
       return false
     }
@@ -46,7 +49,7 @@ export function AuthProvider({ children }) {
     }
   }, [refresh])
 
-  const value = useMemo(() => ({ status, user, refresh, logout }), [status, user, refresh, logout])
+  const value = useMemo(() => ({ status, user, roles, refresh, logout }), [status, user, roles, refresh, logout])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

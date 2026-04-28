@@ -6,7 +6,6 @@ import { getSetting, setSetting } from '../data/settingsRepo.js'
 import { computeDurationMinutes, toIsoNow } from '../domain/time.js'
 import { habitCreateSchema, habitEntryCreateSchema, habitEntrySchema, habitEntryUpdateSchema, habitSchema, habitUpdateSchema } from '../domain/schemas.js'
 import { findOverlappingEntries } from '../domain/overlap.js'
-import { seedHabitAppIfEmpty } from '../seed/seedHabitApp.js'
 
 function newId() {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID()
@@ -44,7 +43,6 @@ export const useHabitAppStore = create((set, get) => ({
     if (get().bootstrapped) return
     set({ loading: true, error: '' })
     try {
-      await seedHabitAppIfEmpty()
       const [habits, entries, enforceNoOverlap, theme] = await Promise.all([
         listHabits(),
         listEntries(),

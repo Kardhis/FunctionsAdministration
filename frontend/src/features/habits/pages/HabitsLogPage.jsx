@@ -1,18 +1,17 @@
 import { useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
 import Button from '../../../components/Button.jsx'
 import Card from '../../../components/Card.jsx'
 import Badge from '../../../components/Badge.jsx'
-import { useHabitAppStore, habitEntryCreateResolver } from '../store/habitAppStore.js'
-import { computeDurationMinutes, formatDurationHuman, todayLocalDateString } from '../domain/time.js'
+import { useHabitAppStore } from '../store/habitAppStore.js'
+import { formatDurationHuman, todayLocalDateString } from '../domain/time.js'
 import { periodPresets, resolvePeriodRange } from '../domain/periods.js'
 import LiveTimer from '../ui/LiveTimer.jsx'
+import HabitEntryCreateModal from '../ui/HabitEntryCreateModal.jsx'
 
 export default function HabitsLogPage() {
   const habits = useHabitAppStore((s) => s.habits)
   const entries = useHabitAppStore((s) => s.entries)
   const createEntry = useHabitAppStore((s) => s.createEntry)
-  const updateEntry = useHabitAppStore((s) => s.updateEntry)
   const deleteEntry = useHabitAppStore((s) => s.deleteEntry)
 
   const [preset, setPreset] = useState('last_7')
@@ -22,7 +21,7 @@ export default function HabitsLogPage() {
   const [category, setCategory] = useState('')
   const [activeOnly, setActiveOnly] = useState('all') // all|true|false
 
-  const [editingId, setEditingId] = useState(null)
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
 
   const range = useMemo(() => resolvePeriodRange({ preset, customFrom, customTo }), [preset, customFrom, customTo])
 
@@ -44,60 +43,17 @@ export default function HabitsLogPage() {
       .sort((a, b) => `${b.date} ${b.endTime}`.localeCompare(`${a.date} ${a.endTime}`))
   }, [activeOnly, category, entries, habitId, habits, range.end, range.start])
 
-  const form = useForm({
-    resolver: habitEntryCreateResolver,
-    defaultValues: {
-      habitId: habits[0]?.id ?? '',
-      date: todayLocalDateString(),
-      startTime: '09:00',
-      endTime: '09:30',
-      notes: '',
-    },
-    mode: 'onChange',
-  })
-
-  const watchStart = form.watch('startTime')
-  const watchEnd = form.watch('endTime')
-  const watchDate = form.watch('date')
-
-  const previewMinutes = useMemo(() => {
-    try {
-      return computeDurationMinutes({ date: watchDate, startTime: watchStart, endTime: watchEnd })
-    } catch {
-      return 0
-    }
-  }, [watchDate, watchEnd, watchStart])
-
-  async function onSubmit(values) {
-    if (editingId) {
-      await updateEntry({ id: editingId, ...values })
-    } else {
-      await createEntry(values)
-    }
-    setEditingId(null)
-    form.reset({
-      habitId: values.habitId,
-      date: todayLocalDateString(),
-      startTime: '09:00',
-      endTime: '09:30',
-      notes: '',
-    })
-  }
-
-  function startEdit(e) {
-    setEditingId(e.id)
-    form.reset({
-      habitId: e.habitId,
-      date: e.date,
-      startTime: e.startTime,
-      endTime: e.endTime,
-      notes: e.notes ?? '',
-    })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
   return (
     <div className="space-y-4">
+      <HabitEntryCreateModal
+        open={isCreateOpen}
+        habits={habits}
+        onClose={() => setIsCreateOpen(false)}
+        onCreated={async (values) => {
+          await createEntry(values)
+          return { ok: true }
+        }}
+      />
       <LiveTimer
         habits={habits.filter((h) => h.active)}
         onComplete={async (payload) => {
@@ -105,93 +61,27 @@ export default function HabitsLogPage() {
         }}
       />
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-      <Card className="p-5 xl:col-span-1">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-text-h">{editingId ? 'Editar registro' : 'Nuevo registro'}</p>
-            <p className="mt-1 text-sm text-text">Duración calculada automáticamente.</p>
-          </div>
-          {editingId ? <Badge tone="warning">edición</Badge> : <Badge tone="accent">crear</Badge>}
-        </div>
-
-        <form className="mt-4 space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-          <label className="block">
-            <span className="text-sm font-medium text-text-h">Hábito</span>
-            <select className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" {...form.register('habitId')}>
-              {habits.map((h) => (
-                <option key={h.id} value={h.id}>
-                  {h.icon ? `${h.icon} ` : ''}
-                  {h.name}
-                </option>
-              ))}
-            </select>
-            {form.formState.errors.habitId ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.habitId.message}</p> : null}
-          </label>
-
-          <label className="block">
-            <span className="text-sm font-medium text-text-h">Fecha</span>
-            <input type="date" className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" {...form.register('date')} />
-            {form.formState.errors.date ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.date.message}</p> : null}
-          </label>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <label className="block">
-              <span className="text-sm font-medium text-text-h">Inicio (24h)</span>
-              <input type="time" className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" {...form.register('startTime')} />
-              {form.formState.errors.startTime ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.startTime.message}</p> : null}
-            </label>
-            <label className="block">
-              <span className="text-sm font-medium text-text-h">Fin (24h)</span>
-              <input type="time" className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" {...form.register('endTime')} />
-              {form.formState.errors.endTime ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.endTime.message}</p> : null}
-            </label>
-          </div>
-
-          <div className="rounded-2xl border border-border bg-bg/60 p-4">
-            <p className="text-sm font-medium text-text-h">Duración</p>
-            <p className="mt-2 text-2xl font-semibold text-text-h">{formatDurationHuman(previewMinutes)}</p>
-            <p className="mt-1 text-xs text-text">{previewMinutes} minutos (se guardará al confirmar)</p>
-          </div>
-
-          <label className="block">
-            <span className="text-sm font-medium text-text-h">Nota (opcional)</span>
-            <textarea rows={3} className="mt-2 w-full resize-none rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" {...form.register('notes')} />
-          </label>
-
-          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => {
-                setEditingId(null)
-                form.reset({
-                  habitId: habits[0]?.id ?? '',
-                  date: todayLocalDateString(),
-                  startTime: '09:00',
-                  endTime: '09:30',
-                  notes: '',
-                })
-              }}
-            >
-              Cancelar
-            </Button>
-            <Button type="submit" variant="primary">
-              {editingId ? 'Guardar' : 'Registrar'}
-            </Button>
-          </div>
-        </form>
-      </Card>
-
-      <Card className="p-5 xl:col-span-2">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-          <div>
+      <div id="sectionRegistros" className="grid w-full grid-cols-1 gap-4 xl:grid-cols-3">
+      <Card className="w-full p-5 xl:col-span-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
             <p className="text-sm font-semibold text-text-h">Registros</p>
             <p className="mt-1 text-sm text-text">
               Periodo: <span className="font-medium text-text-h">{range.label}</span>
             </p>
           </div>
-          <Badge tone="neutral">{filteredEntries.length}</Badge>
+          <div className="flex shrink-0 items-center gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              id="btnNewEntry"
+              className="w-full sm:w-auto ring-1 ring-border bg-bg/80 hover:bg-bg"
+              onClick={() => setIsCreateOpen(true)}
+            >
+              Nuevo registro
+            </Button>
+            <Badge tone="neutral">{filteredEntries.length}</Badge>
+          </div>
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-12">
@@ -255,7 +145,7 @@ export default function HabitsLogPage() {
         </div>
 
         <div className="mt-4 overflow-x-auto">
-          <table className="min-w-[980px] w-full border-separate border-spacing-y-2">
+          <table className="w-full border-separate border-spacing-y-2">
             <thead>
               <tr className="text-left text-xs uppercase tracking-wide text-text">
                 <th className="px-2">Fecha</th>
@@ -280,9 +170,6 @@ export default function HabitsLogPage() {
                     <td className="px-2 py-3 text-sm text-text">{e.notes ? <span className="line-clamp-2">{e.notes}</span> : '—'}</td>
                     <td className="px-2 py-3">
                       <div className="flex justify-end gap-2">
-                        <Button type="button" variant="secondary" size="sm" onClick={() => startEdit(e)}>
-                          Editar
-                        </Button>
                         <Button
                           type="button"
                           variant="ghost"

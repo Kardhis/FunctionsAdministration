@@ -1,0 +1,9 @@
+---
+description: Reglas obligatorias para cualquier cambio en Front End
+globs:
+  - "src/**/*.tsx"
+  - "src/**/*.jsx"
+  - "src/**/*.html"
+  - "src/**/*.css"
+alwaysApply: true
+---

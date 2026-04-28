@@ -75,6 +75,7 @@ export default function HabitsManagePage() {
             <Button
               type="button"
               variant="primary"
+              id="btnNewHabit"
               className="w-full sm:w-auto"
               onClick={() => setIsCreateOpen(true)}
             >

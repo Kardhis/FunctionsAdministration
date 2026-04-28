@@ -1,12 +1,17 @@
-import { openHabitsDB } from './habitsDb.js'
+import { apiFetch } from '../../../data/api.js'
 
 export async function listReminders() {
-  const db = await openHabitsDB()
-  return db.getAll('reminders')
+  return apiFetch('/api/reminders')
 }
 
 export async function putReminder(reminder) {
-  const db = await openHabitsDB()
-  await db.put('reminders', reminder)
-  return reminder
+  if (!reminder?.id) throw new Error('Reminder id is required')
+  try {
+    return await apiFetch('/api/reminders', { method: 'POST', body: reminder })
+  } catch (e) {
+    if (e && e.status === 409) {
+      return apiFetch(`/api/reminders/${encodeURIComponent(reminder.id)}`, { method: 'PUT', body: reminder })
+    }
+    throw e
+  }
 }

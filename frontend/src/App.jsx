@@ -14,6 +14,8 @@ import DailyLogPage from './pages/dashboard/DailyLogPage.jsx'
 import StatsPage from './pages/dashboard/StatsPage.jsx'
 import CalendarPage from './pages/dashboard/CalendarPage.jsx'
 import ProfilePage from './pages/dashboard/ProfilePage.jsx'
+import AdminRoute from './routes/AdminRoute.jsx'
+import AdminUsersPage from './pages/dashboard/AdminUsersPage.jsx'
 
 function App() {
   return (
@@ -42,6 +44,14 @@ function App() {
         <Route path="stats" element={<StatsPage />} />
         <Route path="calendar" element={<CalendarPage />} />
         <Route path="profile" element={<ProfilePage />} />
+        <Route
+          path="admin/users"
+          element={
+            <AdminRoute>
+              <AdminUsersPage />
+            </AdminRoute>
+          }
+        />
       </Route>
       <Route
         path="/private"

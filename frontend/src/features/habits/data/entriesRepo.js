@@ -1,31 +1,31 @@
-import { openHabitsDB } from './habitsDb.js'
+import { apiFetch } from '../../../data/api.js'
 
 export async function listEntries() {
-  const db = await openHabitsDB()
-  return db.getAll('entries')
+  return apiFetch('/api/habit-entries')
 }
 
 export async function listEntriesByDateRange({ fromDate, toDate }) {
-  const db = await openHabitsDB()
-  const idx = db.transaction('entries').store.index('by_date')
-  const range = IDBKeyRange.bound(fromDate, toDate)
-  return idx.getAll(range)
+  const qs = new URLSearchParams({ fromDate, toDate })
+  return apiFetch(`/api/habit-entries?${qs.toString()}`)
 }
 
 export async function putEntry(entry) {
-  const db = await openHabitsDB()
-  await db.put('entries', entry)
-  return entry
+  if (!entry?.id) throw new Error('Entry id is required')
+  try {
+    return await apiFetch('/api/habit-entries', { method: 'POST', body: entry })
+  } catch (e) {
+    if (e && e.status === 409) {
+      return apiFetch(`/api/habit-entries/${encodeURIComponent(entry.id)}`, { method: 'PUT', body: entry })
+    }
+    throw e
+  }
 }
 
 export async function deleteEntry(id) {
-  const db = await openHabitsDB()
-  await db.delete('entries', id)
+  await apiFetch(`/api/habit-entries/${encodeURIComponent(id)}`, { method: 'DELETE' })
 }
 
 export async function clearEntries() {
-  const db = await openHabitsDB()
-  const tx = db.transaction('entries', 'readwrite')
-  await tx.store.clear()
-  await tx.done
+  const entries = await listEntries()
+  await Promise.all(entries.map((e) => deleteEntry(e.id)))
 }
