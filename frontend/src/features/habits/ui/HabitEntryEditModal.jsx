@@ -82,7 +82,7 @@ export default function HabitEntryEditModal({ open, habits, entry, onClose, onSa
           >
             <label className="block">
               <span className="text-sm font-medium text-text-h">Hábito</span>
-              <select className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" {...form.register('habitId')}>
+              <select className="ui-input mt-2" {...form.register('habitId')}>
                 <option value="" disabled>
                   Selecciona…
                 </option>

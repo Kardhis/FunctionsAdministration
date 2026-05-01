@@ -77,7 +77,7 @@ export default function ObjectiveUpsertModal({ mode, open, habits, initial, onCl
           >
             <label className="block">
               <span className="text-sm font-medium text-text-h">Hábito</span>
-              <select className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" {...form.register('habitId')}>
+              <select className="ui-input mt-2" {...form.register('habitId')}>
                 <option value="" disabled>
                   Selecciona…
                 </option>
@@ -124,7 +124,7 @@ export default function ObjectiveUpsertModal({ mode, open, habits, initial, onCl
               <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <label className="block sm:col-span-1">
                   <span className="text-xs font-medium uppercase tracking-wide text-text">Tipo</span>
-                  <select className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" {...form.register('metricType')}>
+                  <select className="ui-input mt-2" {...form.register('metricType')}>
                     <option value="MINUTES">Minutos</option>
                     <option value="REPETITIONS">Repeticiones</option>
                   </select>

@@ -68,7 +68,7 @@ export default function LiveTimer({ habits, onComplete }) {
         <label className="block">
           <span className="text-xs font-medium uppercase tracking-wide text-text">Hábito</span>
             <select
-              className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40"
+              className="ui-input mt-2"
               value={selectedHabitId}
               onChange={(e) => setHabitId(e.target.value)}
               disabled={running}

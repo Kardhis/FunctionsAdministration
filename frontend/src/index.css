@@ -175,6 +175,26 @@ code {
   :focus-visible {
     outline: none;
   }
+
+  /* Native selects (especially on Windows) need explicit option colors in dark. */
+  select {
+    color: var(--text-h);
+    background-color: var(--surface-2);
+  }
+
+  select option,
+  select optgroup {
+    color: var(--text-h);
+    background-color: var(--surface-3);
+  }
+
+  :root[data-theme='dark'] select {
+    color-scheme: dark;
+  }
+
+  :root[data-theme='light'] select {
+    color-scheme: light;
+  }
 }
 
 @layer components {
