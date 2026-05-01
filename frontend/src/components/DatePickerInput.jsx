@@ -41,7 +41,7 @@ export default function DatePickerInput({ value, onChange, placeholder = 'dd/mm/
           disabled={disabled}
           aria-label={label}
           placeholder={placeholder}
-          className="w-full cursor-pointer rounded-2xl border border-border bg-bg px-4 py-3 pr-11 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40 disabled:cursor-not-allowed disabled:opacity-60"
+          className="ui-input cursor-pointer pr-11 disabled:cursor-not-allowed disabled:opacity-60"
           value={display}
           onClick={() => setOpen((v) => !v)}
         />
@@ -49,7 +49,7 @@ export default function DatePickerInput({ value, onChange, placeholder = 'dd/mm/
           type="button"
           variant="ghost"
           disabled={disabled}
-          className="absolute right-2 top-1/2 -translate-y-1/2"
+          className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-xl hover:bg-white/5"
           aria-label="Obrir calendari"
           onClick={() => setOpen((v) => !v)}
         >
@@ -58,21 +58,67 @@ export default function DatePickerInput({ value, onChange, placeholder = 'dd/mm/
       </div>
 
       {open ? (
-        <div className="absolute z-50 mt-2 w-[320px] rounded-2xl border border-border bg-bg p-3 shadow-soft">
+        <div className="absolute z-50 mt-2 w-[340px] rounded-2xl border border-border bg-[color:var(--surface-2)] p-4 shadow-float">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-text-h">Selecciona fecha</p>
+              <p className="mt-0.5 text-xs text-muted">{selected ? format(selected, 'dd/MM/yyyy') : '—'}</p>
+            </div>
+            <Button type="button" variant="ghost" className="h-9 w-9 rounded-xl hover:bg-white/5" onClick={() => setOpen(false)} aria-label="Cerrar">
+              ✕
+            </Button>
+          </div>
+
           <DayPicker
             mode="single"
             locale={ca}
             weekStartsOn={1}
+            showOutsideDays
+            fixedWeeks
             selected={selected ?? undefined}
             onSelect={(d) => {
               onChange?.(dateToIso(d))
               setOpen(false)
             }}
+            classNames={{
+              months: 'mt-3',
+              month: 'space-y-3',
+              caption: 'flex items-center justify-between',
+              caption_label: 'text-sm font-semibold text-text-h',
+              nav: 'flex items-center gap-2',
+              nav_button:
+                'h-9 w-9 rounded-xl border border-border bg-transparent text-text-h transition-[background,border-color] duration-200 ease-out hover:bg-white/5 hover:border-[color:var(--border-strong)]',
+              table: 'w-full border-collapse',
+              head_row: 'grid grid-cols-7 gap-1',
+              head_cell: 'text-[11px] font-semibold uppercase tracking-wider text-muted text-center py-1',
+              row: 'mt-1 grid grid-cols-7 gap-1',
+              cell: 'grid place-items-center',
+              day: 'h-10 w-10 rounded-xl text-sm font-medium text-text-h transition-[background,transform,box-shadow] duration-200 ease-out hover:bg-white/5 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)]',
+              day_today: 'ring-1 ring-[color:var(--border-strong)]',
+              day_outside: 'text-muted opacity-60',
+              day_disabled: 'text-muted opacity-40 cursor-not-allowed',
+              day_selected:
+                'bg-[color:var(--accent)] text-[#061018] shadow-[0_0_0_1px_var(--accent-border),0_8px_24px_rgba(0,0,0,0.35)] hover:bg-[color:var(--accent)]',
+            }}
           />
-          <div className="mt-2 flex justify-end gap-2">
+          <div className="mt-3 flex items-center justify-between gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const today = new Date()
+                onChange?.(dateToIso(today))
+                setOpen(false)
+              }}
+            >
+              Hoy
+            </Button>
+            <div className="flex items-center gap-2">
             <Button
               type="button"
               variant="ghost"
+              size="sm"
               onClick={() => {
                 onChange?.('')
                 setOpen(false)
@@ -80,6 +126,7 @@ export default function DatePickerInput({ value, onChange, placeholder = 'dd/mm/
             >
               Esborrar
             </Button>
+            </div>
           </div>
         </div>
       ) : null}

@@ -4,6 +4,7 @@ import { listEntries, putEntry, deleteEntry as deleteEntryDb } from '../data/ent
 import { deleteHabit as deleteHabitDb, listHabits, putHabit } from '../data/habitsRepo.js'
 import { createCategory, deleteCategory, listCategories, updateCategory } from '../data/categoriesRepo.js'
 import { getSetting, setSetting } from '../data/settingsRepo.js'
+import { applyThemeToRoot, saveThemeSetting } from '../../../theme/theme.js'
 import { computeDurationMinutes, toIsoNow } from '../domain/time.js'
 import { habitCreateSchema, habitEntryCreateSchema, habitEntrySchema, habitEntryUpdateSchema, habitSchema, habitUpdateSchema } from '../domain/schemas.js'
 import { findOverlappingEntries } from '../domain/overlap.js'
@@ -79,7 +80,8 @@ export const useHabitAppStore = create((set, get) => ({
   },
 
   async setTheme(theme) {
-    await setSetting('theme', theme)
+    applyThemeToRoot(theme)
+    await saveThemeSetting(theme)
     set({ settings: { ...get().settings, theme } })
   },
 

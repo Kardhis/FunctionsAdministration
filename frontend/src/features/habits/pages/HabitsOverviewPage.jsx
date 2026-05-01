@@ -1,16 +1,31 @@
-import { useMemo } from 'react'
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, Bar, BarChart, XAxis, YAxis } from 'recharts'
+import { useEffect, useMemo, useState } from 'react'
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, Bar, BarChart, XAxis, YAxis, LabelList } from 'recharts'
 import Card from '../../../components/Card.jsx'
 import Badge from '../../../components/Badge.jsx'
+import DashboardCard from '../../../components/ui/DashboardCard.jsx'
 import { useHabitAppStore } from '../store/habitAppStore.js'
 import { filterEntries, minutesByHabit, pieDataFromMinutesByHabit, barSeriesByDay, summaryStats, computeHabitStreakDays } from '../domain/stats.js'
 import { resolvePeriodRange } from '../domain/periods.js'
 import { formatDurationHuman, todayLocalDateString } from '../domain/time.js'
 import { formatDateEs } from '../../../data/dateFormat.js'
+import { listObjectives } from '../../objectives/data/objectivesRepo.js'
+
+function clamp(n, min, max) {
+  return Math.max(min, Math.min(max, n))
+}
+
+function percentColor(pct) {
+  // 0% -> red (0deg), 100% -> green (120deg)
+  const hue = clamp(pct, 0, 100) * 1.2
+  return `hsl(${hue} 80% 45%)`
+}
 
 export default function HabitsOverviewPage() {
   const habits = useHabitAppStore((s) => s.habits)
   const entries = useHabitAppStore((s) => s.entries)
+
+  const [objectives, setObjectives] = useState([])
+  const [objectivesError, setObjectivesError] = useState('')
 
   const today = todayLocalDateString()
   const todayEntries = useMemo(() => entries.filter((e) => e.date === today), [entries, today])
@@ -41,6 +56,23 @@ export default function HabitsOverviewPage() {
     [pie.rows],
   )
 
+  const weekHabitBars = useMemo(() => {
+    const rows = [...weekByHabit.entries()]
+      .map(([habitId, minutes]) => {
+        const h = habits.find((x) => x.id === habitId)
+        return {
+          habitId,
+          name: h?.name ?? String(habitId),
+          minutes,
+          color: h?.color ?? 'var(--chart-1)',
+        }
+      })
+      .filter((r) => (r.minutes ?? 0) > 0)
+      .sort((a, b) => b.minutes - a.minutes)
+
+    return rows
+  }, [habits, weekByHabit])
+
   const last7 = useMemo(() => resolvePeriodRange({ preset: 'last_7' }), [])
   const last7Entries = useMemo(() => {
     return filterEntries(entries, habits, { activeOnly: true }).filter((e) => {
@@ -52,71 +84,269 @@ export default function HabitsOverviewPage() {
 
   const weekSummary = useMemo(() => summaryStats({ entries: weekEntries, range: weekRange }), [weekEntries, weekRange])
 
+  const chartTooltipStyle = useMemo(
+    () => ({
+      background: 'var(--surface-3)',
+      border: '1px solid var(--border)',
+      borderRadius: 16,
+      boxShadow: 'var(--shadow-float)',
+      color: 'var(--text-h)',
+    }),
+    [],
+  )
+
+  const chartTooltipLabelStyle = useMemo(() => ({ color: 'var(--text)' }), [])
+
+  useEffect(() => {
+    let mounted = true
+    setObjectivesError('')
+    listObjectives({ status: 'IN_PROGRESS' })
+      .then((rows) => {
+        if (!mounted) return
+        const arr = Array.isArray(rows) ? rows : []
+        const mapped = arr
+          .map((o) => {
+            const target = Number(o?.targetValue ?? 0) || 0
+            const progress = Number(o?.progressValue ?? 0) || 0
+            const pct = target > 0 ? clamp((progress / target) * 100, 0, 100) : 0
+            return {
+              id: String(o?.id ?? ''),
+              habitName: String(o?.habitName ?? 'Hábito'),
+              metricType: String(o?.metricType ?? ''),
+              targetValue: target,
+              progressValue: progress,
+              startDate: o?.startDate ?? null,
+              endDate: o?.endDate ?? null,
+              pct,
+            }
+          })
+          .filter((x) => x.id)
+          .sort((a, b) => b.pct - a.pct)
+          .slice(0, 6)
+        setObjectives(mapped)
+      })
+      .catch((e) => {
+        if (!mounted) return
+        setObjectivesError(e instanceof Error ? e.message : String(e))
+        setObjectives([])
+      })
+    return () => {
+      mounted = false
+    }
+  }, [entries.length])
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <Card className="p-5">
-          <p className="text-sm text-text">Tiempo hoy</p>
-          <p className="mt-2 text-3xl font-semibold text-text-h">{formatDurationHuman(todayMinutes)}</p>
-          <p className="mt-2 text-xs text-text">{todayEntries.length} registros</p>
-        </Card>
-        <Card className="p-5">
-          <p className="text-sm text-text">Semana (resumen)</p>
-          <p className="mt-2 text-3xl font-semibold text-text-h">{formatDurationHuman(weekSummary.totalMinutes)}</p>
-          <p className="mt-2 text-xs text-text">
-            Media diaria (rango): <span className="font-medium text-text-h">{Math.round(weekSummary.avgMinutesPerDayInRange)} min</span>
-          </p>
-        </Card>
-        <Card className="p-5">
-          <p className="text-sm text-text">Top hábito (semana)</p>
-          <p className="mt-2 text-xl font-semibold text-text-h">{top3[0]?.name ?? '—'}</p>
-          <p className="mt-2 text-xs text-text">{top3[0] ? `${formatDurationHuman(top3[0].minutes)}` : 'Sin datos'}</p>
-        </Card>
+        <DashboardCard
+          title="Tiempo hoy"
+          value={formatDurationHuman(todayMinutes)}
+          subtitle={`${todayEntries.length} registro(s)`}
+          icon="⏱"
+        />
+        <DashboardCard
+          title="Semana (resumen)"
+          value={formatDurationHuman(weekSummary.totalMinutes)}
+          subtitle={`Media diaria (rango): ${Math.round(weekSummary.avgMinutesPerDayInRange)} min`}
+          icon="▦"
+        />
+        <DashboardCard
+          title="Top hábito (semana)"
+          value={top3[0]?.name ?? '—'}
+          subtitle={top3[0] ? `${formatDurationHuman(top3[0].minutes)}` : 'Sin datos'}
+          icon="✦"
+        />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-        <Card className="p-5 xl:col-span-2">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold text-text-h">Últimos 7 días</p>
-              <p className="mt-1 text-sm text-text">Tiempo total por día (minutos).</p>
-            </div>
-            <Badge tone="accent">Bar</Badge>
-          </div>
-          <div className="mt-4 h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={bars}>
-                <XAxis dataKey="day" tick={{ fontSize: 12 }} tickFormatter={(v) => formatDateEs(v)} />
-                <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip />
-                <Bar dataKey="minutes" radius={[10, 10, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
-
+      <div className="space-y-4">
         <Card className="p-5">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold text-text-h">Distribución (semana)</p>
-              <p className="mt-1 text-sm text-text">Pie por tiempo total.</p>
+              <p className="text-sm font-semibold text-text-h">Objetivos en progreso</p>
+              <p className="mt-1 text-sm text-text">Progreso calculado sobre el objetivo activo.</p>
             </div>
-            <Badge tone="neutral">Pie</Badge>
+            <Badge tone="neutral">{objectives.length}</Badge>
           </div>
-          <div className="mt-4 h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie data={pieChartData} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={2}>
-                  {pieChartData.map((entry) => (
-                    <Cell key={entry.name} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => [`${value} min`, 'Tiempo']} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-          <p className="mt-2 text-xs text-text">Total semana: {formatDurationHuman(pie.total)}</p>
+
+          {objectivesError ? (
+            <div className="mt-4 rounded-2xl border border-border bg-[color:var(--surface-2)] p-4 text-sm text-[color:var(--danger)]">
+              Error cargando objetivos: <code>{objectivesError}</code>
+            </div>
+          ) : null}
+
+          {objectives.length ? (
+            <div className="mt-4 space-y-3">
+              {objectives.map((o) => {
+                const color = percentColor(o.pct)
+                const label = `${Math.round(o.pct)}%`
+                const valueLabel =
+                  o.metricType === 'MINUTES'
+                    ? `${formatDurationHuman(o.progressValue)} / ${formatDurationHuman(o.targetValue)}`
+                    : `${o.progressValue} / ${o.targetValue}`
+
+                return (
+                  <div
+                    key={o.id}
+                    className="rounded-2xl border border-border bg-[color:var(--surface-2)] p-3"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                          <p className="truncate text-sm font-semibold text-text-h">{o.habitName}</p>
+                          <span className="text-xs text-muted">
+                            {o.startDate ? formatDateEs(o.startDate) : '—'} → {o.endDate ? formatDateEs(o.endDate) : '—'}
+                          </span>
+                        </div>
+                        <p className="mt-0.5 text-xs text-muted">{valueLabel}</p>
+                      </div>
+                      <div className="shrink-0">
+                        <span
+                          className="ui-chip"
+                          style={{
+                            boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${color} 40%, var(--border))`,
+                            color,
+                          }}
+                        >
+                          {label}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-white/5">
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${o.pct}%`,
+                          background: `linear-gradient(90deg, ${color}, color-mix(in srgb, ${color} 70%, white))`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="mt-4 rounded-2xl border border-border bg-[color:var(--surface-2)] p-4">
+              <p className="text-sm font-medium text-text-h">Sin objetivos en progreso</p>
+              <p className="mt-1 text-sm text-text">Crea un objetivo para ver aquí tu avance en %.</p>
+            </div>
+          )}
         </Card>
+
+        <Card className="p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-text-h">Tiempo por hábito (semana)</p>
+                <p className="mt-1 text-sm text-text">Lunes → Domingo, ordenado de mayor a menor.</p>
+              </div>
+              <Badge tone="accent">Semana</Badge>
+            </div>
+
+            {weekHabitBars.length ? (
+              <div className="mt-4 h-[320px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={weekHabitBars} layout="vertical" margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+                    <XAxis
+                      type="number"
+                      tick={{ fontSize: 12, fill: 'var(--text)' }}
+                      axisLine={{ stroke: 'var(--divider)' }}
+                      tickLine={{ stroke: 'var(--divider)' }}
+                    />
+                    <YAxis
+                      type="category"
+                      dataKey="name"
+                      interval={0}
+                      width={140}
+                      tickMargin={10}
+                      tick={{ fontSize: 12, fill: 'var(--text)' }}
+                      axisLine={{ stroke: 'var(--divider)' }}
+                      tickLine={{ stroke: 'var(--divider)' }}
+                    />
+                    <Tooltip
+                      contentStyle={chartTooltipStyle}
+                      labelStyle={chartTooltipLabelStyle}
+                      formatter={(value) => [`${value} min`, 'Tiempo']}
+                    />
+                    <Bar dataKey="minutes" radius={[10, 10, 10, 10]}>
+                      {weekHabitBars.map((row) => (
+                        <Cell key={row.habitId} fill={row.color} />
+                      ))}
+                      <LabelList
+                        dataKey="minutes"
+                        position="right"
+                        formatter={(v) => formatDurationHuman(Number(v) || 0)}
+                        style={{ fill: 'var(--text-h)', fontSize: 12, fontWeight: 600 }}
+                      />
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="mt-4 rounded-2xl border border-border bg-[color:var(--surface-2)] p-4">
+                <p className="text-sm font-medium text-text-h">Sin datos esta semana</p>
+                <p className="mt-1 text-sm text-text">Cuando registres sesiones, verás aquí el tiempo invertido por hábito.</p>
+              </div>
+            )}
+        </Card>
+
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+          <Card className="p-5 xl:col-span-2">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-text-h">Últimos 7 días</p>
+                <p className="mt-1 text-sm text-text">Tiempo total por día (minutos).</p>
+              </div>
+              <Badge tone="accent">Bar</Badge>
+            </div>
+            <div className="mt-4 h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={bars}>
+                  <XAxis
+                    dataKey="day"
+                    tick={{ fontSize: 12, fill: 'var(--text)' }}
+                    axisLine={{ stroke: 'var(--divider)' }}
+                    tickLine={{ stroke: 'var(--divider)' }}
+                    tickFormatter={(v) => formatDateEs(v)}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 12, fill: 'var(--text)' }}
+                    axisLine={{ stroke: 'var(--divider)' }}
+                    tickLine={{ stroke: 'var(--divider)' }}
+                  />
+                  <Tooltip contentStyle={chartTooltipStyle} labelStyle={chartTooltipLabelStyle} />
+                  <Bar dataKey="minutes" radius={[10, 10, 0, 0]} fill="var(--chart-1)" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+
+          <Card className="p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-text-h">Distribución (semana)</p>
+                <p className="mt-1 text-sm text-text">Pie por tiempo total.</p>
+              </div>
+              <Badge tone="neutral">Pie</Badge>
+            </div>
+            <div className="mt-4 h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={pieChartData} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={2}>
+                    {pieChartData.map((entry) => (
+                      <Cell key={entry.name} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={chartTooltipStyle}
+                    labelStyle={chartTooltipLabelStyle}
+                    formatter={(value) => [`${value} min`, 'Tiempo']}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <p className="mt-2 text-xs text-text">Total semana: {formatDurationHuman(pie.total)}</p>
+          </Card>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -125,7 +355,10 @@ export default function HabitsOverviewPage() {
           <div className="mt-4 space-y-3">
             {top3.length ? (
               top3.map((t, idx) => (
-                <div key={t.habitId} className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-bg/60 p-3">
+                <div
+                  key={t.habitId}
+                  className="ui-hover flex items-center justify-between gap-3 rounded-2xl border border-border bg-[color:var(--surface-2)] p-3 hover:border-[color:var(--border-strong)]"
+                >
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-text-h">
                       {idx + 1}. {t.name}
@@ -136,7 +369,10 @@ export default function HabitsOverviewPage() {
                 </div>
               ))
             ) : (
-              <p className="text-sm text-text">Sin datos todavía.</p>
+              <div className="rounded-2xl border border-border bg-[color:var(--surface-2)] p-4">
+                <p className="text-sm font-medium text-text-h">Sin datos todavía</p>
+                <p className="mt-1 text-sm text-text">Registra una sesión para empezar a ver tus hábitos destacados.</p>
+              </div>
             )}
           </div>
         </Card>

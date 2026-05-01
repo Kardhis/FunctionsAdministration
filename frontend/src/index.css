@@ -1,25 +1,53 @@
 @import "tailwindcss";
 
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  /* Base tokens (dark-first). If data-theme is unset, prefers-color-scheme will pick. */
+  --bg: #0b0f14;
+  --bg-elevated: #0d131d;
+  --surface: #0f1623;
+  --surface-2: #121c2b;
+  --surface-3: #162235;
+  --code-bg: #0e1623;
+
+  --border: rgba(231, 238, 249, 0.08);
+  --border-strong: rgba(231, 238, 249, 0.12);
+  --divider: rgba(231, 238, 249, 0.06);
+
+  --text-h: #e7eef9;
+  --text: rgba(231, 238, 249, 0.72);
+  --muted: rgba(231, 238, 249, 0.52);
+
+  --accent: #22d3ee;
+  --accent-2: #60a5fa;
+  --ring: rgba(34, 211, 238, 0.45);
+  --accent-bg: rgba(34, 211, 238, 0.12);
+  --accent-border: rgba(34, 211, 238, 0.28);
+
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #fb7185;
+
+  /* Shadow tokens */
+  --shadow-soft: 0 1px 0 rgba(255, 255, 255, 0.04), 0 10px 30px rgba(0, 0, 0, 0.35);
+  --shadow-card: 0 0 0 1px rgba(231, 238, 249, 0.06), 0 12px 30px rgba(0, 0, 0, 0.35);
+  --shadow-float: 0 0 0 1px rgba(231, 238, 249, 0.08), 0 18px 50px rgba(0, 0, 0, 0.45);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  /* Data-viz palette (fallback, habits can override with their own colors) */
+  --chart-1: #22d3ee;
+  --chart-2: #60a5fa;
+  --chart-3: #a78bfa;
+  --chart-4: #34d399;
+  --chart-5: #fbbf24;
+  --chart-6: #fb7185;
 
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
-  font: 18px/145% var(--sans);
+  font: 16px/150% var(--sans);
   letter-spacing: 0.18px;
-  color-scheme: light dark;
+  color-scheme: dark;
   color: var(--text);
   background: var(--bg);
   font-synthesis: none;
@@ -28,23 +56,13 @@
   -moz-osx-font-smoothing: grayscale;
 
   @media (max-width: 1024px) {
-    font-size: 16px;
+    font-size: 15px;
   }
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+    color-scheme: dark;
   }
 
   :root:not([data-theme]) #social .button-icon {
@@ -54,32 +72,35 @@
 
 :root[data-theme='light'] {
   color-scheme: light;
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --bg: #ffffff;
+  --bg-elevated: #ffffff;
+  --surface: #f6f8fb;
+  --surface-2: #eef2f7;
+  --surface-3: #e7edf6;
+  --code-bg: #eef2f7;
+
+  --border: rgba(15, 23, 42, 0.12);
+  --border-strong: rgba(15, 23, 42, 0.18);
+  --divider: rgba(15, 23, 42, 0.08);
+
+  --text-h: #0f172a;
+  --text: rgba(15, 23, 42, 0.74);
+  --muted: rgba(15, 23, 42, 0.52);
+
+  --accent: #0891b2;
+  --accent-2: #2563eb;
+  --ring: rgba(8, 145, 178, 0.35);
+  --accent-bg: rgba(8, 145, 178, 0.1);
+  --accent-border: rgba(8, 145, 178, 0.25);
+
+  --shadow-soft: 0 1px 0 rgba(15, 23, 42, 0.06), 0 18px 40px rgba(15, 23, 42, 0.08);
+  --shadow-card: 0 0 0 1px rgba(15, 23, 42, 0.08), 0 18px 40px rgba(15, 23, 42, 0.1);
+  --shadow-float: 0 0 0 1px rgba(15, 23, 42, 0.1), 0 24px 60px rgba(15, 23, 42, 0.14);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --text: #9ca3af;
-  --text-h: #f3f4f6;
-  --bg: #16171d;
-  --border: #2e303a;
-  --code-bg: #1f2028;
-  --accent: #c084fc;
-  --accent-bg: rgba(192, 132, 252, 0.15);
-  --accent-border: rgba(192, 132, 252, 0.5);
-  --social-bg: rgba(47, 48, 58, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
 }
 
 body {
@@ -140,4 +161,88 @@ code {
   line-height: 135%;
   padding: 4px 8px;
   background: var(--code-bg);
+}
+
+@layer base {
+  ::selection {
+    background: var(--accent-bg);
+  }
+
+  a {
+    color: inherit;
+  }
+
+  :focus-visible {
+    outline: none;
+  }
+}
+
+@layer components {
+  .ui-card {
+    border-radius: 18px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--border);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+  }
+
+  .ui-panel {
+    border-radius: 18px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--border);
+    background: var(--surface-2);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .ui-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 9999px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: inset 0 0 0 1px var(--border);
+    color: var(--text-h);
+  }
+
+  .ui-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .ui-input {
+    width: 100%;
+    border-radius: 18px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--border);
+    background: var(--surface-2);
+    padding: 12px 16px;
+    font-size: 14px;
+    color: var(--text-h);
+    box-shadow: var(--shadow-soft);
+    transition: background 200ms ease-out, border-color 200ms ease-out, box-shadow 200ms ease-out, transform 200ms ease-out, color 200ms ease-out, opacity 200ms ease-out;
+  }
+
+  .ui-input::placeholder {
+    color: var(--muted);
+  }
+
+  .ui-input:focus-visible {
+    outline: none;
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+    box-shadow: var(--shadow-soft), 0 0 0 2px var(--ring);
+  }
+
+  .ui-textarea {
+    resize: none;
+  }
 }

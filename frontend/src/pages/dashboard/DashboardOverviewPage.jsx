@@ -2,6 +2,7 @@ import Card from '../../components/Card.jsx'
 import Button from '../../components/Button.jsx'
 import Badge from '../../components/Badge.jsx'
 import { SectionHeader } from '../../components/Section.jsx'
+import DashboardCard from '../../components/ui/DashboardCard.jsx'
 import {
   dashboardMetrics,
   dashboardModules,
@@ -27,18 +28,13 @@ export default function DashboardOverviewPage() {
     <div className="space-y-6">
       <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         {dashboardMetrics.map((m) => (
-          <Card key={m.key} className="p-5">
-            <p className="text-sm text-text">{m.label}</p>
-            <div className="mt-2 flex items-end justify-between gap-3">
-              <p className="text-2xl font-semibold text-text-h">{m.value}</p>
-              {m.delta ? (
-                <Badge tone="neutral">
-                  {m.delta.value >= 0 ? '+' : ''}
-                  {m.delta.value}% {m.delta.period === 'week' ? 'sem' : 'mes'}
-                </Badge>
-              ) : null}
-            </div>
-          </Card>
+          <DashboardCard
+            key={m.key}
+            title={m.label}
+            value={m.value}
+            delta={m.delta ? `${m.delta.value >= 0 ? '+' : ''}${m.delta.value}% ${m.delta.period === 'week' ? 'sem' : 'mes'}` : null}
+            tone="neutral"
+          />
         ))}
       </section>
 
@@ -58,7 +54,7 @@ export default function DashboardOverviewPage() {
             <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
               {dashboardModules.map((mod) => (
                 <Link key={mod.key} to={mod.primaryCta.to} className="group">
-                  <div className="h-full rounded-2xl border border-border bg-bg/60 p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-soft">
+                  <div className="ui-hover h-full rounded-2xl border border-border bg-[color:var(--surface-2)] p-5 shadow-soft hover:-translate-y-0.5 hover:border-[color:var(--border-strong)] hover:shadow-card">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="truncate text-base font-semibold text-text-h">{mod.title}</p>
@@ -101,7 +97,7 @@ export default function DashboardOverviewPage() {
             <div className="mt-4 space-y-3">
               {dashboardRecentActivity.map((evt) => (
                 <div key={evt.id} className="flex gap-3">
-                  <div className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-black/5 text-text-h ring-1 ring-border dark:bg-white/5">
+                  <div className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white/5 text-text-h ring-1 ring-border">
                     {evt.type === 'login' ? '⎆' : null}
                     {evt.type === 'habit_completed' ? '✓' : null}
                     {evt.type === 'habit_created' ? '+' : null}
@@ -118,7 +114,7 @@ export default function DashboardOverviewPage() {
 
           <Card className="p-5">
             <SectionHeader title="Siguiente paso" subtitle="Pequeña guía para hoy." />
-            <div className="mt-4 rounded-2xl border border-border bg-bg/60 p-4">
+            <div className="mt-4 rounded-2xl border border-border bg-[color:var(--surface-2)] p-4">
               <p className="text-sm text-text">
                 Si quieres maximizar consistencia, empieza con un hábito pequeño y registrable en menos de 2 minutos.
               </p>

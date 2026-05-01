@@ -4,6 +4,7 @@ import { useHabitAppStore } from '../store/habitAppStore.js'
 import Button from '../../../components/Button.jsx'
 import HabitCreateModal from './HabitCreateModal.jsx'
 import HabitCreatedMessageModal from './HabitCreatedMessageModal.jsx'
+import { applyThemeToRoot, loadThemeSetting } from '../../../theme/theme.js'
 
 function TabLink({ to, children }) {
   return (
@@ -28,7 +29,6 @@ export default function HabitsAppLayout() {
   const error = useHabitAppStore((s) => s.error)
   const toasts = useHabitAppStore((s) => s.toasts)
   const dismissToast = useHabitAppStore((s) => s.dismissToast)
-  const theme = useHabitAppStore((s) => s.settings.theme)
   const createHabit = useHabitAppStore((s) => s.createHabit)
   const refreshHabits = useHabitAppStore((s) => s.refreshHabits)
   const categories = useHabitAppStore((s) => s.categories)
@@ -40,6 +40,22 @@ export default function HabitsAppLayout() {
   useEffect(() => {
     bootstrap()
   }, [bootstrap])
+
+  useEffect(() => {
+    let mounted = true
+    loadThemeSetting()
+      .then((t) => {
+        if (!mounted) return
+        applyThemeToRoot(t)
+      })
+      .catch(() => {
+        if (!mounted) return
+        applyThemeToRoot('system')
+      })
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   useEffect(() => {
     const timers = toastTimersRef.current
@@ -65,14 +81,6 @@ export default function HabitsAppLayout() {
       }
     }
   }, [toasts])
-
-  useEffect(() => {
-    const root = document.documentElement
-    const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ?? false
-    const effective = theme === 'system' ? (prefersDark ? 'dark' : 'light') : theme
-    root.dataset.theme = effective
-    root.style.colorScheme = effective
-  }, [theme])
 
   const title = useMemo(() => {
     const seg = location.pathname.split('/').filter(Boolean)

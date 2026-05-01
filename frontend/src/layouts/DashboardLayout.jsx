@@ -1,10 +1,11 @@
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../auth/AuthContext.jsx'
 import Avatar from '../components/Avatar.jsx'
 import Button from '../components/Button.jsx'
 import Badge from '../components/Badge.jsx'
 import { dashboardNav } from '../data/dashboardMock.js'
+import { applyThemeToRoot, loadThemeSetting } from '../theme/theme.js'
 
 function pageTitleFromPath(pathname) {
   const base = pathname.replace(/\/+$/, '')
@@ -60,6 +61,22 @@ export default function DashboardLayout() {
   const displayName = useMemo(() => displayNameFromUser(user), [user])
   const email = useMemo(() => emailFromUser(user), [user])
 
+  useEffect(() => {
+    let mounted = true
+    loadThemeSetting()
+      .then((t) => {
+        if (!mounted) return
+        applyThemeToRoot(t)
+      })
+      .catch(() => {
+        if (!mounted) return
+        applyThemeToRoot('system')
+      })
+    return () => {
+      mounted = false
+    }
+  }, [])
+
   return (
     <div className="min-h-[100svh] bg-bg text-text">
       <div
@@ -67,7 +84,7 @@ export default function DashboardLayout() {
         className="pointer-events-none fixed inset-0 opacity-70"
         style={{
           background:
-            'radial-gradient(800px 500px at 15% 10%, rgba(170,59,255,0.12), transparent 60%), radial-gradient(900px 600px at 90% 20%, rgba(170,59,255,0.08), transparent 55%)',
+            'radial-gradient(800px 500px at 15% 10%, rgba(34,211,238,0.12), transparent 60%), radial-gradient(900px 600px at 90% 20%, rgba(96,165,250,0.10), transparent 55%)',
         }}
       />
 

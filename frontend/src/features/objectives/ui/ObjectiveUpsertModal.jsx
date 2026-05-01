@@ -113,7 +113,7 @@ export default function ObjectiveUpsertModal({ mode, open, habits, initial, onCl
               <span className="text-sm font-medium text-text-h">Fecha de finalización</span>
               <DatePickerInput value={watchEndDate} onChange={(v) => form.setValue('endDate', v, { shouldDirty: true, shouldValidate: true })} label="Fecha de finalización" />
               {form.formState.errors.endDate ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.endDate.message}</p> : null}
-              {watchEndDate ? <p className="mt-1 text-xs text-text">Vista previa: {formatDateEs(watchEndDate)}</p> : null}
+              {watchEndDate ? <p className="mt-1 text-xs text-text">Vista prèvia: {formatDateEs(watchEndDate)}</p> : null}
             </label>
 
             <div className="rounded-2xl border border-border bg-bg/60 p-4">
