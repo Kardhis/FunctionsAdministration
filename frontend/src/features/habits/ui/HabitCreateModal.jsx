@@ -10,27 +10,18 @@ const defaultValues = {
   description: '',
   color: '#7c3aed',
   icon: '',
-  category: 'estudio',
+  categoryIds: [],
   active: true,
-  targetType: 'minutes_per_day',
-  targetValue: 30,
-  targetPeriod: 'day',
 }
 
-export default function HabitCreateModal({ open, onClose, onCreated }) {
+export default function HabitCreateModal({ open, categories = [], onClose, onCreated }) {
   const form = useForm({
     resolver: habitCreateResolver,
     defaultValues,
     mode: 'onChange',
   })
 
-  const targetType = form.watch('targetType')
-  useEffect(() => {
-    if (!open) return
-    if (targetType === 'minutes_per_day') form.setValue('targetPeriod', 'day', { shouldValidate: true })
-    if (targetType === 'sessions_per_week') form.setValue('targetPeriod', 'week', { shouldValidate: true })
-    if (targetType === 'hours_per_month') form.setValue('targetPeriod', 'month', { shouldValidate: true })
-  }, [form, open, targetType])
+  const color = form.watch('color')
 
   useEffect(() => {
     if (!open) return
@@ -96,7 +87,12 @@ export default function HabitCreateModal({ open, onClose, onCreated }) {
               <label className="block">
                 <span className="text-sm font-medium text-text-h">Color</span>
                 <div className="mt-2 flex items-center gap-3">
-                  <input type="color" className="h-12 w-14 rounded-xl border border-border bg-bg" {...form.register('color')} />
+                  <input
+                    type="color"
+                    className="h-12 w-14 rounded-xl border border-border bg-bg"
+                    value={typeof color === 'string' ? color : '#7c3aed'}
+                    onChange={(e) => form.setValue('color', e.target.value, { shouldValidate: true, shouldDirty: true })}
+                  />
                   <input
                     className="w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40"
                     {...form.register('color')}
@@ -119,18 +115,33 @@ export default function HabitCreateModal({ open, onClose, onCreated }) {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <label className="block">
-                <span className="text-sm font-medium text-text-h">Categoría</span>
-                <select
-                  className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40"
-                  {...form.register('category')}
-                >
-                  <option value="salud">Salud</option>
-                  <option value="estudio">Estudio</option>
-                  <option value="trabajo">Trabajo</option>
-                  <option value="ejercicio">Ejercicio</option>
-                  <option value="ocio">Ocio</option>
-                  <option value="otro">Otro</option>
-                </select>
+                <span className="text-sm font-medium text-text-h">Categorías (opcional)</span>
+                <div className="mt-2 space-y-2 rounded-2xl border border-border bg-bg/60 p-3">
+                  {categories.filter((c) => c.active).length ? (
+                    categories
+                      .filter((c) => c.active)
+                      .map((c) => {
+                        const selected = (form.watch('categoryIds') ?? []).includes(c.id)
+                        return (
+                          <label key={c.id} className="flex items-center justify-between gap-3 text-sm text-text-h">
+                            <span className="truncate">{c.name}</span>
+                            <input
+                              type="checkbox"
+                              className="h-4 w-4"
+                              checked={selected}
+                              onChange={(e) => {
+                                const prev = form.getValues('categoryIds') ?? []
+                                const next = e.target.checked ? [...prev, c.id] : prev.filter((x) => x !== c.id)
+                                form.setValue('categoryIds', next, { shouldValidate: true })
+                              }}
+                            />
+                          </label>
+                        )
+                      })
+                  ) : (
+                    <p className="text-sm text-text">No hay categorías activas todavía.</p>
+                  )}
+                </div>
               </label>
 
               <label className="flex items-center gap-3 pt-7">
@@ -142,48 +153,6 @@ export default function HabitCreateModal({ open, onClose, onCreated }) {
                 />
                 <span className="text-sm font-medium text-text-h">Activo</span>
               </label>
-            </div>
-
-            <div className="rounded-2xl border border-border bg-bg/60 p-4">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-semibold text-text-h">Objetivo</p>
-                <Badge tone="neutral">MVP</Badge>
-              </div>
-              <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <label className="block sm:col-span-1">
-                  <span className="text-xs font-medium uppercase tracking-wide text-text">Tipo</span>
-                  <select
-                    className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40"
-                    {...form.register('targetType')}
-                  >
-                    <option value="minutes_per_day">Minutos / día</option>
-                    <option value="sessions_per_week">Sesiones / semana</option>
-                    <option value="hours_per_month">Horas / mes</option>
-                  </select>
-                </label>
-                <label className="block sm:col-span-1">
-                  <span className="text-xs font-medium uppercase tracking-wide text-text">Valor</span>
-                  <input
-                    type="number"
-                    className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40"
-                    {...form.register('targetValue', { valueAsNumber: true })}
-                  />
-                  {form.formState.errors.targetValue ? (
-                    <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.targetValue.message}</p>
-                  ) : null}
-                </label>
-                <label className="block sm:col-span-1">
-                  <span className="text-xs font-medium uppercase tracking-wide text-text">Periodo</span>
-                  <select
-                    className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40"
-                    {...form.register('targetPeriod')}
-                  >
-                    <option value="day">Día</option>
-                    <option value="week">Semana</option>
-                    <option value="month">Mes</option>
-                  </select>
-                </label>
-              </div>
             </div>
 
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">

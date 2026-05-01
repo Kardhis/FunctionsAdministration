@@ -1,11 +1,5 @@
 import { z } from 'zod'
 
-export const habitCategorySchema = z.enum(['salud', 'estudio', 'trabajo', 'ejercicio', 'ocio', 'otro'])
-
-export const habitTargetPeriodSchema = z.enum(['day', 'week', 'month'])
-
-export const habitTargetTypeSchema = z.enum(['minutes_per_day', 'sessions_per_week', 'hours_per_month'])
-
 export const habitSchema = z
   .object({
     id: z.string().min(1),
@@ -15,11 +9,8 @@ export const habitSchema = z
       .string()
       .regex(/^#([0-9a-fA-F]{6})$/, 'Color inválido (usa formato #RRGGBB)'),
     icon: z.string().trim().max(32).nullable().optional(),
-    category: habitCategorySchema.nullable().optional(),
+    categoryIds: z.array(z.string().min(1)).default([]),
     active: z.boolean(),
-    targetType: habitTargetTypeSchema,
-    targetValue: z.number().positive('El objetivo debe ser > 0'),
-    targetPeriod: habitTargetPeriodSchema,
     createdAt: z.string().min(1),
     updatedAt: z.string().min(1),
   })
@@ -37,11 +28,8 @@ export const habitUpdateSchema = z
       .regex(/^#([0-9a-fA-F]{6})$/, 'Color inválido (usa formato #RRGGBB)')
       .optional(),
     icon: z.string().trim().max(32).nullable().optional(),
-    category: habitCategorySchema.nullable().optional(),
+    categoryIds: z.array(z.string().min(1)).optional(),
     active: z.boolean().optional(),
-    targetType: habitTargetTypeSchema.optional(),
-    targetValue: z.number().positive('El objetivo debe ser > 0').optional(),
-    targetPeriod: habitTargetPeriodSchema.optional(),
   })
   .strict()
 
@@ -73,25 +61,6 @@ export const habitEntrySchema = habitEntryBaseSchema.superRefine((val, ctx) => {
   }
 })
 
-// #region agent log
-fetch('http://127.0.0.1:7682/ingest/642c7c98-6081-45de-bcbd-80eda9ca897a', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'X-Debug-Session-Id': '1da3e3',
-  },
-  body: JSON.stringify({
-    sessionId: '1da3e3',
-    runId: 'pre-fix',
-    hypothesisId: 'H1',
-    location: 'features/habits/domain/schemas.js:habitEntryCreateSchema',
-    message: 'About to define habitEntryCreateSchema via omit on habitEntrySchema',
-    data: {},
-    timestamp: Date.now(),
-  }),
-}).catch(() => {})
-// #endregion agent log
-
 let habitEntryCreateSchemaTmp
 try {
   habitEntryCreateSchemaTmp = habitEntryBaseSchema
@@ -109,44 +78,7 @@ try {
         })
       }
     })
-
-  // #region agent log
-  fetch('http://127.0.0.1:7682/ingest/642c7c98-6081-45de-bcbd-80eda9ca897a', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Debug-Session-Id': '1da3e3',
-    },
-    body: JSON.stringify({
-      sessionId: '1da3e3',
-      runId: 'post-fix',
-      hypothesisId: 'H4',
-      location: 'features/habits/domain/schemas.js:habitEntryCreateSchema',
-      message: 'habitEntryCreateSchema defined successfully via baseSchema.omit().superRefine()',
-      data: {},
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {})
-  // #endregion agent log
 } catch (e) {
-  // #region agent log
-  fetch('http://127.0.0.1:7682/ingest/642c7c98-6081-45de-bcbd-80eda9ca897a', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Debug-Session-Id': '1da3e3',
-    },
-    body: JSON.stringify({
-      sessionId: '1da3e3',
-      runId: 'post-fix',
-      hypothesisId: 'H4',
-      location: 'features/habits/domain/schemas.js:habitEntryCreateSchema',
-      message: 'FAILED to define habitEntryCreateSchema',
-      data: { error: e instanceof Error ? e.message : String(e) },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {})
-  // #endregion agent log
   throw e
 }
 

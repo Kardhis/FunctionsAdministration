@@ -1,10 +1,12 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import Card from '../../../components/Card.jsx'
 import Button from '../../../components/Button.jsx'
 import Badge from '../../../components/Badge.jsx'
 import { habitEntryCreateResolver } from '../store/habitAppStore.js'
 import { computeDurationMinutes, formatDurationHuman, todayLocalDateString } from '../domain/time.js'
+import { formatDateEs } from '../../../data/dateFormat.js'
+import DatePickerInput from '../../../components/DatePickerInput.jsx'
 
 const defaultValues = {
   habitId: '',
@@ -99,8 +101,9 @@ export default function HabitEntryCreateModal({ open, habits, onClose, onCreated
 
             <label className="block">
               <span className="text-sm font-medium text-text-h">Fecha</span>
-              <input type="date" className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" {...form.register('date')} />
+              <DatePickerInput value={watchDate} onChange={(v) => form.setValue('date', v, { shouldDirty: true, shouldValidate: true })} label="Fecha" />
               {form.formState.errors.date ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.date.message}</p> : null}
+              {watchDate ? <p className="mt-1 text-xs text-text">Vista previa: {formatDateEs(watchDate)}</p> : null}
             </label>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

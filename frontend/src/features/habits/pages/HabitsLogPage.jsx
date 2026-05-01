@@ -7,21 +7,26 @@ import { formatDurationHuman, todayLocalDateString } from '../domain/time.js'
 import { periodPresets, resolvePeriodRange } from '../domain/periods.js'
 import LiveTimer from '../ui/LiveTimer.jsx'
 import HabitEntryCreateModal from '../ui/HabitEntryCreateModal.jsx'
+import HabitEntryEditModal from '../ui/HabitEntryEditModal.jsx'
+import { formatDateEs } from '../../../data/dateFormat.js'
 
 export default function HabitsLogPage() {
   const habits = useHabitAppStore((s) => s.habits)
   const entries = useHabitAppStore((s) => s.entries)
   const createEntry = useHabitAppStore((s) => s.createEntry)
+  const updateEntry = useHabitAppStore((s) => s.updateEntry)
   const deleteEntry = useHabitAppStore((s) => s.deleteEntry)
 
   const [preset, setPreset] = useState('last_7')
   const [customFrom, setCustomFrom] = useState(todayLocalDateString())
   const [customTo, setCustomTo] = useState(todayLocalDateString())
   const [habitId, setHabitId] = useState('')
-  const [category, setCategory] = useState('')
+  const categories = useHabitAppStore((s) => s.categories)
+  const [categoryId, setCategoryId] = useState('')
   const [activeOnly, setActiveOnly] = useState('all') // all|true|false
 
   const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [editingEntry, setEditingEntry] = useState(null)
 
   const range = useMemo(() => resolvePeriodRange({ preset, customFrom, customTo }), [preset, customFrom, customTo])
 
@@ -34,14 +39,14 @@ export default function HabitsLogPage() {
         if (habitId && e.habitId !== habitId) return false
         const h = habitsById.get(e.habitId)
         if (!h) return false
-        if (category && h.category !== category) return false
+        if (categoryId && !(Array.isArray(h.categoryIds) && h.categoryIds.includes(categoryId))) return false
         if (activeOnly === 'true' && h.active !== true) return false
         if (activeOnly === 'false' && h.active !== false) return false
         return true
       })
       .slice()
       .sort((a, b) => `${b.date} ${b.endTime}`.localeCompare(`${a.date} ${a.endTime}`))
-  }, [activeOnly, category, entries, habitId, habits, range.end, range.start])
+  }, [activeOnly, categoryId, entries, habitId, habits, range.end, range.start])
 
   return (
     <div className="space-y-4">
@@ -52,6 +57,18 @@ export default function HabitsLogPage() {
         onCreated={async (values) => {
           await createEntry(values)
           return { ok: true }
+        }}
+      />
+      <HabitEntryEditModal
+        open={Boolean(editingEntry)}
+        habits={habits}
+        entry={editingEntry}
+        onClose={() => setEditingEntry(null)}
+        onSaved={async (values) => {
+          if (!editingEntry?.id) return { ok: false }
+          const res = await updateEntry({ id: editingEntry.id, ...values })
+          if (res?.ok) setEditingEntry(null)
+          return res
         }}
       />
       <LiveTimer
@@ -110,14 +127,13 @@ export default function HabitsLogPage() {
 
           <label className="lg:col-span-3">
             <span className="text-xs font-medium uppercase tracking-wide text-text">Categoría</span>
-            <select className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" value={category} onChange={(e) => setCategory(e.target.value)}>
+            <select className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
               <option value="">Todas</option>
-              <option value="salud">Salud</option>
-              <option value="estudio">Estudio</option>
-              <option value="trabajo">Trabajo</option>
-              <option value="ejercicio">Ejercicio</option>
-              <option value="ocio">Ocio</option>
-              <option value="otro">Otro</option>
+              {(Array.isArray(categories) ? categories : []).map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
             </select>
           </label>
 
@@ -161,7 +177,7 @@ export default function HabitsLogPage() {
                 const h = habits.find((x) => x.id === e.habitId)
                 return (
                   <tr key={e.id} className="rounded-2xl bg-bg/60 ring-1 ring-border">
-                    <td className="px-2 py-3 text-sm text-text">{e.date}</td>
+                    <td className="px-2 py-3 text-sm text-text">{formatDateEs(e.date)}</td>
                     <td className="px-2 py-3 text-sm font-medium text-text-h">{h?.name ?? '—'}</td>
                     <td className="px-2 py-3 text-sm text-text">
                       {e.startTime}–{e.endTime}
@@ -170,6 +186,9 @@ export default function HabitsLogPage() {
                     <td className="px-2 py-3 text-sm text-text">{e.notes ? <span className="line-clamp-2">{e.notes}</span> : '—'}</td>
                     <td className="px-2 py-3">
                       <div className="flex justify-end gap-2">
+                        <Button type="button" variant="secondary" size="sm" onClick={() => setEditingEntry(e)}>
+                          Editar
+                        </Button>
                         <Button
                           type="button"
                           variant="ghost"

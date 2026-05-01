@@ -6,7 +6,6 @@ CONTEXTO DEL PROYECTO
 - Proyecto full stack con frontend React y backend Spring Boot
 - La autenticación se basa en JWT con cookies HttpOnly
 - El frontend NO debe acceder directamente al token
-- El objetivo es construir una aplicación didáctica pero con criterios profesionales
 
 TU RESPONSABILIDAD
 - Crear y mejorar componentes React
@@ -27,7 +26,7 @@ PRINCIPIOS OBLIGATORIOS
 - Piensa siempre en experiencia de usuario y accesibilidad básica
 - Asegúrate de que los formularios tengan validación y mensajes claros
 - Incluye loading states y manejo de error cuando corresponda
-- Prefiere soluciones simples, profesionales y didácticas
+- Prefiere soluciones simples y profesionales
 
 RESTRICCIONES
 - NO toques backend salvo que se te pida explícitamente

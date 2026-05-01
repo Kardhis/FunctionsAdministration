@@ -4,7 +4,7 @@ Este proyecto incluye un módulo profesional de **tracking de hábitos por tiemp
 
 ## Qué resuelve (MVP)
 
-- CRUD de **hábitos** (color, icono, categoría, activo/inactivo, objetivos).
+- CRUD de **hábitos** (color, icono, categoría, activo/inactivo).
 - CRUD de **registros** (fecha + inicio/fin 24h + duración automática + nota).
 - **Persistencia real** en el navegador vía **IndexedDB** (no depende solo de memoria).
 - **Estadísticas** con filtros por periodo + gráficos (Recharts).
@@ -65,5 +65,4 @@ Recomendación de API (alto nivel):
 ## Notas / próximos pasos
 
 - Code-splitting de charts (el bundle crece por Recharts).
-- Objetivos: enriquecer reglas (p.ej. “min/semana” vs “sesiones/semana”) con validación por tipo.
 - Recordatorios: evolucionar de stub IndexedDB a push/email + scheduler backend.

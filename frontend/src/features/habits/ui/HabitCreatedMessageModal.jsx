@@ -48,13 +48,8 @@ export default function HabitCreatedMessageModal({ open, habit, onClose }) {
                 <span className="text-text-h">Color:</span> <code>{habit.color}</code>
               </p>
               <p>
-                <span className="text-text-h">Categoría:</span> <code>{habit.category ?? '—'}</code>
-              </p>
-              <p className="sm:col-span-2">
-                <span className="text-text-h">Objetivo:</span>{' '}
-                <code>
-                  {habit.targetValue} · {habit.targetType} / {habit.targetPeriod}
-                </code>
+                <span className="text-text-h">Categorías:</span>{' '}
+                <code>{Array.isArray(habit.categoryIds) && habit.categoryIds.length ? `${habit.categoryIds.length}` : '—'}</code>
               </p>
             </div>
           </div>

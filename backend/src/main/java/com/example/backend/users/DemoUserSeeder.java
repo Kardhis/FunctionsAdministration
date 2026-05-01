@@ -37,7 +37,7 @@ public class DemoUserSeeder implements CommandLineRunner {
   public void run(String... args) {
     if (!enabled) return;
 
-    String email = "demo@example.com";
+    String email = "adminuser@mail.com";
     boolean exists = userRepository.findByEmailIgnoreCase(email).isPresent();
     if (exists) return;
 

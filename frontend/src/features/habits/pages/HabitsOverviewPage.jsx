@@ -6,7 +6,7 @@ import { useHabitAppStore } from '../store/habitAppStore.js'
 import { filterEntries, minutesByHabit, pieDataFromMinutesByHabit, barSeriesByDay, summaryStats, computeHabitStreakDays } from '../domain/stats.js'
 import { resolvePeriodRange } from '../domain/periods.js'
 import { formatDurationHuman, todayLocalDateString } from '../domain/time.js'
-import { goalProgressForHabit } from '../domain/goals.js'
+import { formatDateEs } from '../../../data/dateFormat.js'
 
 export default function HabitsOverviewPage() {
   const habits = useHabitAppStore((s) => s.habits)
@@ -52,16 +52,6 @@ export default function HabitsOverviewPage() {
 
   const weekSummary = useMemo(() => summaryStats({ entries: weekEntries, range: weekRange }), [weekEntries, weekRange])
 
-  const goalsPreview = useMemo(() => {
-    return habits
-      .filter((h) => h.active)
-      .slice(0, 3)
-      .map((h) => {
-        const p = goalProgressForHabit({ habit: h, entries, anchorDate: new Date() })
-        return { habit: h, ...p }
-      })
-  }, [entries, habits])
-
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -96,7 +86,7 @@ export default function HabitsOverviewPage() {
           <div className="mt-4 h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={bars}>
-                <XAxis dataKey="day" tick={{ fontSize: 12 }} />
+                <XAxis dataKey="day" tick={{ fontSize: 12 }} tickFormatter={(v) => formatDateEs(v)} />
                 <YAxis tick={{ fontSize: 12 }} />
                 <Tooltip />
                 <Bar dataKey="minutes" radius={[10, 10, 0, 0]} />
@@ -148,26 +138,6 @@ export default function HabitsOverviewPage() {
             ) : (
               <p className="text-sm text-text">Sin datos todavía.</p>
             )}
-          </div>
-        </Card>
-
-        <Card className="p-5">
-          <p className="text-sm font-semibold text-text-h">Progreso de objetivos</p>
-          <div className="mt-4 space-y-4">
-            {goalsPreview.map((g) => (
-              <div key={g.habit.id} className="rounded-2xl border border-border bg-bg/60 p-3">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="truncate text-sm font-semibold text-text-h">{g.habit.name}</p>
-                  <Badge tone="neutral">{Math.round(g.pct * 100)}%</Badge>
-                </div>
-                <p className="mt-1 text-xs text-text">
-                  {g.label}: <span className="font-medium text-text-h">{g.current}</span> / {g.target}
-                </p>
-                <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-black/5 ring-1 ring-border dark:bg-white/5">
-                  <div className="h-full bg-accent" style={{ width: `${Math.round(g.pct * 100)}%` }} />
-                </div>
-              </div>
-            ))}
           </div>
         </Card>
       </div>

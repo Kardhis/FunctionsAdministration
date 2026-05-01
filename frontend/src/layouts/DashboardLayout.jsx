@@ -13,6 +13,7 @@ function pageTitleFromPath(pathname) {
     const leaf = base.split('/').filter(Boolean).slice(2).join('/') // habits/...
     const map = {
       overview: 'Hábitos · Dashboard',
+      objectives: 'Hábitos · Objetivos',
       manage: 'Hábitos · Gestión',
       log: 'Hábitos · Registros',
       week: 'Hábitos · Semana',

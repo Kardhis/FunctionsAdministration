@@ -16,6 +16,7 @@ import CalendarPage from './pages/dashboard/CalendarPage.jsx'
 import ProfilePage from './pages/dashboard/ProfilePage.jsx'
 import AdminRoute from './routes/AdminRoute.jsx'
 import AdminUsersPage from './pages/dashboard/AdminUsersPage.jsx'
+import ObjectivesPage from './features/objectives/pages/ObjectivesPage.jsx'
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         <Route path="habits" element={<HabitsAppLayout />}>
           <Route index element={<Navigate to="overview" replace />} />
           <Route path="overview" element={<HabitsOverviewPage />} />
+          <Route path="objectives" element={<ObjectivesPage />} />
           <Route path="manage" element={<HabitsManagePage />} />
           <Route path="log" element={<HabitsLogPage />} />
           <Route path="week" element={<HabitsWeekPage />} />

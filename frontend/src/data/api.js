@@ -1,7 +1,8 @@
 export const API_BASE = import.meta.env?.VITE_API_BASE ?? 'http://localhost:8080'
 
 export async function apiFetch(path, { method = 'GET', body, headers } = {}) {
-  const res = await fetch(`${API_BASE}${path}`, {
+  const url = `${API_BASE}${path}`
+  const res = await fetch(url, {
     method,
     headers: { 'Content-Type': 'application/json', ...(headers ?? {}) },
     credentials: 'include',

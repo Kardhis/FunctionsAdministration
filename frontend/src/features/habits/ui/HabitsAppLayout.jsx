@@ -31,6 +31,7 @@ export default function HabitsAppLayout() {
   const theme = useHabitAppStore((s) => s.settings.theme)
   const createHabit = useHabitAppStore((s) => s.createHabit)
   const refreshHabits = useHabitAppStore((s) => s.refreshHabits)
+  const categories = useHabitAppStore((s) => s.categories)
 
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [createdHabit, setCreatedHabit] = useState(null)
@@ -66,24 +67,6 @@ export default function HabitsAppLayout() {
   }, [toasts])
 
   useEffect(() => {
-    // #region agent log
-    fetch('http://127.0.0.1:7682/ingest/642c7c98-6081-45de-bcbd-80eda9ca897a', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '1da3e3' },
-      body: JSON.stringify({
-        sessionId: '1da3e3',
-        runId: 'route-check',
-        hypothesisId: 'R1',
-        location: 'features/habits/ui/HabitsAppLayout.jsx:useEffect(location)',
-        message: 'HabitsAppLayout mounted / location changed',
-        data: { pathname: location.pathname },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {})
-    // #endregion agent log
-  }, [location.pathname])
-
-  useEffect(() => {
     const root = document.documentElement
     const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ?? false
     const effective = theme === 'system' ? (prefersDark ? 'dark' : 'light') : theme
@@ -96,6 +79,7 @@ export default function HabitsAppLayout() {
     const last = seg[seg.length - 1]
     const map = {
       overview: 'Dashboard de hábitos',
+      objectives: 'Objetivos',
       manage: 'Gestión de hábitos',
       log: 'Registro de hábitos',
       week: 'Vista semanal',
@@ -106,6 +90,10 @@ export default function HabitsAppLayout() {
   }, [location.pathname])
 
   const isManageTab = useMemo(() => location.pathname.endsWith('/dashboard/habits/manage'), [location.pathname])
+  const sortedCategories = useMemo(
+    () => (Array.isArray(categories) ? categories.slice().sort((a, b) => String(a.name).localeCompare(String(b.name))) : []),
+    [categories],
+  )
 
   return (
     <div className="space-y-4">
@@ -118,6 +106,7 @@ export default function HabitsAppLayout() {
 
         <div className="flex flex-wrap gap-2">
           <TabLink to="/dashboard/habits/overview">Dashboard</TabLink>
+          <TabLink to="/dashboard/habits/objectives">Objetivos</TabLink>
           <TabLink to="/dashboard/habits/manage">Hábitos</TabLink>
           <TabLink to="/dashboard/habits/log">Registros</TabLink>
           <TabLink to="/dashboard/habits/week">Semana</TabLink>
@@ -172,6 +161,7 @@ export default function HabitsAppLayout() {
 
       <HabitCreateModal
         open={isCreateOpen}
+        categories={sortedCategories}
         onClose={() => setIsCreateOpen(false)}
         onCreated={async (values) => {
           const res = await createHabit(values)

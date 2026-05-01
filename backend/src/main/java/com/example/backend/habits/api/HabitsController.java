@@ -2,11 +2,17 @@ package com.example.backend.habits.api;
 
 import com.example.backend.habits.Habit;
 import com.example.backend.habits.HabitRepository;
+import com.example.backend.categories.HabitCategory;
+import com.example.backend.categories.HabitCategoryLink;
+import com.example.backend.categories.HabitCategoryLinkKey;
+import com.example.backend.categories.HabitCategoryLinkRepository;
+import com.example.backend.categories.HabitCategoryRepository;
 import com.example.backend.users.CurrentUserService;
 import java.security.Principal;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,11 +34,8 @@ public class HabitsController {
       String description,
       String color,
       String icon,
-      Habit.Category category,
+      List<String> categoryIds,
       boolean active,
-      Habit.TargetType targetType,
-      java.math.BigDecimal targetValue,
-      Habit.TargetPeriod targetPeriod,
       Instant createdAt,
       Instant updatedAt) {}
 
@@ -42,17 +45,22 @@ public class HabitsController {
       String description,
       String color,
       String icon,
-      Habit.Category category,
-      Boolean active,
-      Habit.TargetType targetType,
-      java.math.BigDecimal targetValue,
-      Habit.TargetPeriod targetPeriod) {}
+      List<String> categoryIds,
+      Boolean active) {}
 
   private final HabitRepository habitRepository;
+  private final HabitCategoryRepository habitCategoryRepository;
+  private final HabitCategoryLinkRepository habitCategoryLinkRepository;
   private final CurrentUserService currentUserService;
 
-  public HabitsController(HabitRepository habitRepository, CurrentUserService currentUserService) {
+  public HabitsController(
+      HabitRepository habitRepository,
+      HabitCategoryRepository habitCategoryRepository,
+      HabitCategoryLinkRepository habitCategoryLinkRepository,
+      CurrentUserService currentUserService) {
     this.habitRepository = habitRepository;
+    this.habitCategoryRepository = habitCategoryRepository;
+    this.habitCategoryLinkRepository = habitCategoryLinkRepository;
     this.currentUserService = currentUserService;
   }
 
@@ -60,12 +68,13 @@ public class HabitsController {
   public List<HabitDto> list(Principal principal) {
     var user = currentUserService.requireUser(principal);
     return habitRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId()).stream()
-        .map(HabitsController::toDto)
+        .map(h -> toDto(h, habitCategoryLinkRepository.findCategoryIdsByHabitId(h.getId())))
         .toList();
   }
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
+  @Transactional
   public HabitDto create(@RequestBody HabitUpsertRequest req, Principal principal) {
     var user = currentUserService.requireUser(principal);
     if (req == null || req.id() == null || req.id().isBlank()) {
@@ -76,9 +85,6 @@ public class HabitsController {
     }
     if (req.color() == null || req.color().isBlank()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "color_required");
-    }
-    if (req.targetType() == null || req.targetValue() == null || req.targetPeriod() == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "target_required");
     }
 
     boolean exists = habitRepository.findByIdAndUserId(req.id(), user.getId()).isPresent();
@@ -94,18 +100,18 @@ public class HabitsController {
     h.setDescription(req.description());
     h.setColor(req.color());
     h.setIcon(req.icon());
-    h.setCategory(req.category());
     h.setActive(req.active() == null ? true : req.active());
-    h.setTargetType(req.targetType());
-    h.setTargetValue(req.targetValue());
-    h.setTargetPeriod(req.targetPeriod());
     h.setCreatedAt(now);
     h.setUpdatedAt(now);
 
-    return toDto(habitRepository.save(h));
+    Habit saved = habitRepository.save(h);
+    habitRepository.flush();
+    replaceHabitCategories(saved, user.getId(), req.categoryIds());
+    return toDto(saved, habitCategoryLinkRepository.findCategoryIdsByHabitId(saved.getId()));
   }
 
   @PutMapping("/{id}")
+  @Transactional
   public HabitDto update(
       @PathVariable("id") String id, @RequestBody HabitUpsertRequest req, Principal principal) {
     var user = currentUserService.requireUser(principal);
@@ -114,7 +120,7 @@ public class HabitsController {
             .findByIdAndUserId(id, user.getId())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "habit_not_found"));
 
-    if (req == null) req = new HabitUpsertRequest(null, null, null, null, null, null, null, null, null, null);
+    if (req == null) req = new HabitUpsertRequest(null, null, null, null, null, null, null);
 
     if (req.name() != null) prev.setName(req.name());
     if (req.description() != null || (req.description() == null && reqHasField(req, "description"))) {
@@ -124,16 +130,15 @@ public class HabitsController {
     if (req.icon() != null || (req.icon() == null && reqHasField(req, "icon"))) {
       prev.setIcon(req.icon());
     }
-    if (req.category() != null || (req.category() == null && reqHasField(req, "category"))) {
-      prev.setCategory(req.category());
-    }
     if (req.active() != null) prev.setActive(req.active());
-    if (req.targetType() != null) prev.setTargetType(req.targetType());
-    if (req.targetValue() != null) prev.setTargetValue(req.targetValue());
-    if (req.targetPeriod() != null) prev.setTargetPeriod(req.targetPeriod());
     prev.setUpdatedAt(Instant.now());
 
-    return toDto(habitRepository.save(prev));
+    Habit saved = habitRepository.save(prev);
+    habitRepository.flush();
+    if (req.categoryIds() != null) {
+      replaceHabitCategories(saved, user.getId(), req.categoryIds());
+    }
+    return toDto(saved, habitCategoryLinkRepository.findCategoryIdsByHabitId(saved.getId()));
   }
 
   @DeleteMapping("/{id}")
@@ -147,18 +152,15 @@ public class HabitsController {
     habitRepository.delete(h);
   }
 
-  private static HabitDto toDto(Habit h) {
+  private static HabitDto toDto(Habit h, List<String> categoryIds) {
     return new HabitDto(
         h.getId(),
         h.getName(),
         h.getDescription(),
         h.getColor(),
         h.getIcon(),
-        h.getCategory(),
+        categoryIds == null ? List.of() : categoryIds,
         h.isActive(),
-        h.getTargetType(),
-        h.getTargetValue(),
-        h.getTargetPeriod(),
         h.getCreatedAt(),
         h.getUpdatedAt());
   }
@@ -169,9 +171,29 @@ public class HabitsController {
     // For MVP, we assume null means "clear" for icon/description/category only when caller sets it.
     // This helper is a placeholder for future JSON Merge Patch support.
     return switch (name) {
-      case "description", "icon", "category" -> true;
+      case "description", "icon" -> true;
       default -> false;
     };
+  }
+
+  private void replaceHabitCategories(Habit habit, Long userId, List<String> categoryIds) {
+    habitCategoryLinkRepository.deleteAllByIdHabitId(habit.getId());
+    if (categoryIds == null || categoryIds.isEmpty()) return;
+
+    for (String categoryId : categoryIds) {
+      if (categoryId == null || categoryId.isBlank()) continue;
+      HabitCategory category =
+          habitCategoryRepository
+              .findByIdAndUserId(categoryId, userId)
+              .orElseThrow(
+                  () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "category_not_found"));
+
+      HabitCategoryLink link = new HabitCategoryLink();
+      link.setHabit(habit);
+      link.setCategory(category);
+      link.setId(new HabitCategoryLinkKey(habit.getId(), category.getId()));
+      habitCategoryLinkRepository.save(link);
+    }
   }
 }
 

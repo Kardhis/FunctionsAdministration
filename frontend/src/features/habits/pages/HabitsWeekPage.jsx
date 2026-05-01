@@ -5,6 +5,7 @@ import Badge from '../../../components/Badge.jsx'
 import { useHabitAppStore } from '../store/habitAppStore.js'
 import { getWeekRangeMonday } from '../domain/periods.js'
 import { formatDurationHuman } from '../domain/time.js'
+import { formatDateEs } from '../../../data/dateFormat.js'
 
 export default function HabitsWeekPage() {
   const habits = useHabitAppStore((s) => s.habits)
@@ -42,7 +43,7 @@ export default function HabitsWeekPage() {
         <div>
           <p className="text-sm font-semibold text-text-h">Vista semanal</p>
           <p className="mt-1 text-sm text-text">
-            {format(week.start, 'yyyy-MM-dd')} → {format(week.end, 'yyyy-MM-dd')}
+            {formatDateEs(format(week.start, 'yyyy-MM-dd'))} → {formatDateEs(format(week.end, 'yyyy-MM-dd'))}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -65,7 +66,7 @@ export default function HabitsWeekPage() {
               <th className="px-2">Hábito</th>
               {days.map((d) => (
                 <th key={d} className="px-2">
-                  {d.slice(5)}
+                  {formatDateEs(d).slice(0, 5)}
                 </th>
               ))}
               <th className="px-2 text-right">Total</th>

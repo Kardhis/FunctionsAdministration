@@ -7,8 +7,8 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const { refresh } = useAuth()
 
-  const [email, setEmail] = useState('demo@example.com')
-  const [password, setPassword] = useState('password')
+  const [email, setEmail] = useState('adminuser@mail.com')
+  const [password, setPassword] = useState('Admin123!')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 

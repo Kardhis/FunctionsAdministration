@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { listEntries, putEntry, deleteEntry as deleteEntryDb } from '../data/entriesRepo.js'
 import { deleteHabit as deleteHabitDb, listHabits, putHabit } from '../data/habitsRepo.js'
+import { createCategory, deleteCategory, listCategories, updateCategory } from '../data/categoriesRepo.js'
 import { getSetting, setSetting } from '../data/settingsRepo.js'
 import { computeDurationMinutes, toIsoNow } from '../domain/time.js'
 import { habitCreateSchema, habitEntryCreateSchema, habitEntrySchema, habitEntryUpdateSchema, habitSchema, habitUpdateSchema } from '../domain/schemas.js'
@@ -33,6 +34,7 @@ export const useHabitAppStore = create((set, get) => ({
 
   habits: [],
   entries: [],
+  categories: [],
 
   settings: {
     enforceNoOverlap: false,
@@ -43,15 +45,17 @@ export const useHabitAppStore = create((set, get) => ({
     if (get().bootstrapped) return
     set({ loading: true, error: '' })
     try {
-      const [habits, entries, enforceNoOverlap, theme] = await Promise.all([
+      const [habits, entries, categories, enforceNoOverlap, theme] = await Promise.all([
         listHabits(),
         listEntries(),
+        listCategories(),
         getSetting('enforceNoOverlap', false),
         getSetting('theme', 'system'),
       ])
       set({
         habits,
         entries,
+        categories,
         settings: { enforceNoOverlap: Boolean(enforceNoOverlap), theme: String(theme) },
         bootstrapped: true,
         loading: false,
@@ -80,45 +84,12 @@ export const useHabitAppStore = create((set, get) => ({
   },
 
   async createHabit(input) {
-    // #region agent log
-    fetch('http://127.0.0.1:7682/ingest/642c7c98-6081-45de-bcbd-80eda9ca897a', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '1da3e3' },
-      keepalive: true,
-      body: JSON.stringify({
-        sessionId: '1da3e3',
-        runId: 'pre-fix',
-        hypothesisId: 'H3',
-        location: 'features/habits/store/habitAppStore.js:createHabit',
-        message: 'createHabit called',
-        data: { name: input?.name ?? null, color: input?.color ?? null, category: input?.category ?? null, targetType: input?.targetType ?? null },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {})
-    // #endregion agent log
-
     const parsed = habitCreateSchema.safeParse({
       ...input,
       active: input.active ?? true,
     })
     if (!parsed.success) {
       const msg = parsed.error.issues[0]?.message ?? 'Datos inválidos'
-      // #region agent log
-      fetch('http://127.0.0.1:7682/ingest/642c7c98-6081-45de-bcbd-80eda9ca897a', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '1da3e3' },
-        keepalive: true,
-        body: JSON.stringify({
-          sessionId: '1da3e3',
-          runId: 'pre-fix',
-          hypothesisId: 'H3',
-          location: 'features/habits/store/habitAppStore.js:createHabit',
-          message: 'createHabit Zod safeParse failed',
-          data: { message: msg },
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {})
-      // #endregion agent log
       set({ toasts: pushLimited(get().toasts, { kind: 'error', message: msg }) })
       return { ok: false, error: msg }
     }
@@ -132,28 +103,51 @@ export const useHabitAppStore = create((set, get) => ({
     })
 
     await putHabit(habit)
-    // #region agent log
-    fetch('http://127.0.0.1:7682/ingest/642c7c98-6081-45de-bcbd-80eda9ca897a', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '1da3e3' },
-      keepalive: true,
-      body: JSON.stringify({
-        sessionId: '1da3e3',
-        runId: 'pre-fix',
-        hypothesisId: 'H3',
-        location: 'features/habits/store/habitAppStore.js:createHabit',
-        message: 'createHabit persisted via putHabit',
-        data: { id: habit.id, name: habit.name },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {})
-    // #endregion agent log
     set({ habits: await listHabits(), toasts: pushLimited(get().toasts, { kind: 'success', message: 'Hábito creado.' }) })
     return { ok: true, habit }
   },
 
   async refreshHabits() {
     set({ habits: await listHabits() })
+  },
+
+  async refreshCategories() {
+    set({ categories: await listCategories() })
+  },
+
+  async createCategory(input) {
+    const id = newId()
+    const now = toIsoNow()
+    const payload = {
+      id,
+      name: String(input?.name ?? '').trim(),
+      active: Boolean(input?.active ?? true),
+      createdAt: now,
+      updatedAt: now,
+    }
+    await createCategory(payload)
+    set({ categories: await listCategories(), toasts: pushLimited(get().toasts, { kind: 'success', message: 'Categoría creada.' }) })
+    return { ok: true, category: payload }
+  },
+
+  async updateCategory(patch) {
+    if (!patch?.id) return { ok: false, error: 'ID requerido' }
+    const payload = { name: patch.name, active: patch.active }
+    await updateCategory(patch.id, payload)
+    set({ categories: await listCategories(), toasts: pushLimited(get().toasts, { kind: 'success', message: 'Categoría actualizada.' }) })
+    return { ok: true }
+  },
+
+  async toggleCategoryActive(id) {
+    const prev = get().categories.find((c) => c.id === id)
+    if (!prev) return { ok: false, error: 'Categoría no encontrada' }
+    return get().updateCategory({ id, active: !prev.active })
+  },
+
+  async deleteCategory(id) {
+    await deleteCategory(id)
+    set({ categories: await listCategories(), toasts: pushLimited(get().toasts, { kind: 'success', message: 'Categoría eliminada.' }) })
+    return { ok: true }
   },
 
   async updateHabit(patch) {
