@@ -1,0 +1,15 @@
+# Desarrollo local: define DB_URL, DB_USER, DB_PASSWORD y APP_JWT_SECRET (p. ej. variables de entorno o .env del IDE).
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  flyway:
+    enabled: true
+
+app:
+  jwt:
+    secret: ${APP_JWT_SECRET}
+  # APP_DEMO_SEED_USER=true crea adminuser@mail.com / password al arrancar (ver README).
+  demo:
+    seed-user: ${APP_DEMO_SEED_USER:false}

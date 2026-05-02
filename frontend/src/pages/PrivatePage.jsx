@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext.jsx'
+import { API_BASE } from '../data/api.js'
 
 export default function PrivatePage() {
   const navigate = useNavigate()
@@ -17,7 +18,7 @@ export default function PrivatePage() {
       setIsLoading(true)
       setError('')
       try {
-        const res = await fetch('http://localhost:8080/api/private', {
+        const res = await fetch(`${API_BASE}/api/private`, {
           method: 'GET',
           credentials: 'include',
         })

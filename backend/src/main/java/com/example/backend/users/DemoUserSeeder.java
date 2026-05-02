@@ -25,7 +25,7 @@ public class DemoUserSeeder implements CommandLineRunner {
       PasswordEncoder passwordEncoder,
       RoleRepository roleRepository,
       UserRoleRepository userRoleRepository,
-      @Value("${app.demo.seed-user:true}") boolean enabled) {
+      @Value("${app.demo.seed-user:false}") boolean enabled) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
     this.roleRepository = roleRepository;

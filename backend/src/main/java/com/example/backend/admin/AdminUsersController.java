@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -78,6 +79,7 @@ public class AdminUsersController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
+  @Transactional
   public AdminUserDto create(@RequestBody CreateUserRequest req) {
     if (req == null || req.email() == null || req.email().isBlank()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "email_required");
@@ -114,6 +116,7 @@ public class AdminUsersController {
   }
 
   @PutMapping("/{id}")
+  @Transactional
   public AdminUserDto updateBasics(@PathVariable("id") Long id, @RequestBody UpdateUserRequest req) {
     User u =
         userRepository
@@ -143,6 +146,7 @@ public class AdminUsersController {
   }
 
   @PutMapping("/{id}/status")
+  @Transactional
   public AdminUserDto updateStatus(
       @PathVariable("id") Long id, @RequestBody UpdateStatusRequest req) {
     if (req == null || req.active() == null) {
@@ -166,6 +170,7 @@ public class AdminUsersController {
   }
 
   @PutMapping("/{id}/roles")
+  @Transactional
   public AdminUserDto updateRoles(
       @PathVariable("id") Long id, @RequestBody UpdateRolesRequest req) {
     if (req == null || req.roles() == null) {

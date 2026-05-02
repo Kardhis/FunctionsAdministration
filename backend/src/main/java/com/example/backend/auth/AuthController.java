@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 import com.example.backend.users.UserRepository;
 import com.example.backend.rbac.UserRoleRepository;
 
@@ -47,13 +48,8 @@ public class AuthController {
   }
 
   @PostMapping("/auth/login")
-  public ResponseEntity<?> login(@RequestBody LoginRequest req) {
-    if (req == null || req.email() == null || req.password() == null) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-          .body(Map.of("error", "email_and_password_required"));
-    }
-
-    var userOpt = userRepository.findByEmailIgnoreCase(req.email());
+  public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
+    var userOpt = userRepository.findByEmailIgnoreCase(req.email().trim());
     if (userOpt.isEmpty() || !userOpt.get().isActive()) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid_credentials"));
     }

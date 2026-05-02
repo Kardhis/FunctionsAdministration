@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext.jsx'
+import { API_BASE } from '../data/api.js'
 import './LoginPage.css'
 
 export default function LoginPage() {
   const navigate = useNavigate()
   const { refresh } = useAuth()
 
-  const [email, setEmail] = useState('adminuser@mail.com')
-  const [password, setPassword] = useState('Admin123!')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
@@ -18,7 +19,7 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      const res = await fetch('http://localhost:8080/auth/login', {
+      const res = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -114,18 +115,6 @@ export default function LoginPage() {
                     Error: <code>{error}</code>
                   </p>
                 ) : null}
-
-                <details className="cpDetails">
-                  <summary>Credenciales demo</summary>
-                  <ul>
-                    <li>
-                      <code>demo@example.com</code>
-                    </li>
-                    <li>
-                      <code>password</code>
-                    </li>
-                  </ul>
-                </details>
               </div>
             </form>
           </div>

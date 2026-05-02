@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { API_BASE } from '../data/api.js'
 
 const AuthContext = createContext(null)
 
@@ -10,7 +11,7 @@ export function AuthProvider({ children }) {
 
   const refresh = useCallback(async () => {
     try {
-      const res = await fetch('http://localhost:8080/auth/me', {
+      const res = await fetch(`${API_BASE}/auth/me`, {
         method: 'GET',
         credentials: 'include',
       })
@@ -40,7 +41,7 @@ export function AuthProvider({ children }) {
 
   const logout = useCallback(async () => {
     try {
-      await fetch('http://localhost:8080/auth/logout', {
+      await fetch(`${API_BASE}/auth/logout`, {
         method: 'POST',
         credentials: 'include',
       })
