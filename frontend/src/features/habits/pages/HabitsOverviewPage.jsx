@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useIsLgUp } from '../../../hooks/useMediaQuery.js'
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, Bar, BarChart, XAxis, YAxis, LabelList } from 'recharts'
 import Card from '../../../components/Card.jsx'
 import Badge from '../../../components/Badge.jsx'
@@ -21,6 +22,7 @@ function percentColor(pct) {
 }
 
 export default function HabitsOverviewPage() {
+  const isLgUp = useIsLgUp()
   const habits = useHabitAppStore((s) => s.habits)
   const entries = useHabitAppStore((s) => s.entries)
 
@@ -243,12 +245,16 @@ export default function HabitsOverviewPage() {
             </div>
 
             {weekHabitBars.length ? (
-              <div className="mt-4 h-[320px]">
+              <div className={`mt-4 ${isLgUp ? 'h-[320px]' : 'h-[260px] sm:h-[300px]'}`}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={weekHabitBars} layout="vertical" margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+                  <BarChart
+                    data={weekHabitBars}
+                    layout="vertical"
+                    margin={{ left: isLgUp ? 8 : 4, right: isLgUp ? 8 : 4, top: 8, bottom: 8 }}
+                  >
                     <XAxis
                       type="number"
-                      tick={{ fontSize: 12, fill: 'var(--text)' }}
+                      tick={{ fontSize: isLgUp ? 12 : 10, fill: 'var(--text)' }}
                       axisLine={{ stroke: 'var(--divider)' }}
                       tickLine={{ stroke: 'var(--divider)' }}
                     />
@@ -256,9 +262,9 @@ export default function HabitsOverviewPage() {
                       type="category"
                       dataKey="name"
                       interval={0}
-                      width={140}
-                      tickMargin={10}
-                      tick={{ fontSize: 12, fill: 'var(--text)' }}
+                      width={isLgUp ? 140 : 88}
+                      tickMargin={isLgUp ? 10 : 6}
+                      tick={{ fontSize: isLgUp ? 12 : 10, fill: 'var(--text)' }}
                       axisLine={{ stroke: 'var(--divider)' }}
                       tickLine={{ stroke: 'var(--divider)' }}
                     />
@@ -275,7 +281,7 @@ export default function HabitsOverviewPage() {
                         dataKey="minutes"
                         position="right"
                         formatter={(v) => formatDurationHuman(Number(v) || 0)}
-                        style={{ fill: 'var(--text-h)', fontSize: 12, fontWeight: 600 }}
+                        style={{ fill: 'var(--text-h)', fontSize: isLgUp ? 12 : 10, fontWeight: 600 }}
                       />
                     </Bar>
                   </BarChart>
@@ -298,18 +304,22 @@ export default function HabitsOverviewPage() {
               </div>
               <Badge tone="accent">Bar</Badge>
             </div>
-            <div className="mt-4 h-64">
+            <div className={`mt-4 ${isLgUp ? 'h-64' : 'h-52 sm:h-60'}`}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={bars}>
+                <BarChart data={bars} margin={{ left: 4, right: 8, bottom: isLgUp ? 8 : 20, top: 8 }}>
                   <XAxis
                     dataKey="day"
-                    tick={{ fontSize: 12, fill: 'var(--text)' }}
+                    tick={{ fontSize: isLgUp ? 12 : 10, fill: 'var(--text)' }}
                     axisLine={{ stroke: 'var(--divider)' }}
                     tickLine={{ stroke: 'var(--divider)' }}
                     tickFormatter={(v) => formatDateEs(v)}
+                    angle={isLgUp ? 0 : -35}
+                    textAnchor={isLgUp ? 'middle' : 'end'}
+                    height={isLgUp ? 30 : 48}
                   />
                   <YAxis
-                    tick={{ fontSize: 12, fill: 'var(--text)' }}
+                    width={isLgUp ? undefined : 32}
+                    tick={{ fontSize: isLgUp ? 12 : 10, fill: 'var(--text)' }}
                     axisLine={{ stroke: 'var(--divider)' }}
                     tickLine={{ stroke: 'var(--divider)' }}
                   />
@@ -328,10 +338,17 @@ export default function HabitsOverviewPage() {
               </div>
               <Badge tone="neutral">Pie</Badge>
             </div>
-            <div className="mt-4 h-64">
+            <div className={`mt-4 ${isLgUp ? 'h-64' : 'h-56 sm:h-64'}`}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={pieChartData} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={2}>
+                  <Pie
+                    data={pieChartData}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={isLgUp ? 55 : 42}
+                    outerRadius={isLgUp ? 90 : 72}
+                    paddingAngle={2}
+                  >
                     {pieChartData.map((entry) => (
                       <Cell key={entry.name} fill={entry.color} />
                     ))}

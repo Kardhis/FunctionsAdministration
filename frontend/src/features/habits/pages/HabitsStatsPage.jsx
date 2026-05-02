@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useIsLgUp } from '../../../hooks/useMediaQuery.js'
 import { Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Bar, BarChart } from 'recharts'
 import Card from '../../../components/Card.jsx'
 import Badge from '../../../components/Badge.jsx'
@@ -9,6 +10,7 @@ import { compareRanges, filterEntries, minutesByHabit, pieDataFromMinutesByHabit
 import { formatDurationHuman } from '../domain/time.js'
 
 export default function HabitsStatsPage() {
+  const isLgUp = useIsLgUp()
   const habits = useHabitAppStore((s) => s.habits)
   const entries = useHabitAppStore((s) => s.entries)
 
@@ -176,10 +178,17 @@ export default function HabitsStatsPage() {
             </div>
             <Badge tone="neutral">Pie</Badge>
           </div>
-          <div className="mt-4 h-72">
+          <div className={`mt-4 ${isLgUp ? 'h-72' : 'h-64 sm:h-72'}`}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={55} outerRadius={95} paddingAngle={2}>
+                <Pie
+                  data={pieData}
+                  dataKey="value"
+                  nameKey="name"
+                  innerRadius={isLgUp ? 55 : 42}
+                  outerRadius={isLgUp ? 95 : 76}
+                  paddingAngle={2}
+                >
                   {pieData.map((entry) => (
                     <Cell key={entry.name} fill={entry.color} />
                   ))}
@@ -199,11 +208,17 @@ export default function HabitsStatsPage() {
             </div>
             <Badge tone="accent">Bar</Badge>
           </div>
-          <div className="mt-4 h-72">
+          <div className={`mt-4 ${isLgUp ? 'h-72' : 'h-60 sm:h-72'}`}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={bars}>
-                <XAxis dataKey="day" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
+              <BarChart data={bars} margin={{ left: 4, right: 8, bottom: isLgUp ? 8 : 18, top: 8 }}>
+                <XAxis
+                  dataKey="day"
+                  tick={{ fontSize: isLgUp ? 11 : 9 }}
+                  angle={isLgUp ? 0 : -30}
+                  textAnchor={isLgUp ? 'middle' : 'end'}
+                  height={isLgUp ? 28 : 44}
+                />
+                <YAxis width={isLgUp ? undefined : 36} tick={{ fontSize: isLgUp ? 11 : 9 }} />
                 <Tooltip />
                 <Bar dataKey="minutes" radius={[10, 10, 0, 0]} />
               </BarChart>
@@ -220,11 +235,17 @@ export default function HabitsStatsPage() {
           </div>
           <Badge tone="neutral">Line</Badge>
         </div>
-        <div className="mt-4 h-72">
+        <div className={`mt-4 ${isLgUp ? 'h-72' : 'h-60 sm:h-72'}`}>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={lineByHabitTop}>
-              <XAxis dataKey="day" tick={{ fontSize: 11 }} />
-              <YAxis tick={{ fontSize: 11 }} />
+            <LineChart data={lineByHabitTop} margin={{ left: 4, right: 8, bottom: isLgUp ? 8 : 18, top: 8 }}>
+              <XAxis
+                dataKey="day"
+                tick={{ fontSize: isLgUp ? 11 : 9 }}
+                angle={isLgUp ? 0 : -30}
+                textAnchor={isLgUp ? 'middle' : 'end'}
+                height={isLgUp ? 28 : 44}
+              />
+              <YAxis width={isLgUp ? undefined : 36} tick={{ fontSize: isLgUp ? 11 : 9 }} />
               <Tooltip />
               {Object.keys(lineByHabitTop[0] ?? {})
                 .filter((k) => k !== 'day')

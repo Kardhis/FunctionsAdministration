@@ -12,7 +12,7 @@ function TabLink({ to, children }) {
       to={to}
       className={({ isActive }) =>
         [
-          'rounded-xl px-3 py-2 text-sm font-medium ring-1 transition',
+          'shrink-0 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm font-medium ring-1 transition lg:py-2',
           isActive ? 'bg-[color:var(--accent-bg)] text-text-h ring-[color:var(--accent-border)]' : 'text-text-h/80 ring-transparent hover:bg-black/5 dark:hover:bg-white/5',
         ].join(' ')
       }
@@ -112,7 +112,11 @@ export default function HabitsAppLayout() {
           <p className="mt-1 text-sm text-text">MVP con persistencia local (IndexedDB) y capa lista para API Spring Boot.</p>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div
+          className="-mx-1 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:thin] lg:mx-0 lg:flex-wrap lg:overflow-visible lg:pb-0 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border"
+          role="navigation"
+          aria-label="Secciones del módulo hábitos"
+        >
           <TabLink to="/dashboard/habits/overview">Dashboard</TabLink>
           <TabLink to="/dashboard/habits/objectives">Objetivos</TabLink>
           <TabLink to="/dashboard/habits/manage">Hábitos</TabLink>

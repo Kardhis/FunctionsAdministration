@@ -64,7 +64,48 @@ export default function HabitsManagePage() {
           </div>
         </div>
 
-        <div className="mt-4 overflow-x-auto">
+        <div className="mt-4 space-y-3 lg:hidden">
+          {sorted.map((h) => (
+            <div key={h.id} className="rounded-2xl border border-border bg-bg/60 p-4 ring-1 ring-border">
+              <div className="flex items-start gap-3">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-lg" style={{ background: `${h.color}22`, color: h.color, border: `1px solid ${h.color}55` }}>
+                  {h.icon || '•'}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-base font-semibold text-text-h">{h.name}</p>
+                  {h.description ? <p className="mt-1 text-sm text-text">{h.description}</p> : null}
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <span className="text-sm text-text">{Array.isArray(h.categoryIds) && h.categoryIds.length ? `${h.categoryIds.length} categoría(s)` : 'Sin categorías'}</span>
+                    <Badge tone={h.active ? 'accent' : 'neutral'}>{h.active ? 'activo' : 'inactivo'}</Badge>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4 flex flex-col gap-2">
+                <Button type="button" variant="secondary" className="min-h-11 w-full" onClick={() => startEdit(h)}>
+                  Editar
+                </Button>
+                <Button type="button" variant="secondary" className="min-h-11 w-full" onClick={() => setHabitActive(h.id, !h.active)}>
+                  {h.active ? 'Desactivar' : 'Activar'}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="min-h-11 w-full text-[crimson]"
+                  onClick={() => {
+                    const ok = window.confirm(`Eliminar “${h.name}”?`)
+                    if (!ok) return
+                    deleteHabit(h.id)
+                  }}
+                >
+                  Eliminar
+                </Button>
+              </div>
+            </div>
+          ))}
+          {!sorted.length ? <p className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-text">No hay hábitos todavía.</p> : null}
+        </div>
+
+        <div className="mt-4 hidden overflow-x-auto lg:block">
           <table className="min-w-[760px] w-full border-separate border-spacing-y-2">
             <thead>
               <tr className="text-left text-xs uppercase tracking-wide text-text">
@@ -117,6 +158,13 @@ export default function HabitsManagePage() {
                   </td>
                 </tr>
               ))}
+              {!sorted.length ? (
+                <tr>
+                  <td className="px-2 py-3 text-sm text-text" colSpan={4}>
+                    No hay hábitos todavía.
+                  </td>
+                </tr>
+              ) : null}
             </tbody>
           </table>
         </div>
@@ -179,7 +227,31 @@ export default function HabitsManagePage() {
           </div>
         </div>
 
-        <div className="mt-4 overflow-x-auto">
+        <div className="mt-4 space-y-3 lg:hidden">
+          {sortedCategories.map((c) => (
+            <div key={c.id} className="rounded-2xl border border-border bg-bg/60 p-4 ring-1 ring-border">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-base font-semibold text-text-h">{c.name}</p>
+                <Badge tone={c.active ? 'accent' : 'neutral'}>{c.active ? 'activo' : 'inactivo'}</Badge>
+              </div>
+              <p className="mt-2 text-sm text-text">Hábitos: {c.habitCount ?? 0}</p>
+              <div className="mt-4 flex flex-col gap-2">
+                <Button type="button" variant="secondary" className="min-h-11 w-full" onClick={() => setEditingCategory(c)}>
+                  Editar
+                </Button>
+                <Button type="button" variant="secondary" className="min-h-11 w-full" onClick={() => toggleCategoryActive(c.id)}>
+                  {c.active ? 'Desactivar' : 'Activar'}
+                </Button>
+                <Button type="button" variant="ghost" className="min-h-11 w-full text-[crimson]" onClick={() => setDeletingCategory(c)}>
+                  Eliminar
+                </Button>
+              </div>
+            </div>
+          ))}
+          {!sortedCategories.length ? <p className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-text">Sin categorías todavía.</p> : null}
+        </div>
+
+        <div className="mt-4 hidden overflow-x-auto lg:block">
           <table className="w-full border-separate border-spacing-y-2">
             <thead>
               <tr className="text-left text-xs uppercase tracking-wide text-text">

@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+/* Responsive: align UI with Tailwind sm (640px) and lg (1024px). Prefer min-w-0 in flex children to avoid horizontal overflow. */
+
 :root {
   /* Base tokens (dark-first). If data-theme is unset, prefers-color-scheme will pick. */
   --bg: #0b0f14;

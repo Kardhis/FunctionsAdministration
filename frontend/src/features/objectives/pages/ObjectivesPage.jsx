@@ -159,14 +159,14 @@ export default function ObjectivesPage() {
 
           <label className="lg:col-span-3">
             <span className="text-xs font-medium uppercase tracking-wide text-text">Desde (fin)</span>
-            <DatePickerInput value={from} onChange={setFrom} label="Desde (fin)" />
+            <DatePickerInput value={from} onChange={setFrom} label="Des de" />
             {from ? <p className="mt-1 text-xs text-text">Vista previa: {formatDateEs(from)}</p> : null}
           </label>
 
           <label className="lg:col-span-3">
             <span className="text-xs font-medium uppercase tracking-wide text-text">Hasta (fin)</span>
             <DatePickerInput value={to} onChange={setTo} label="Hasta (fin)" />
-            {to ? <p className="mt-1 text-xs text-text">Vista previa: {formatDateEs(to)}</p> : null}
+            {to ? <p className="mt-1 text-xs text-text">Vista prèvia: {formatDateEs(to)}</p> : null}
           </label>
         </div>
 
@@ -177,7 +177,72 @@ export default function ObjectivesPage() {
           </div>
         ) : null}
 
-        <div className="mt-4 overflow-x-auto">
+        <div className="mt-4 space-y-3 lg:hidden">
+          {rows.map((o) => (
+            <div key={o.id} className="rounded-2xl border border-border bg-bg/60 p-4 ring-1 ring-border">
+              <p className="text-base font-semibold text-text-h">{o.habitName ?? '—'}</p>
+              <dl className="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
+                <div>
+                  <dt className="text-xs uppercase tracking-wide text-text">Notas</dt>
+                  <dd className="mt-0.5 text-text">{o.notes ? <span className="line-clamp-3">{o.notes}</span> : '—'}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase tracking-wide text-text">Creado</dt>
+                  <dd className="mt-0.5 text-text">{formatDateEs(o.createdAt)}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase tracking-wide text-text">Inicio</dt>
+                  <dd className="mt-0.5 text-text">{formatDateEs(o.startDate)}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase tracking-wide text-text">Fin</dt>
+                  <dd className="mt-0.5 text-text">{formatDateEs(o.endDate)}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase tracking-wide text-text">Tipo</dt>
+                  <dd className="mt-0.5 text-text">{o.metricType === 'REPETITIONS' ? 'Repeticiones' : 'Minutos'}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase tracking-wide text-text">Progreso</dt>
+                  <dd className="mt-0.5 text-text">
+                    {o.progressValue} / {o.targetValue}
+                  </dd>
+                </div>
+                <div className="sm:col-span-2">
+                  <dt className="text-xs uppercase tracking-wide text-text">Estado</dt>
+                  <dd className="mt-0.5 text-text">{o.statusLabel ?? o.statusCode}</dd>
+                </div>
+              </dl>
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="min-h-11 w-full sm:w-auto"
+                  onClick={() =>
+                    setEditing({
+                      id: o.id,
+                      habitId: o.habitId,
+                      habitName: o.habitName,
+                      notes: o.notes ?? '',
+                      startDate: o.startDate ?? '',
+                      endDate: o.endDate,
+                      metricType: o.metricType,
+                      targetValue: o.targetValue,
+                    })
+                  }
+                >
+                  Editar
+                </Button>
+                <Button type="button" variant="ghost" className="min-h-11 w-full text-[crimson] sm:w-auto" onClick={() => setDeleting(o)}>
+                  Eliminar
+                </Button>
+              </div>
+            </div>
+          ))}
+          {!loading && !rows.length ? <p className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-text">Sin objetivos para los filtros actuales.</p> : null}
+        </div>
+
+        <div className="mt-4 hidden overflow-x-auto lg:block">
           <table className="min-w-[860px] w-full border-separate border-spacing-y-2">
             <thead>
               <tr className="text-left text-xs uppercase tracking-wide text-text">

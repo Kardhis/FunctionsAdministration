@@ -160,8 +160,58 @@ export default function HabitsLogPage() {
           ) : null}
         </div>
 
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full border-separate border-spacing-y-2">
+        <div className="mt-4 space-y-3 lg:hidden">
+          {filteredEntries.map((e) => {
+            const h = habits.find((x) => x.id === e.habitId)
+            return (
+              <div key={e.id} className="rounded-2xl border border-border bg-bg/60 p-4 ring-1 ring-border">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <p className="text-sm font-medium text-text">{formatDateEs(e.date)}</p>
+                  <p className="text-base font-semibold text-text-h">{h?.name ?? '—'}</p>
+                </div>
+                <dl className="mt-3 space-y-2 text-sm">
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-text">Ventana</dt>
+                    <dd className="text-right text-text-h">
+                      {e.startTime}–{e.endTime}
+                    </dd>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-text">Duración</dt>
+                    <dd className="text-right font-medium text-text-h">{formatDurationHuman(e.durationMinutes)}</dd>
+                  </div>
+                  {e.notes ? (
+                    <div>
+                      <dt className="text-text">Nota</dt>
+                      <dd className="mt-1 text-text">{e.notes}</dd>
+                    </div>
+                  ) : null}
+                </dl>
+                <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
+                  <Button type="button" variant="secondary" className="min-h-11 w-full sm:w-auto" onClick={() => setEditingEntry(e)}>
+                    Editar
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="min-h-11 w-full text-[crimson] sm:w-auto"
+                    onClick={() => {
+                      const ok = window.confirm('Eliminar este registro?')
+                      if (!ok) return
+                      deleteEntry(e.id)
+                    }}
+                  >
+                    Eliminar
+                  </Button>
+                </div>
+              </div>
+            )
+          })}
+          {!filteredEntries.length ? <p className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-text">Sin registros para los filtros actuales.</p> : null}
+        </div>
+
+        <div className="mt-4 hidden overflow-x-auto lg:block">
+          <table className="min-w-[720px] w-full border-separate border-spacing-y-2">
             <thead>
               <tr className="text-left text-xs uppercase tracking-wide text-text">
                 <th className="px-2">Fecha</th>
@@ -207,6 +257,13 @@ export default function HabitsLogPage() {
                   </tr>
                 )
               })}
+              {!filteredEntries.length ? (
+                <tr>
+                  <td className="px-2 py-3 text-sm text-text" colSpan={6}>
+                    Sin registros para los filtros actuales.
+                  </td>
+                </tr>
+              ) : null}
             </tbody>
           </table>
         </div>

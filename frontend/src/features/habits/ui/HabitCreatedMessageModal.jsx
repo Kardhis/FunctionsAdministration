@@ -18,8 +18,8 @@ export default function HabitCreatedMessageModal({ open, habit, onClose }) {
   return (
     <div className="fixed inset-0 z-50">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" onClick={() => onClose?.()} />
-      <div className="relative mx-auto flex min-h-[100svh] max-w-xl items-center justify-center px-4 py-10">
-        <Card className="w-full p-6">
+      <div className="relative mx-auto flex min-h-[100svh] w-full max-w-xl items-center justify-center px-3 py-4 sm:px-4 sm:py-10">
+        <Card className="max-h-[min(90dvh,800px)] w-full overflow-y-auto overscroll-y-contain p-5 sm:p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-xs font-medium uppercase tracking-wide text-text">Creado</p>
@@ -55,7 +55,7 @@ export default function HabitCreatedMessageModal({ open, habit, onClose }) {
           </div>
 
           <div className="mt-6 flex justify-end gap-3">
-            <Button variant="primary" type="button" onClick={() => onClose?.()}>
+            <Button variant="primary" type="button" className="min-h-11 w-full sm:w-auto" onClick={() => onClose?.()}>
               Cerrar
             </Button>
           </div>

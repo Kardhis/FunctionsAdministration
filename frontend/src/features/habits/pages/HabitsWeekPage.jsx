@@ -46,20 +46,49 @@ export default function HabitsWeekPage() {
             {formatDateEs(format(week.start, 'yyyy-MM-dd'))} → {formatDateEs(format(week.end, 'yyyy-MM-dd'))}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <button type="button" className="rounded-xl border border-border bg-bg px-3 py-2 text-sm" onClick={() => setOffset((v) => v - 1)}>
+        <div className="flex flex-wrap items-center gap-2">
+          <button type="button" className="min-h-11 rounded-xl border border-border bg-bg px-3 py-2 text-sm" onClick={() => setOffset((v) => v - 1)}>
             ← Semana
           </button>
-          <button type="button" className="rounded-xl border border-border bg-bg px-3 py-2 text-sm" onClick={() => setOffset(0)}>
+          <button type="button" className="min-h-11 rounded-xl border border-border bg-bg px-3 py-2 text-sm" onClick={() => setOffset(0)}>
             Hoy
           </button>
-          <button type="button" className="rounded-xl border border-border bg-bg px-3 py-2 text-sm" onClick={() => setOffset((v) => v + 1)}>
+          <button type="button" className="min-h-11 rounded-xl border border-border bg-bg px-3 py-2 text-sm" onClick={() => setOffset((v) => v + 1)}>
             Semana →
           </button>
         </div>
       </div>
 
-      <div className="mt-4 overflow-x-auto">
+      <div className="mt-4 space-y-3 lg:hidden">
+        {matrix.map((m) => (
+          <div key={m.habit.id} className="rounded-2xl border border-border bg-bg/60 p-4 ring-1 ring-border">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">{m.habit.icon || '•'}</span>
+              <span className="min-w-0 text-base font-semibold text-text-h">{m.habit.name}</span>
+            </div>
+            <div className="mt-3 grid grid-cols-7 gap-1.5 text-center">
+              {m.row.map((cell) => (
+                <div key={cell.day} className="min-w-0">
+                  <p className="text-[10px] font-medium uppercase leading-tight text-text">{formatDateEs(cell.day).slice(0, 5)}</p>
+                  <div className="mt-1 min-h-[2rem]">
+                    {cell.minutes > 0 ? (
+                      <Badge tone="accent" className="max-w-full justify-center px-1 py-0.5 text-[10px]">
+                        {formatDurationHuman(cell.minutes)}
+                      </Badge>
+                    ) : (
+                      <span className="text-xs text-text">—</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="mt-3 border-t border-border pt-3 text-sm font-semibold text-text-h">Total: {formatDurationHuman(m.total)}</p>
+          </div>
+        ))}
+        {!matrix.length ? <p className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-text">No hay hábitos activos esta semana.</p> : null}
+      </div>
+
+      <div className="mt-4 hidden overflow-x-auto lg:block">
         <table className="min-w-[980px] w-full border-separate border-spacing-y-2">
           <thead>
             <tr className="text-left text-xs uppercase tracking-wide text-text">

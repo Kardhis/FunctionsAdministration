@@ -1,4 +1,10 @@
 /** @type {import('tailwindcss').Config} */
+/**
+ * Breakpoints (Tailwind defaults): mobile-first.
+ * - sm: 640px — tablet/portrait from here up
+ * - lg: 1024px — desktop / “sidebar + tabla completa” layouts
+ * Use max-lg / lg: to split mobile drawer vs desktop shell and card vs table views.
+ */
 export default {
   content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
   theme: {

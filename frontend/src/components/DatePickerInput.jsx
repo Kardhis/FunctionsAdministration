@@ -58,7 +58,7 @@ export default function DatePickerInput({ value, onChange, placeholder = 'dd/mm/
       </div>
 
       {open ? (
-        <div className="absolute z-50 mt-2 w-[340px] rounded-2xl border border-border bg-[color:var(--surface-2)] p-4 shadow-float">
+        <div className="absolute right-0 z-50 mt-2 w-[min(340px,calc(100vw-1.5rem))] max-w-[calc(100vw-1.5rem)] rounded-2xl border border-border bg-[color:var(--surface-2)] p-3 shadow-float sm:left-0 sm:right-auto sm:p-4">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
               <p className="text-sm font-semibold text-text-h">Selecciona fecha</p>
