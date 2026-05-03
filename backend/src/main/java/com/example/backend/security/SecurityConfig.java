@@ -12,8 +12,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
-  @Value("${springdoc.api-docs.enabled:false}")
-  private boolean apiDocsEnabled;
+//  @Value("${springdoc.api-docs.enabled:false}")
+//  private boolean apiDocsEnabled;
 
   @Bean
   SecurityFilterChain securityFilterChain(
@@ -21,8 +21,8 @@ public class SecurityConfig {
       JwtCookieAuthenticationFilter jwtCookieAuthenticationFilter,
       Environment env)
       throws Exception {
-//    boolean apiDocsEnabled =
-//       env.getProperty("springdoc.api-docs.enabled", Boolean.class, Boolean.TRUE);
+    boolean apiDocsEnabled =
+       env.getProperty("springdoc.api-docs.enabled", Boolean.class, Boolean.TRUE);
 
     http
         .cors(Customizer.withDefaults())
