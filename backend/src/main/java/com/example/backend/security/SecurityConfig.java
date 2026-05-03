@@ -37,7 +37,7 @@ public class SecurityConfig {
               auth
                 .requestMatchers("/health", "/actuator/health", "/actuator/info", "/error")
                   .permitAll()
-                .requestMatchers(HttpMethod.POST, "/login")
+                .requestMatchers("/login")
                   .permitAll()
                 .requestMatchers("/auth/login", "/auth/logout")
                   .permitAll()
