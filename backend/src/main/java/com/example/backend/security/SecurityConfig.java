@@ -12,16 +12,20 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
+  @Value("${springdoc.api-docs.enabled:false}")
+  private boolean apiDocsEnabled;
+
   @Bean
   SecurityFilterChain securityFilterChain(
       HttpSecurity http,
       JwtCookieAuthenticationFilter jwtCookieAuthenticationFilter,
       Environment env)
       throws Exception {
-    boolean apiDocsEnabled =
-        env.getProperty("springdoc.api-docs.enabled", Boolean.class, Boolean.TRUE);
+//    boolean apiDocsEnabled =
+//       env.getProperty("springdoc.api-docs.enabled", Boolean.class, Boolean.TRUE);
 
-    http.cors(Customizer.withDefaults())
+    http
+        .cors(Customizer.withDefaults())
         .csrf(csrf -> csrf.disable())
         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(
@@ -30,17 +34,20 @@ public class SecurityConfig {
                 auth.requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**")
                     .permitAll();
               }
-              auth.requestMatchers("/health", "/actuator/health", "/actuator/info", "/error")
+              auth
+                .requestMatchers("/health", "/actuator/health", "/actuator/info", "/error")
                   .permitAll()
-                  .requestMatchers("/auth/login", "/auth/logout")
+                .requestMatchers(HttpMethod.POST, "/login")
                   .permitAll()
-                  .requestMatchers("/auth/me")
+                .requestMatchers("/auth/login", "/auth/logout")
+                  .permitAll()
+                .requestMatchers("/auth/me")
                   .authenticated()
-                  .requestMatchers("/api/admin/**")
+                .requestMatchers("/api/admin/**")
                   .hasRole("ADMIN")
-                  .requestMatchers("/api/**")
+                .requestMatchers("/api/**")
                   .hasAnyRole("ADMIN", "USER")
-                  .anyRequest()
+                .anyRequest()
                   .authenticated();
             })
         .exceptionHandling(

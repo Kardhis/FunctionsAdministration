@@ -10,6 +10,8 @@ spring:
     hibernate:
       ddl-auto: none
     open-in-view: false
+  jackson:
+    time-zone: Europe/Madrid
 
 server:
   port: 8080
@@ -23,6 +25,8 @@ management:
 logging:
   level:
     org.flywaydb: INFO
+  pattern:
+    dateformat: dd-MM-yyyy HH:mm:ss
 
 springdoc:
   api-docs:

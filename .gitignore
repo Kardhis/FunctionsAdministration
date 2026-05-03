@@ -21,6 +21,8 @@ out/
 # ======================
 .env
 .env.*
+!.env.development
+!.env.production
 
 # ======================
 # IDE
