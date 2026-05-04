@@ -82,10 +82,30 @@ export const dashboardRecentActivity = [
 /** @type {import('./types.js').NavItem[]} */
 export const dashboardNav = [
   { key: 'overview', label: 'Overview', to: '/dashboard', icon: 'grid' },
-  { key: 'habits', label: 'Hábitos', to: '/dashboard/habits/overview', icon: 'spark' },
+  {
+    key: 'habits',
+    label: 'Hàbits',
+    icon: 'spark',
+    children: [
+      { key: 'habits-dashboard', label: 'Dashboard', to: '/dashboard/habits/overview' },
+      { key: 'habits-objectives', label: 'Objetivos', to: '/dashboard/habits/objectives' },
+      { key: 'habits-manage', label: 'Hábitos', to: '/dashboard/habits/manage' },
+      { key: 'habits-log', label: 'Registros', to: '/dashboard/habits/log' },
+      { key: 'habits-week', label: 'Semana', to: '/dashboard/habits/week' },
+      { key: 'habits-analytics', label: 'Analítica', to: '/dashboard/habits/analytics' },
+      { key: 'habits-settings', label: 'Ajustes', to: '/dashboard/habits/settings' },
+    ],
+  },
   { key: 'daily', label: 'Registro', to: '/dashboard/daily', icon: 'check' },
   { key: 'stats', label: 'Estadísticas', to: '/dashboard/stats', icon: 'chart' },
   { key: 'calendar', label: 'Calendario', to: '/dashboard/calendar', icon: 'calendar' },
   { key: 'profile', label: 'Perfil', to: '/dashboard/profile', icon: 'user' },
+  {
+    key: 'admin',
+    label: 'Administració',
+    icon: 'shield',
+    requiresAdmin: true,
+    children: [{ key: 'admin-users', label: 'Usuaris', to: '/dashboard/admin/users' }],
+  },
 ]
 

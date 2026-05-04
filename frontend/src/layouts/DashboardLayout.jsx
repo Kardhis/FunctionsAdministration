@@ -10,18 +10,19 @@ import { applyThemeToRoot, loadThemeSetting } from '../theme/theme.js'
 function pageTitleFromPath(pathname) {
   const base = pathname.replace(/\/+$/, '')
   if (base === '/dashboard') return 'Dashboard'
+  if (base.startsWith('/dashboard/admin/users')) return 'Administració · Usuaris'
   if (base.startsWith('/dashboard/habits')) {
     const leaf = base.split('/').filter(Boolean).slice(2).join('/') // habits/...
     const map = {
-      overview: 'Hábitos · Dashboard',
-      objectives: 'Hábitos · Objetivos',
-      manage: 'Hábitos · Gestión',
-      log: 'Hábitos · Registros',
-      week: 'Hábitos · Semana',
-      analytics: 'Hábitos · Analítica',
-      settings: 'Hábitos · Ajustes',
+      overview: 'Hàbits · Dashboard',
+      objectives: 'Hàbits · Objetivos',
+      manage: 'Hàbits · Hábitos',
+      log: 'Hàbits · Registros',
+      week: 'Hàbits · Semana',
+      analytics: 'Hàbits · Analítica',
+      settings: 'Hàbits · Ajustes',
     }
-    return map[leaf] ?? 'Hábitos'
+    return map[leaf] ?? 'Hàbits'
   }
   const [, , segment] = base.split('/')
   const map = {
@@ -51,6 +52,28 @@ function emailFromUser(user) {
   return user.email || ''
 }
 
+/** @param {{ to: string }} child @param {string} pathname */
+function childPathActive(child, pathname) {
+  return pathname === child.to || pathname.startsWith(`${child.to}/`)
+}
+
+/** @param {import('../data/types.js').NavItem} item @param {string} pathname */
+function navGroupChildActive(item, pathname) {
+  return Boolean(item.children?.some((c) => childPathActive(c, pathname)))
+}
+
+/** @param {string} icon */
+function NavGlyph({ icon }) {
+  if (icon === 'grid') return '▦'
+  if (icon === 'spark') return '✦'
+  if (icon === 'check') return '✓'
+  if (icon === 'chart') return '▤'
+  if (icon === 'calendar') return '▢'
+  if (icon === 'user') return '◉'
+  if (icon === 'shield') return '◈'
+  return '•'
+}
+
 function SidebarPanel({
   location,
   isCollapsed,
@@ -60,8 +83,28 @@ function SidebarPanel({
   displayName,
   email,
   navId,
+  navItems,
 }) {
   const showLabels = mobileDrawer || !isCollapsed
+  const [groupOpenOverride, setGroupOpenOverride] = useState({})
+
+  /** @param {import('../data/types.js').NavItem} item */
+  function isGroupOpen(item) {
+    if (!item.children?.length) return false
+    if (Object.prototype.hasOwnProperty.call(groupOpenOverride, item.key)) {
+      return groupOpenOverride[item.key]
+    }
+    return navGroupChildActive(item, location.pathname)
+  }
+
+  /** @param {import('../data/types.js').NavItem} item */
+  function toggleGroup(item) {
+    setGroupOpenOverride((prev) => {
+      const prevOpen =
+        Object.prototype.hasOwnProperty.call(prev, item.key) ? prev[item.key] : navGroupChildActive(item, location.pathname)
+      return { ...prev, [item.key]: !prevOpen }
+    })
+  }
 
   return (
     <div className="flex h-full flex-col p-4">
@@ -100,32 +143,103 @@ function SidebarPanel({
       </div>
 
       <nav id={navId} className="mt-6 flex flex-col gap-1" aria-label="Principal">
-        {dashboardNav.map((item) => (
-          <NavLink
-            key={item.key}
-            to={item.to}
-            end={item.to === '/dashboard'}
-            onClick={mobileDrawer ? onCloseMobile : undefined}
-            className={({ isActive }) =>
-              [
-                'group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition lg:py-2',
-                isActive || (item.key === 'habits' && location.pathname.startsWith('/dashboard/habits'))
-                  ? 'bg-[color:var(--accent-bg)] text-text-h ring-1 ring-[color:var(--accent-border)]'
-                  : 'text-text-h/80 hover:bg-black/5 dark:hover:bg-white/5',
-              ].join(' ')
+        {navItems.map((item) => {
+          if (item.children?.length) {
+            const firstTo = item.children[0].to
+            const groupActive = navGroupChildActive(item, location.pathname)
+
+            if (!showLabels) {
+              return (
+                <NavLink
+                  key={item.key}
+                  to={firstTo}
+                  onClick={mobileDrawer ? onCloseMobile : undefined}
+                  className={() =>
+                    [
+                      'group flex items-center justify-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition lg:py-2',
+                      groupActive
+                        ? 'bg-[color:var(--accent-bg)] text-text-h ring-1 ring-[color:var(--accent-border)]'
+                        : 'text-text-h/80 hover:bg-black/5 dark:hover:bg-white/5',
+                    ].join(' ')
+                  }
+                  title={item.label}
+                >
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-black/5 text-text-h ring-1 ring-border transition group-hover:bg-black/10 dark:bg-white/5 dark:group-hover:bg-white/10">
+                    <NavGlyph icon={item.icon} />
+                  </span>
+                </NavLink>
+              )
             }
-          >
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-black/5 text-text-h ring-1 ring-border transition group-hover:bg-black/10 dark:bg-white/5 dark:group-hover:bg-white/10">
-              {item.icon === 'grid' ? '▦' : null}
-              {item.icon === 'spark' ? '✦' : null}
-              {item.icon === 'check' ? '✓' : null}
-              {item.icon === 'chart' ? '▤' : null}
-              {item.icon === 'calendar' ? '▢' : null}
-              {item.icon === 'user' ? '◉' : null}
-            </span>
-            {showLabels ? <span className="truncate">{item.label}</span> : null}
-          </NavLink>
-        ))}
+
+            const open = isGroupOpen(item)
+            return (
+              <div key={item.key} className="flex flex-col gap-0.5">
+                <button
+                  type="button"
+                  onClick={() => toggleGroup(item)}
+                  aria-expanded={open}
+                  className={[
+                    'group flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left text-sm font-medium transition lg:py-2',
+                    groupActive && !open ? 'text-text-h ring-1 ring-[color:var(--accent-border)]/60' : '',
+                    'text-text-h/80 hover:bg-black/5 dark:hover:bg-white/5',
+                  ].join(' ')}
+                >
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-black/5 text-text-h ring-1 ring-border transition group-hover:bg-black/10 dark:bg-white/5 dark:group-hover:bg-white/10">
+                    <NavGlyph icon={item.icon} />
+                  </span>
+                  <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                  <span className="shrink-0 text-xs text-text-h/70" aria-hidden>
+                    {open ? '▾' : '▸'}
+                  </span>
+                </button>
+                {open ? (
+                  <div className="ml-3 flex flex-col gap-0.5 border-l border-border pl-3">
+                    {item.children.map((child) => (
+                      <NavLink
+                        key={child.key}
+                        to={child.to}
+                        onClick={mobileDrawer ? onCloseMobile : undefined}
+                        className={({ isActive }) =>
+                          [
+                            'flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition',
+                            isActive || childPathActive(child, location.pathname)
+                              ? 'bg-[color:var(--accent-bg)] text-text-h ring-1 ring-[color:var(--accent-border)]'
+                              : 'text-text-h/80 hover:bg-black/5 dark:hover:bg-white/5',
+                          ].join(' ')
+                        }
+                      >
+                        <span className="truncate">{child.label}</span>
+                      </NavLink>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            )
+          }
+
+          const to = item.to ?? '/dashboard'
+          return (
+            <NavLink
+              key={item.key}
+              to={to}
+              end={to === '/dashboard'}
+              onClick={mobileDrawer ? onCloseMobile : undefined}
+              className={({ isActive }) =>
+                [
+                  'group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition lg:py-2',
+                  isActive || (item.key === 'habits' && location.pathname.startsWith('/dashboard/habits'))
+                    ? 'bg-[color:var(--accent-bg)] text-text-h ring-1 ring-[color:var(--accent-border)]'
+                    : 'text-text-h/80 hover:bg-black/5 dark:hover:bg-white/5',
+                ].join(' ')
+              }
+            >
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-black/5 text-text-h ring-1 ring-border transition group-hover:bg-black/10 dark:bg-white/5 dark:group-hover:bg-white/10">
+                <NavGlyph icon={item.icon} />
+              </span>
+              {showLabels ? <span className="truncate">{item.label}</span> : null}
+            </NavLink>
+          )
+        })}
       </nav>
 
       <div className="mt-auto pt-4">
@@ -146,9 +260,14 @@ function SidebarPanel({
 export default function DashboardLayout() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { user, logout } = useAuth()
+  const { user, logout, roles } = useAuth()
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [navOpen, setNavOpen] = useState(false)
+
+  const navItems = useMemo(() => {
+    const isAdmin = Array.isArray(roles) && roles.includes('ADMIN')
+    return dashboardNav.filter((item) => !item.requiresAdmin || isAdmin)
+  }, [roles])
 
   const title = useMemo(() => pageTitleFromPath(location.pathname), [location.pathname])
   const displayName = useMemo(() => displayNameFromUser(user), [user])
@@ -219,6 +338,7 @@ export default function DashboardLayout() {
           displayName={displayName}
           email={email}
           navId="dashboard-mobile-nav"
+          navItems={navItems}
         />
       </aside>
 
@@ -237,6 +357,7 @@ export default function DashboardLayout() {
             displayName={displayName}
             email={email}
             navId={undefined}
+            navItems={navItems}
           />
         </aside>
 

@@ -127,19 +127,6 @@ export default function HabitsAppLayout() {
         </div>
       </div>
 
-      {isManageTab ? (
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-text">Acciones rápidas para gestionar tus hábitos.</p>
-          <Button
-            type="button"
-            variant="primary"
-            className="bg-[color:var(--accent)] text-white ring-1 ring-[color:var(--accent-border)]"
-            onClick={() => setIsCreateOpen(true)}
-          >
-            Nuevo hábito
-          </Button>
-        </div>
-      ) : null}
 
       {loading ? (
         <div className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-text">Cargando datos locales…</div>

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import Card from '../../../components/Card.jsx'
 import Button from '../../../components/Button.jsx'
+import { modalFooterRow, modalFooterPrimaryButtonClass } from '../../../components/modalFooter.js'
 import Badge from '../../../components/Badge.jsx'
 
 export default function HabitCreatedMessageModal({ open, habit, onClose }) {
@@ -54,8 +55,8 @@ export default function HabitCreatedMessageModal({ open, habit, onClose }) {
             </div>
           </div>
 
-          <div className="mt-6 flex justify-end gap-3">
-            <Button variant="primary" type="button" className="min-h-11 w-full sm:w-auto" onClick={() => onClose?.()}>
+          <div className={`mt-6 ${modalFooterRow}`}>
+            <Button variant="primary" type="button" size="lg" className={modalFooterPrimaryButtonClass} onClick={() => onClose?.()}>
               Cerrar
             </Button>
           </div>

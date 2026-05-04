@@ -1,11 +1,14 @@
 package com.example.backend.security;
 
+import java.util.Arrays;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -17,17 +20,25 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class SecurityConfig {
 
+  private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
+
 //  @Value("${springdoc.api-docs.enabled:false}")
 //  private boolean apiDocsEnabled;
 
   @Bean
-  public CorsConfigurationSource corsConfigurationSource() {
+  public CorsConfigurationSource corsConfigurationSource(
+      @Value("${app.cors.allowed-origins:http://localhost:5173}") String allowedOriginsRaw) {
     CorsConfiguration config = new CorsConfiguration();
 
-    config.setAllowedOrigins(
-        List.of(
-            "http://168.231.84.188",
-            "https://168.231.84.188"));
+    List<String> origins =
+        Arrays.stream(allowedOriginsRaw.split(","))
+            .map(String::trim)
+            .filter(s -> !s.isEmpty())
+            .toList();
+    if (origins.isEmpty()) {
+      origins = List.of("http://localhost:5173");
+    }
+    config.setAllowedOrigins(origins);
 
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     config.setAllowedHeaders(List.of("*"));
@@ -35,6 +46,11 @@ public class SecurityConfig {
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", config);
+
+    log.info(
+        "CORS enabled (SecurityConfig CorsConfigurationSource). allowedOrigins={}",
+        config.getAllowedOrigins());
+
     return source;
   }
 
@@ -42,13 +58,14 @@ public class SecurityConfig {
   SecurityFilterChain securityFilterChain(
       HttpSecurity http,
       JwtCookieAuthenticationFilter jwtCookieAuthenticationFilter,
-      Environment env)
+      Environment env,
+      CorsConfigurationSource corsConfigurationSource)
       throws Exception {
     boolean apiDocsEnabled =
        env.getProperty("springdoc.api-docs.enabled", Boolean.class, Boolean.TRUE);
 
     http
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        .cors(cors -> cors.configurationSource(corsConfigurationSource))
         .csrf(csrf -> csrf.disable())
         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(
@@ -64,7 +81,7 @@ public class SecurityConfig {
                   .permitAll()
                 .requestMatchers("/login")
                   .permitAll()
-                .requestMatchers("/auth/login", "/auth/logout")
+                .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/login/", "/auth/logout", "/auth/logout/")
                   .permitAll()
                 .requestMatchers("/auth/me")
                   .authenticated()

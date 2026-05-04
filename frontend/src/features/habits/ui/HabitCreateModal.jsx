@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import Card from '../../../components/Card.jsx'
 import Button from '../../../components/Button.jsx'
+import { modalFooterRow, modalFooterCancelButtonClass, modalFooterPrimaryButtonClass } from '../../../components/modalFooter.js'
 import Badge from '../../../components/Badge.jsx'
 import { habitCreateResolver } from '../store/habitAppStore.js'
 
@@ -155,11 +156,11 @@ export default function HabitCreateModal({ open, categories = [], onClose, onCre
               </label>
             </div>
 
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
-              <Button type="button" variant="ghost" className="min-h-11 w-full sm:w-auto" onClick={() => onClose?.()}>
+            <div className={`mt-2 ${modalFooterRow}`}>
+              <Button type="button" variant="ghost" size="sm" className={modalFooterCancelButtonClass} onClick={() => onClose?.()}>
                 Cancelar
               </Button>
-              <Button type="submit" variant="primary" className="min-h-11 w-full sm:w-auto">
+              <Button type="submit" variant="primary" size="lg" className={modalFooterPrimaryButtonClass}>
                 Crear hábito
               </Button>
             </div>

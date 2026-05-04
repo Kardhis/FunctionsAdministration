@@ -11,8 +11,10 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,6 +46,8 @@ public class AdminUsersController {
   public record UpdateStatusRequest(Boolean active) {}
 
   public record UpdateRolesRequest(List<String> roles) {}
+
+  public record UpdatePasswordRequest(String password) {}
 
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
@@ -189,6 +193,34 @@ public class AdminUsersController {
         u.getCreatedAt(),
         u.getUpdatedAt(),
         userRoleRepository.findRoleNamesByUserId(u.getId()));
+  }
+
+  @PutMapping("/{id}/password")
+  @Transactional
+  public ResponseEntity<Void> updatePassword(
+      @PathVariable("id") Long id, @RequestBody UpdatePasswordRequest req) {
+    if (req == null || req.password() == null || req.password().isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "password_required");
+    }
+    User u =
+        userRepository
+            .findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user_not_found"));
+    u.setPasswordHash(passwordEncoder.encode(req.password()));
+    u.setUpdatedAt(Instant.now());
+    userRepository.save(u);
+    return ResponseEntity.noContent().build();
+  }
+
+  @DeleteMapping("/{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @Transactional
+  public void delete(@PathVariable("id") Long id) {
+    User u =
+        userRepository
+            .findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user_not_found"));
+    userRepository.delete(u);
   }
 
   private void setRoles(User user, List<String> roleNames) {

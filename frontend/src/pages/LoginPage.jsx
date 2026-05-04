@@ -29,7 +29,14 @@ export default function LoginPage() {
       const data = await res.json().catch(() => ({}))
 
       if (!res.ok) {
-        setError(data?.error ?? `HTTP ${res.status}`)
+        const code = data?.error
+        const message =
+          code === 'account_inactive'
+            ? 'Esta cuenta está desactivada. Un administrador debe activarla en Administració · Usuaris (Actiu / Desactiu).'
+            : code === 'invalid_credentials'
+              ? 'Credenciales incorrectas.'
+              : (code ?? `HTTP ${res.status}`)
+        setError(message)
         return
       }
 

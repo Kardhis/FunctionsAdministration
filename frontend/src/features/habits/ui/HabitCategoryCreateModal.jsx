@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import Card from '../../../components/Card.jsx'
 import Button from '../../../components/Button.jsx'
+import { modalFooterRow, modalFooterCancelButtonClass, modalFooterPrimaryButtonClass } from '../../../components/modalFooter.js'
 
 const defaultValues = {
   name: '',
@@ -76,11 +77,11 @@ export default function HabitCategoryCreateModal({ open, onClose, onCreated }) {
               <span className="text-sm font-medium text-text-h">Activa</span>
             </label>
 
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
-              <Button type="button" variant="ghost" className="min-h-11 w-full sm:w-auto" onClick={() => onClose?.()}>
+            <div className={`mt-2 ${modalFooterRow}`}>
+              <Button type="button" variant="ghost" size="sm" className={modalFooterCancelButtonClass} onClick={() => onClose?.()}>
                 Cancelar
               </Button>
-              <Button type="submit" variant="primary" className="min-h-11 w-full sm:w-auto">
+              <Button type="submit" variant="primary" size="lg" className={modalFooterPrimaryButtonClass}>
                 Crear
               </Button>
             </div>

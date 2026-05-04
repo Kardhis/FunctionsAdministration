@@ -11,7 +11,11 @@
  */
 
 /**
- * @typedef {{ key: 'overview'|'habits'|'daily'|'stats'|'calendar'|'profile', label: string, to: string, icon: string }} NavItem
+ * @typedef {{ key: string, label: string, to: string }} NavChildItem
+ */
+
+/**
+ * @typedef {{ key: string, label: string, to?: string, icon: string, requiresAdmin?: boolean, children?: NavChildItem[] }} NavItem
  */
 
 /**

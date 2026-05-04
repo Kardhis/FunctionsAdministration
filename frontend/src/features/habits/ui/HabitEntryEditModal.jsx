@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import Card from '../../../components/Card.jsx'
 import Button from '../../../components/Button.jsx'
+import { modalFooterRow, modalFooterCancelButtonClass, modalFooterPrimaryButtonClass } from '../../../components/modalFooter.js'
 import Badge from '../../../components/Badge.jsx'
 import { habitEntryCreateResolver } from '../store/habitAppStore.js'
 import { computeDurationMinutes, formatDurationHuman } from '../domain/time.js'
@@ -131,11 +132,11 @@ export default function HabitEntryEditModal({ open, habits, entry, onClose, onSa
               <textarea rows={3} className="mt-2 w-full resize-none rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" {...form.register('notes')} />
             </label>
 
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
-              <Button type="button" variant="ghost" className="min-h-11 w-full sm:w-auto" onClick={() => onClose?.()}>
+            <div className={`mt-2 ${modalFooterRow}`}>
+              <Button type="button" variant="ghost" size="sm" className={modalFooterCancelButtonClass} onClick={() => onClose?.()}>
                 Cancelar
               </Button>
-              <Button type="submit" variant="primary" className="min-h-11 w-full sm:w-auto">
+              <Button type="submit" variant="primary" size="lg" className={modalFooterPrimaryButtonClass}>
                 Guardar cambios
               </Button>
             </div>

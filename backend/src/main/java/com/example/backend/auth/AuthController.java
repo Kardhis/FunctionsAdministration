@@ -49,12 +49,18 @@ public class AuthController {
 
   @PostMapping("/auth/login")
   public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
-    var userOpt = userRepository.findByEmailIgnoreCase(req.email().trim());
-    if (userOpt.isEmpty() || !userOpt.get().isActive()) {
+    String emailTrim = req.email().trim();
+    var userOpt = userRepository.findByEmailIgnoreCase(emailTrim);
+    if (userOpt.isEmpty()) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid_credentials"));
     }
 
     var user = userOpt.get();
+    if (!user.isActive()) {
+      return ResponseEntity.status(HttpStatus.FORBIDDEN)
+          .body(Map.of("error", "account_inactive"));
+    }
+
     if (!passwordEncoder.matches(req.password(), user.getPasswordHash())) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid_credentials"));
     }

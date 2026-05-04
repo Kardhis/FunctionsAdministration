@@ -5,7 +5,7 @@ export default function Button({ as = 'button', variant = 'primary', size = 'md'
 
   const variants = {
     primary:
-      'bg-accent text-[#061018] shadow-card hover:brightness-110 active:brightness-95',
+      'bg-[color:var(--accent)] text-[#061018] shadow-card hover:brightness-110 active:brightness-95',
     secondary:
       'bg-[color:var(--accent-bg)] ring-1 ring-[color:var(--accent-border)] hover:bg-[color:var(--accent-bg)]/80',
     outline:

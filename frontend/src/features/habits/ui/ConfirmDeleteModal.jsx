@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import Card from '../../../components/Card.jsx'
 import Button from '../../../components/Button.jsx'
+import { modalFooterRow, modalFooterCancelButtonClass, modalFooterPrimaryButtonClass } from '../../../components/modalFooter.js'
 
 export default function ConfirmDeleteModal({ open, title = 'Confirmar', message = '¿Seguro?', onCancel, onConfirm }) {
   useEffect(() => {
@@ -30,11 +31,11 @@ export default function ConfirmDeleteModal({ open, title = 'Confirmar', message 
             </Button>
           </div>
 
-          <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <Button type="button" variant="ghost" className="min-h-11 w-full sm:w-auto" onClick={() => onCancel?.()}>
+          <div className={`mt-6 ${modalFooterRow}`}>
+            <Button type="button" variant="ghost" size="sm" className={modalFooterCancelButtonClass} onClick={() => onCancel?.()}>
               Cancelar
             </Button>
-            <Button type="button" variant="primary" className="min-h-11 w-full bg-[crimson] hover:brightness-110 sm:w-auto" onClick={() => onConfirm?.()}>
+            <Button type="button" variant="danger" size="lg" className={modalFooterPrimaryButtonClass} onClick={() => onConfirm?.()}>
               Eliminar
             </Button>
           </div>

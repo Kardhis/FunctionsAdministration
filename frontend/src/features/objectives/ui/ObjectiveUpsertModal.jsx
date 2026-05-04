@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Card from '../../../components/Card.jsx'
 import Button from '../../../components/Button.jsx'
+import { modalFooterRow, modalFooterCancelButtonClass, modalFooterPrimaryButtonClass } from '../../../components/modalFooter.js'
 import Badge from '../../../components/Badge.jsx'
 import { objectiveCreateSchema } from '../domain/schemas.js'
 import { formatDateEs } from '../../../data/dateFormat.js'
@@ -141,11 +142,11 @@ export default function ObjectiveUpsertModal({ mode, open, habits, initial, onCl
               </div>
             </div>
 
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
-              <Button type="button" variant="ghost" className="min-h-11 w-full sm:w-auto" onClick={() => onClose?.()}>
+            <div className={`mt-2 ${modalFooterRow}`}>
+              <Button type="button" variant="ghost" size="sm" className={modalFooterCancelButtonClass} onClick={() => onClose?.()}>
                 Cancelar
               </Button>
-              <Button type="submit" variant="primary" className="min-h-11 w-full sm:w-auto" disabled={!allHabits.length}>
+              <Button type="submit" variant="primary" size="lg" className={modalFooterPrimaryButtonClass} disabled={!allHabits.length}>
                 {mode === 'edit' ? 'Guardar cambios' : 'Crear objetivo'}
               </Button>
             </div>
