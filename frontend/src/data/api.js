@@ -1,4 +1,25 @@
-export const API_BASE = import.meta.env?.VITE_API_BASE ?? 'http://localhost:8080'
+function computeApiBase() {
+  const fromEnv = import.meta.env?.VITE_API_BASE
+  const devDefault = 'http://localhost:8080'
+  const trimmed = typeof fromEnv === 'string' ? fromEnv.trim() : ''
+  let resolved = trimmed !== '' ? trimmed : devDefault
+
+  if (typeof window !== 'undefined' && import.meta.env.PROD) {
+    const host = window.location.hostname
+    const isLocalPage = host === 'localhost' || host === '127.0.0.1' || host === ''
+    const looksLikeDevApi =
+      resolved === devDefault ||
+      resolved.startsWith('http://localhost:') ||
+      resolved.startsWith('http://127.0.0.1:')
+    if (!isLocalPage && looksLikeDevApi) {
+      resolved = `${window.location.protocol}//${host}:8080`
+    }
+  }
+
+  return resolved
+}
+
+export const API_BASE = computeApiBase()
 
 export async function apiFetch(path, { method = 'GET', body, headers } = {}) {
   const url = `${API_BASE}${path}`
@@ -19,4 +40,3 @@ export async function apiFetch(path, { method = 'GET', body, headers } = {}) {
   }
   return data
 }
-

@@ -36,6 +36,14 @@ export function AuthProvider({ children }) {
   }, [])
 
   useEffect(() => {
+    const pathname = typeof window !== 'undefined' ? window.location.pathname : ''
+    if (pathname === '/login') {
+      // Avoid a guaranteed 401 noise on the public login page.
+      setUser(null)
+      setRoles([])
+      setStatus('unauthenticated')
+      return
+    }
     refresh()
   }, [refresh])
 
