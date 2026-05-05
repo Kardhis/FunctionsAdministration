@@ -19,6 +19,26 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
+      // #region agent log
+      fetch('http://127.0.0.1:7799/ingest/4640c2d9-05e7-49ac-af5a-780a24bdc3b2', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '16e790' },
+        body: JSON.stringify({
+          sessionId: '16e790',
+          runId: 'pre-fix',
+          hypothesisId: 'H1',
+          location: 'LoginPage.jsx:onSubmit:pre_fetch',
+          message: 'Submitting login',
+          data: {
+            apiBase: API_BASE,
+            pageOrigin: typeof window !== 'undefined' ? window.location.origin : null,
+            pageProtocol: typeof window !== 'undefined' ? window.location.protocol : null,
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {})
+      // #endregion agent log
+
       const res = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -27,6 +47,29 @@ export default function LoginPage() {
       })
 
       const data = await res.json().catch(() => ({}))
+
+      // #region agent log
+      fetch('http://127.0.0.1:7799/ingest/4640c2d9-05e7-49ac-af5a-780a24bdc3b2', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '16e790' },
+        body: JSON.stringify({
+          sessionId: '16e790',
+          runId: 'pre-fix',
+          hypothesisId: 'H2',
+          location: 'LoginPage.jsx:onSubmit:post_fetch',
+          message: 'Login response received',
+          data: {
+            status: res.status,
+            ok: res.ok,
+            redirected: res.redirected,
+            type: res.type,
+            url: res.url,
+            errorCode: data?.error ?? null,
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {})
+      // #endregion agent log
 
       if (!res.ok) {
         const code = data?.error
@@ -43,6 +86,24 @@ export default function LoginPage() {
       await refresh()
       navigate('/dashboard', { replace: true })
     } catch (err) {
+      // #region agent log
+      fetch('http://127.0.0.1:7799/ingest/4640c2d9-05e7-49ac-af5a-780a24bdc3b2', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '16e790' },
+        body: JSON.stringify({
+          sessionId: '16e790',
+          runId: 'pre-fix',
+          hypothesisId: 'H3',
+          location: 'LoginPage.jsx:onSubmit:catch',
+          message: 'Login fetch threw',
+          data: {
+            name: err instanceof Error ? err.name : null,
+            message: err instanceof Error ? err.message : String(err),
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {})
+      // #endregion agent log
       setError(err instanceof Error ? err.message : String(err))
     } finally {
       setIsLoading(false)
