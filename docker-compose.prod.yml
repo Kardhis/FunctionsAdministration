@@ -1,0 +1,38 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: functions-mysql
+    environment:
+      MYSQL_DATABASE: functions_administration
+      MYSQL_USER: functions
+      MYSQL_PASSWORD: functions
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - functions_mysql_data:/var/lib/mysql
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: functions-backend
+    depends_on:
+      - mysql
+    environment:
+      # Critical: force Spring profile
+      SPRING_PROFILES_ACTIVE: prod
+
+      # Required by application-prod.yml
+      DB_URL: jdbc:mysql://mysql:3306/functions_administration?useUnicode=true&characterEncoding=utf8&connectionCollation=utf8mb4_0900_ai_ci&serverTimezone=UTC
+      DB_USER: functions
+      DB_PASSWORD: functions
+      APP_JWT_SECRET: change-me-in-prod
+
+      # CORS (belt and suspenders): explicitly allow your frontend origins
+      APP_CORS_ALLOWED_ORIGINS: http://168.231.84.188,https://168.231.84.188
+    ports:
+      - "8080:8080"
+
+volumes:
+  functions_mysql_data:

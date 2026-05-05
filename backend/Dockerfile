@@ -1,0 +1,15 @@
+FROM maven:3.9-eclipse-temurin-17 AS build
+WORKDIR /src
+COPY pom.xml /src/pom.xml
+COPY src /src/src
+RUN mvn -q -DskipTests package
+
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=build /src/target/*.jar /app/app.jar
+
+# Ensure production profile unless overridden at runtime
+ENV SPRING_PROFILES_ACTIVE=prod
+
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","/app/app.jar"]
