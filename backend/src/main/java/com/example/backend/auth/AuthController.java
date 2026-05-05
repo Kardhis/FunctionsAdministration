@@ -91,10 +91,16 @@ public class AuthController {
     var roles = userRoleRepository.findRoleNamesByUserId(user.getId());
     String token = jwtService.createToken(user.getEmail().toLowerCase(), roles);
 
+    boolean isHttps =
+        request.isSecure()
+            || "https".equalsIgnoreCase(request.getHeader("X-Forwarded-Proto"))
+            || "https".equalsIgnoreCase(request.getHeader("X-Forwarded-Protocol"));
+    boolean secureFlag = cookieSecure && isHttps;
+
     ResponseCookie cookie =
         ResponseCookie.from(cookieName, token)
             .httpOnly(true)
-            .secure(cookieSecure)
+            .secure(secureFlag)
             .path("/")
             .sameSite(cookieSameSite)
             .maxAge(Duration.ofSeconds(expiresSeconds))
@@ -107,8 +113,10 @@ public class AuthController {
         "AuthController.java:login:set_cookie",
         "Login OK, setting cookie",
         String.format(
-            "{\"setCookieHasSecure\":%s,\"sameSite\":%s,\"maxAgeSeconds\":%d,\"setCookieHeaderLength\":%d}",
+            "{\"setCookieHasSecure\":%s,\"configuredCookieSecure\":%s,\"isHttps\":%s,\"sameSite\":%s,\"maxAgeSeconds\":%d,\"setCookieHeaderLength\":%d}",
+            secureFlag,
             cookieSecure,
+            isHttps,
             jsonStringOrNull(cookieSameSite),
             expiresSeconds,
             cookie.toString().length()));
@@ -128,11 +136,16 @@ public class AuthController {
   }
 
   @PostMapping("/auth/logout")
-  public ResponseEntity<?> logout() {
+  public ResponseEntity<?> logout(HttpServletRequest request) {
+    boolean isHttps =
+        request.isSecure()
+            || "https".equalsIgnoreCase(request.getHeader("X-Forwarded-Proto"))
+            || "https".equalsIgnoreCase(request.getHeader("X-Forwarded-Protocol"));
+    boolean secureFlag = cookieSecure && isHttps;
     ResponseCookie cookie =
         ResponseCookie.from(cookieName, "")
             .httpOnly(true)
-            .secure(cookieSecure)
+            .secure(secureFlag)
             .path("/")
             .sameSite(cookieSameSite)
             .maxAge(Duration.ZERO)
