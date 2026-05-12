@@ -1,0 +1,39 @@
+---
+description: UI and UX quality standards.
+globs: "src/**/*.{js,jsx,ts,tsx,css,scss}"
+alwaysApply: true
+---
+
+# UI and UX Standards
+
+- Maintain a modern, professional, polished visual appearance.
+- Preserve visual consistency across the application.
+- Respect spacing, typography, shadows, colors, and layout systems.
+
+## Styling
+
+- Avoid inline styles unless values are dynamic.
+- Prefer reusable styling patterns.
+- Maintain consistent spacing and sizing.
+- Preserve dark mode quality if used.
+
+## User experience
+
+Every interactive element should define:
+- hover state
+- focus state
+- disabled state
+- loading state
+
+## Feedback
+
+- Provide clear user feedback for actions.
+- Avoid silent failures.
+- Show loading indicators for async actions.
+- Show empty states for empty content.
+
+## Tables and lists
+
+- Tables must remain usable on small screens.
+- Avoid layout breaking.
+- Prefer readable density and spacing.

@@ -1,0 +1,27 @@
+---
+description: Frontend authentication and security rules.
+globs: "src/**/*.{js,jsx,ts,tsx}"
+alwaysApply: true
+---
+
+# Frontend Security Standards
+
+- Never expose secrets in frontend code.
+- Treat all frontend data as untrusted.
+- Avoid dangerouslySetInnerHTML unless sanitized.
+
+## JWT and authentication
+
+- Do not expose JWT tokens in logs or URLs.
+- Handle 401 Unauthorized properly.
+- Login screens must avoid leaking security details.
+
+## Sensitive data
+
+- Avoid storing sensitive information insecurely.
+- Do not expose backend internals to users.
+- Avoid leaking stack traces or technical details.
+
+## Input handling
+
+- Validate and sanitize user input where appropriate.

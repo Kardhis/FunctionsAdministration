@@ -1,0 +1,32 @@
+---
+description: API communication standards.
+globs: "src/**/*.{js,jsx,ts,tsx}"
+alwaysApply: true
+---
+
+# API Standards
+
+- Centralize API communication.
+- Avoid direct fetch calls scattered across components.
+- Use the existing API abstraction layer.
+
+## Configuration
+
+- Never hardcode production URLs.
+- Use environment configuration properly.
+
+## Error handling
+
+Handle:
+- loading
+- empty responses
+- validation errors
+- unauthorized responses
+- network failures
+- server errors
+
+## Async behavior
+
+- Avoid race conditions where relevant.
+- Cancel outdated requests when appropriate.
+- Avoid duplicate unnecessary requests.

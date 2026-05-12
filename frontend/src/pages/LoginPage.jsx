@@ -1,17 +1,26 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext.jsx'
 import { API_BASE } from '../data/api.js'
 import './LoginPage.css'
 
 export default function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { refresh } = useAuth()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [info, setInfo] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    const m = location.state?.message
+    if (typeof m === 'string' && m) {
+      setInfo(m)
+    }
+  }, [location.state])
 
   async function onSubmit(e) {
     e.preventDefault()
@@ -116,28 +125,18 @@ export default function LoginPage() {
       <div className="cpGlowOrbs" aria-hidden="true" />
 
       <section className="cpShell" aria-label="Login">
-        <div className="cpHero">
-          <div className="cpPill" aria-hidden="true">
-            <span className="cpDot" />
-            <span className="cpPillText">Neon_Access</span>
-          </div>
-          <h1 className="cpTitle">Iniciar sesión</h1>
-          <p className="cpSubtitle">
-            Autenticación con JWT en cookie <code>HttpOnly</code>. El frontend no
-            toca el token; solo envía <code>credentials: "include"</code>.
-          </p>
-        </div>
-
         <div className="cpCard" role="region" aria-label="Panel de acceso">
           <div className="cpCardInner">
             <header className="cpCardTitleRow">
               <h2 className="cpCardTitle">Acceso</h2>
-              <p className="cpCardHint">
-                Usa las credenciales demo o prueba un error para ver el feedback.
-              </p>
             </header>
 
             <form onSubmit={onSubmit} className="cpForm" noValidate>
+              {info ? (
+                <p className="cpInfo" role="status" aria-live="polite">
+                  {info}
+                </p>
+              ) : null}
               <div className="cpField">
                 <label className="cpLabel" htmlFor="login-email">
                   Email
@@ -185,6 +184,15 @@ export default function LoginPage() {
                 ) : null}
               </div>
             </form>
+
+            <nav className="cpAuthLinks" aria-label="Otras opciones">
+              <Link className="cpAuthLink" to="/register">
+                Crear cuenta
+              </Link>
+              <Link className="cpAuthLink" to="/forgot-password">
+                ¿Has olvidado la contraseña?
+              </Link>
+            </nav>
           </div>
         </div>
       </section>

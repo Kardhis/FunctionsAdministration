@@ -23,6 +23,7 @@ export const API_BASE = computeApiBase()
 
 export async function apiFetch(path, { method = 'GET', body, headers } = {}) {
   const url = `${API_BASE}${path}`
+
   const res = await fetch(url, {
     method,
     headers: { 'Content-Type': 'application/json', ...(headers ?? {}) },

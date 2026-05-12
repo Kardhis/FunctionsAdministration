@@ -1,0 +1,26 @@
+---
+description: Frontend performance optimization rules.
+globs: "src/**/*.{js,jsx,ts,tsx}"
+alwaysApply: true
+---
+
+# Performance Standards
+
+- Avoid unnecessary heavy rendering.
+- Keep rendering predictable and efficient.
+
+## Components
+
+- Lazy load large pages when appropriate.
+- Avoid oversized component trees.
+- Avoid unnecessary state updates.
+
+## Assets
+
+- Optimize images and assets.
+- Avoid loading unnecessary resources.
+
+## Rendering
+
+- Use memoization only when justified.
+- Avoid premature optimization.

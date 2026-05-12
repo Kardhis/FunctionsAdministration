@@ -68,9 +68,10 @@
 .cpShell {
   width: min(980px, 100%);
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
+  grid-template-columns: 1fr;
   gap: clamp(18px, 3vw, 40px);
   align-items: center;
+  justify-items: center;
   position: relative;
   z-index: 1;
 }
@@ -174,11 +175,14 @@
   display: grid;
   gap: 6px;
   margin-bottom: 2px;
+  text-align: center;
+  justify-items: center;
 }
 
 .cpCardTitle {
   margin: 0;
-  font-size: 18px;
+  font-size: 22px;
+  line-height: 1.15;
   letter-spacing: 0.02em;
   color: rgba(255, 255, 255, 0.92);
 }
@@ -305,6 +309,35 @@
   border: 1px solid rgba(255, 77, 122, 0.25);
   background: rgba(255, 77, 122, 0.10);
   color: rgba(255, 210, 223, 0.92);
+}
+
+.cpInfo {
+  margin: 0;
+  border-radius: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 255, 209, 0.22);
+  background: rgba(0, 255, 209, 0.08);
+  color: rgba(210, 255, 248, 0.95);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.cpAuthLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.cpAuthLink {
+  color: rgba(184, 255, 247, 0.88);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.cpAuthLink:hover {
+  text-decoration: underline;
 }
 
 .cpDetails {

@@ -1,0 +1,38 @@
+---
+description: Mobile-first responsive frontend rules.
+globs: "src/**/*.{js,jsx,ts,tsx,css,scss}"
+alwaysApply: true
+---
+
+# Responsive Standards
+
+- Build mobile-first layouts.
+- Ensure all pages work correctly on:
+  - mobile (360px)
+  - tablet (768px)
+  - desktop (1024px+)
+
+## Layout
+
+- Use flexible layouts.
+- Prefer flex/grid over fixed positioning.
+- Avoid fixed widths that break responsiveness.
+- Use wrapping and overflow handling properly.
+
+## Tables
+
+For tables:
+- Prefer responsive cards on mobile when appropriate.
+- Otherwise provide horizontal scrolling.
+- Never allow tables to overflow the viewport invisibly.
+
+## Typography
+
+- Ensure text remains readable on small screens.
+- Avoid oversized typography on mobile.
+- Maintain proper spacing and touch targets.
+
+## Touch usability
+
+- Ensure clickable elements are easy to tap.
+- Avoid tiny buttons or crowded controls.

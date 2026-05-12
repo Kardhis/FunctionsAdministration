@@ -1,0 +1,15 @@
+---
+description: Frontend git and repository hygiene.
+globs: "src/**/*"
+alwaysApply: true
+---
+
+# Git Hygiene
+
+- Keep commits focused and cohesive.
+- Avoid unrelated modifications.
+- Preserve formatting consistency.
+- Avoid reformatting entire files unnecessarily.
+- Do not commit debug code.
+- Do not commit secrets or sensitive configuration.
+- Respect existing project conventions.

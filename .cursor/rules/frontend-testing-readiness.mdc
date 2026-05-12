@@ -1,0 +1,30 @@
+---
+description: Frontend testability standards.
+globs: "src/**/*.{js,jsx,ts,tsx}"
+alwaysApply: true
+---
+
+# Frontend Testing Readiness
+
+- Write components in a testable way.
+- Avoid tightly coupled implementations.
+
+## Selectors
+
+- Prefer semantic selectors.
+- Use stable IDs where necessary.
+- Avoid brittle selectors based on CSS classes only.
+
+## Structure
+
+- Keep logic isolated and predictable.
+- Separate business logic from rendering when complexity increases.
+
+## Behavior
+
+When implementing features, consider:
+- happy path
+- validation path
+- loading path
+- error path
+- edge cases

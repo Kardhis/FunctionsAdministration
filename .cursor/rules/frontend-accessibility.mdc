@@ -1,0 +1,38 @@
+---
+description: Accessibility and semantic HTML standards.
+globs: "src/**/*.{js,jsx,ts,tsx}"
+alwaysApply: true
+---
+
+# Accessibility Standards
+
+- Use semantic HTML whenever possible.
+- Prefer semantic elements over generic div/span containers.
+
+## Forms
+
+- Every input must have a label.
+- Associate labels correctly.
+- Show accessible validation messages.
+
+## Interaction
+
+- All interactions must be keyboard accessible.
+- Use button for actions.
+- Use anchor for navigation.
+
+## Accessibility behavior
+
+- Preserve visible focus states.
+- Do not rely only on color for meaning.
+- Use aria-* only when semantic HTML is insufficient.
+
+## Images
+
+- All meaningful images require alt text.
+- Decorative images should not pollute screen readers.
+
+## Structure
+
+- Use logical heading hierarchy.
+- Avoid skipping heading levels unnecessarily.

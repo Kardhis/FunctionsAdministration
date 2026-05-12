@@ -1,0 +1,47 @@
+---
+description: Core frontend engineering standards.
+globs: "src/**/*.{js,jsx,ts,tsx}"
+alwaysApply: true
+---
+
+# Frontend Core Standards
+
+- Prioritize maintainability, readability, scalability, accessibility, and responsive behavior.
+- Avoid hacks and temporary solutions unless explicitly requested.
+- Preserve existing behavior unless the task explicitly changes it.
+- Prefer small focused modifications over large rewrites.
+- Inspect surrounding architecture before implementing changes.
+- Separate UI, business logic, API logic, hooks, and utilities.
+- Avoid duplicated logic.
+- Avoid business logic directly inside JSX.
+
+## Project organization
+
+Prefer this structure:
+
+```text
+src/
+  api/
+  assets/
+  components/
+  features/
+  hooks/
+  layouts/
+  pages/
+  routes/
+  styles/
+  utils/
+
+## Naming
+- Use descriptive and intention-revealing names.
+- Avoid abbreviations unless universally understood.
+- Use kebab-case for IDs.
+- Use PascalCase for React components.
+- Use camelCase for variables and functions.
+
+## Code quality
+- Remove dead code and unused imports.
+- Avoid magic strings and magic numbers.
+- Keep files reasonably small and cohesive.
+- Do not mix unrelated refactors with feature work.
+

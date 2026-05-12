@@ -1,0 +1,43 @@
+---
+description: React architecture and component rules.
+globs: "src/**/*.{jsx,tsx}"
+alwaysApply: true
+---
+
+# React Standards
+
+- Use functional components only.
+- Prefer hooks over class components.
+- Keep components focused and reusable.
+- Avoid overly large components.
+
+## Components
+
+- Separate presentation from business logic when complexity grows.
+- Avoid deeply nested JSX.
+- Extract reusable pieces when reuse is expected.
+- Prefer explicit props over implicit behavior.
+
+## State
+
+- Use local state for local concerns.
+- Extract reusable stateful logic into custom hooks.
+- Avoid unnecessary global state.
+- Avoid duplicated derived state.
+
+## Rendering
+
+- Prevent unnecessary re-renders when relevant.
+- Use memoization only when justified.
+- Avoid creating unstable objects/functions unnecessarily inside render.
+
+## Effects
+
+- Keep useEffect predictable and minimal.
+- Avoid effects that synchronize unnecessary state.
+- Cleanup subscriptions and listeners properly.
+
+## Routing
+
+- Keep route components lightweight.
+- Move business logic outside routing definitions when possible.

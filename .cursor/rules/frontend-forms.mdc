@@ -1,0 +1,31 @@
+---
+description: Form architecture and validation standards.
+globs: "src/**/*.{js,jsx,ts,tsx}"
+alwaysApply: true
+---
+
+# Form Standards
+
+All forms must handle:
+- initial state
+- validation state
+- loading state
+- success state when relevant
+- error state
+
+## Validation
+
+- Validate user input appropriately.
+- Show user-friendly validation messages.
+- Prevent duplicate submissions.
+
+## UX
+
+- Disable submit buttons during submission.
+- Preserve user-entered values on validation failure.
+- Focus important invalid fields when appropriate.
+
+## Security
+
+- Never expose sensitive information unnecessarily.
+- Do not log passwords or tokens.
