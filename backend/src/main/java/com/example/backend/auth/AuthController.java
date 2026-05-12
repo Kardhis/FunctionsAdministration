@@ -27,6 +27,8 @@ public class AuthController {
   private final UserRepository userRepository;
   private final UserRoleRepository userRoleRepository;
   private final PasswordEncoder passwordEncoder;
+  private final UserRegistrationService userRegistrationService;
+  private final PasswordResetService passwordResetService;
   private final String cookieName;
   private final long expiresSeconds;
   private final boolean cookieSecure;
@@ -37,6 +39,8 @@ public class AuthController {
       UserRepository userRepository,
       UserRoleRepository userRoleRepository,
       PasswordEncoder passwordEncoder,
+      UserRegistrationService userRegistrationService,
+      PasswordResetService passwordResetService,
       @Value("${app.auth.cookie-name}") String cookieName,
       @Value("${app.jwt.expires-seconds}") long expiresSeconds,
       @Value("${app.auth.cookie-secure}") boolean cookieSecure,
@@ -45,10 +49,33 @@ public class AuthController {
     this.userRepository = userRepository;
     this.userRoleRepository = userRoleRepository;
     this.passwordEncoder = passwordEncoder;
+    this.userRegistrationService = userRegistrationService;
+    this.passwordResetService = passwordResetService;
     this.cookieName = cookieName;
     this.expiresSeconds = expiresSeconds;
     this.cookieSecure = cookieSecure;
     this.cookieSameSite = cookieSameSite;
+  }
+
+  @PostMapping("/auth/register")
+  public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest req) {
+    userRegistrationService.register(req);
+    return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "register_ok"));
+  }
+
+  @PostMapping("/auth/forgot-password")
+  public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest req) {
+    passwordResetService.requestForgotPassword(req.email());
+    return ResponseEntity.ok(
+        Map.of(
+            "message",
+            "Si el correo está registrado, recibirás un enlace para restablecer la contraseña."));
+  }
+
+  @PostMapping("/auth/reset-password")
+  public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest req) {
+    passwordResetService.resetPassword(req.token(), req.newPassword());
+    return ResponseEntity.ok(Map.of("message", "password_reset_ok"));
   }
 
   @PostMapping("/auth/login")

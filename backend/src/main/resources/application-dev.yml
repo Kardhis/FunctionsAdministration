@@ -4,6 +4,17 @@ spring:
     url: ${DB_URL}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
+  mail:
+    host: ${MAIL_HOST:}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: ${MAIL_SMTP_AUTH:true}
+          starttls:
+            enable: ${MAIL_SMTP_STARTTLS:true}
   flyway:
     enabled: true
   jackson:
@@ -11,7 +22,9 @@ spring:
 
 app:
   jwt:
-    secret: ${APP_JWT_SECRET}
+    secret: ${APP_JWT_SECRET:local-dev-only-change-in-production-min-32-chars}
+  frontend:
+    base-url: ${APP_FRONTEND_BASE_URL:http://localhost:5173}
   # APP_DEMO_SEED_USER=true crea adminuser@mail.com / password al arrancar (ver README).
   demo:
     seed-user: ${APP_DEMO_SEED_USER:false}
@@ -25,3 +38,4 @@ springdoc:
     enabled: true
   swagger-ui:
     enabled: true
+

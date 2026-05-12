@@ -1,4 +1,15 @@
 spring:
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: ${MAIL_SMTP_AUTH:true}
+          starttls:
+            enable: ${MAIL_SMTP_STARTTLS:true}
   datasource:
     url: ${DB_URL}
     username: ${DB_USER}
@@ -10,6 +21,12 @@ spring:
 app:
   jwt:
     secret: ${APP_JWT_SECRET}
+  frontend:
+    base-url: ${APP_FRONTEND_BASE_URL}
+  password-reset:
+    token-validity-seconds: ${APP_PASSWORD_RESET_TTL_SECONDS:3600}
+    mail-from: ${APP_PASSWORD_RESET_MAIL_FROM:}
+    mail-subject: ${APP_PASSWORD_RESET_MAIL_SUBJECT:Recuperación de contraseña}
   demo:
     seed-user: false
   auth:

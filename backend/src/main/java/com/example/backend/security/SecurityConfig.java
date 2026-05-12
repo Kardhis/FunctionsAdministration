@@ -81,7 +81,18 @@ public class SecurityConfig {
                   .permitAll()
                 .requestMatchers("/login")
                   .permitAll()
-                .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/login/", "/auth/logout", "/auth/logout/")
+                .requestMatchers(
+                    HttpMethod.POST,
+                    "/auth/login",
+                    "/auth/login/",
+                    "/auth/logout",
+                    "/auth/logout/",
+                    "/auth/register",
+                    "/auth/register/",
+                    "/auth/forgot-password",
+                    "/auth/forgot-password/",
+                    "/auth/reset-password",
+                    "/auth/reset-password/")
                   .permitAll()
                 .requestMatchers("/auth/me")
                   .authenticated()
