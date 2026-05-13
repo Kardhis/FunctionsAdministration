@@ -1,9 +1,10 @@
 spring:
   mail:
-    host: ${MAIL_HOST}
+    # Empty defaults so the app starts without MAIL_* in Docker; forgot-password skips email until SMTP is set.
+    host: ${MAIL_HOST:dcastel.work@gmail.com}
     port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
     properties:
       mail:
         smtp:
@@ -22,7 +23,7 @@ app:
   jwt:
     secret: ${APP_JWT_SECRET}
   frontend:
-    base-url: ${APP_FRONTEND_BASE_URL}
+    base-url: ${APP_FRONTEND_BASE_URL:http://168.231.84.188}
   password-reset:
     token-validity-seconds: ${APP_PASSWORD_RESET_TTL_SECONDS:3600}
     mail-from: ${APP_PASSWORD_RESET_MAIL_FROM:}
