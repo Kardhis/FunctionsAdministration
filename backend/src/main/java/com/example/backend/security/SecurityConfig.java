@@ -9,6 +9,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -16,6 +17,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import com.example.backend.debug.AgentNdjsonLog;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 public class SecurityConfig {
@@ -106,7 +111,24 @@ public class SecurityConfig {
         .exceptionHandling(
             eh ->
                 eh.authenticationEntryPoint(
-                    (req, res, ex) -> res.sendError(401, "Unauthorized")));
+                    (HttpServletRequest servletReq, HttpServletResponse res, AuthenticationException ex) -> {
+                      // #region agent log
+                      AgentNdjsonLog.append82787c(
+                          "pre-fix",
+                          "H1",
+                          "SecurityConfig.authenticationEntryPoint",
+                          "401 Unauthorized entry point invoked",
+                          String.format(
+                              "{\"method\":\"%s\",\"requestURI\":\"%s\",\"servletPath\":\"%s\",\"contextPath\":\"%s\",\"authType\":%s}",
+                              AgentNdjsonLog.safe(servletReq.getMethod()),
+                              AgentNdjsonLog.safe(servletReq.getRequestURI()),
+                              AgentNdjsonLog.safe(servletReq.getServletPath()),
+                              AgentNdjsonLog.safe(servletReq.getContextPath()),
+                              AgentNdjsonLog.jsonStringOrNull(
+                                  servletReq.getAuthType() == null ? null : servletReq.getAuthType())));
+                      // #endregion agent log
+                      res.sendError(401, "Unauthorized");
+                    }));
     http.addFilterBefore(
         jwtCookieAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     return http.build();

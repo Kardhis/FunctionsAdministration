@@ -3,9 +3,6 @@ package com.example.backend.auth;
 import java.time.Duration;
 import java.security.Principal;
 import java.util.Map;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -19,6 +16,8 @@ import jakarta.validation.Valid;
 import com.example.backend.users.UserRepository;
 import com.example.backend.rbac.UserRoleRepository;
 import jakarta.servlet.http.HttpServletRequest;
+
+import com.example.backend.debug.AgentNdjsonLog;
 
 @RestController
 public class AuthController {
@@ -65,6 +64,14 @@ public class AuthController {
 
   @PostMapping("/auth/forgot-password")
   public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest req) {
+    // #region agent log
+    AgentNdjsonLog.append82787c(
+        "pre-fix",
+        "H3",
+        "AuthController.forgotPassword:entry",
+        "forgot-password reached controller",
+        "{}");
+    // #endregion agent log
     passwordResetService.requestForgotPassword(req.email());
     return ResponseEntity.ok(
         Map.of(
@@ -81,22 +88,22 @@ public class AuthController {
   @PostMapping("/auth/login")
   public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req, HttpServletRequest request) {
     // #region agent log
-    agentLog(
+    AgentNdjsonLog.append82787c(
         "pre-fix",
         "H1",
         "AuthController.java:login:entry",
         "Login attempt (no secrets)",
         String.format(
             "{\"origin\":%s,\"host\":%s,\"scheme\":\"%s\",\"isSecure\":%s,\"cookieName\":\"%s\",\"cookieSecure\":%s,\"sameSite\":%s,\"expiresSeconds\":%d,\"emailDomain\":%s}",
-            jsonStringOrNull(request.getHeader("Origin")),
-            jsonStringOrNull(request.getHeader("Host")),
-            safe(request.getScheme()),
+            AgentNdjsonLog.jsonStringOrNull(request.getHeader("Origin")),
+            AgentNdjsonLog.jsonStringOrNull(request.getHeader("Host")),
+            AgentNdjsonLog.safe(request.getScheme()),
             request.isSecure(),
-            safe(cookieName),
+            AgentNdjsonLog.safe(cookieName),
             cookieSecure,
-            jsonStringOrNull(cookieSameSite),
+            AgentNdjsonLog.jsonStringOrNull(cookieSameSite),
             expiresSeconds,
-            jsonStringOrNull(extractDomain(req.email()))));
+            AgentNdjsonLog.jsonStringOrNull(extractDomain(req.email()))));
     // #endregion agent log
 
     String emailTrim = req.email().trim();
@@ -134,7 +141,7 @@ public class AuthController {
             .build();
 
     // #region agent log
-    agentLog(
+    AgentNdjsonLog.append82787c(
         "pre-fix",
         "H2",
         "AuthController.java:login:set_cookie",
@@ -144,7 +151,7 @@ public class AuthController {
             secureFlag,
             cookieSecure,
             isHttps,
-            jsonStringOrNull(cookieSameSite),
+            AgentNdjsonLog.jsonStringOrNull(cookieSameSite),
             expiresSeconds,
             cookie.toString().length()));
     // #endregion agent log
@@ -181,43 +188,6 @@ public class AuthController {
     return ResponseEntity.ok()
         .header("Set-Cookie", cookie.toString())
         .body(Map.of("message", "logout_ok"));
-  }
-
-  private static void agentLog(
-      String runId, String hypothesisId, String location, String message, String dataJsonObject) {
-    try {
-      String line =
-          String.format(
-              "{\"sessionId\":\"16e790\",\"runId\":%s,\"hypothesisId\":%s,\"location\":%s,\"message\":%s,\"data\":%s,\"timestamp\":%d}%n",
-              jsonStringOrNull(runId),
-              jsonStringOrNull(hypothesisId),
-              jsonStringOrNull(location),
-              jsonStringOrNull(message),
-              (dataJsonObject == null || dataJsonObject.isBlank()) ? "{}" : dataJsonObject,
-              System.currentTimeMillis());
-      Files.writeString(
-          Path.of("debug-16e790.log"),
-          line,
-          StandardOpenOption.CREATE,
-          StandardOpenOption.WRITE,
-          StandardOpenOption.APPEND);
-    } catch (Exception ignored) {
-      // swallow
-    }
-  }
-
-  private static String safe(String s) {
-    return s == null ? "" : s;
-  }
-
-  private static String jsonEscape(String s) {
-    if (s == null) return "";
-    return s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
-  }
-
-  private static String jsonStringOrNull(String s) {
-    if (s == null) return "null";
-    return "\"" + jsonEscape(s) + "\"";
   }
 
   private static String extractDomain(String email) {
