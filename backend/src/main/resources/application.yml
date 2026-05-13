@@ -1,6 +1,11 @@
 spring:
   application:
     name: backend
+  # Belt-and-suspenders: also set via @SpringBootApplication(exclude=...). Ensures this runs even if
+  # an older fat JAR or layered image missed the annotation metadata refresh.
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
   flyway:
