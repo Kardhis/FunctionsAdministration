@@ -28,7 +28,7 @@ services:
       DB_USER: functions
       DB_PASSWORD: functions
       APP_JWT_SECRET: jwt_secret_dcc_?!¡¿
-      
+
       # Base URL for password-reset links in emails (must match how users open the SPA)
       APP_FRONTEND_BASE_URL: http://168.231.84.188
 
