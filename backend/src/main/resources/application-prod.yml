@@ -1,7 +1,11 @@
 spring:
+  # Prod must not load default in-memory user (conflicts with JWT + can cause 401 on public /auth/*).
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration
   mail:
     # Empty defaults so the app starts without MAIL_* in Docker; forgot-password skips email until SMTP is set.
-    host: ${MAIL_HOST:dcastel.work@gmail.com}
+    host: ${MAIL_HOST:}
     port: ${MAIL_PORT:587}
     username: ${MAIL_USERNAME:}
     password: ${MAIL_PASSWORD:}
