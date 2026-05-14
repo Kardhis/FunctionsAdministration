@@ -1,0 +1,59 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: functions-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command:
+      [
+        "--character-set-server=utf8mb4",
+        "--collation-server=utf8mb4_0900_ai_ci"
+      ]
+    ports:
+      - "127.0.0.1:3306:3306"
+
+  backend:
+    image: functions-backend:1.0
+    container_name: functions-backend
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      APP_CORS_ALLOWED_ORIGINS: http://168.231.84.188,https://168.231.84.188
+
+      APP_JWT_SECRET: ${APP_JWT_SECRET}
+      DB_URL: ${DB_URL}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      TZ: Europe/Madrid
+      JAVA_TOOL_OPTIONS: "-Duser.timezone=Europe/Madrid"
+      
+      MAIL_HOST: smtp.gmail.com
+      MAIL_PORT: "587"
+      MAIL_USERNAME: dcastel.work@gmail.com
+      MAIL_PASSWORD: rlwrjqsuovqmsfce
+      APP_FRONTEND_BASE_URL: http://168.231.84.188
+      APP_PASSWORD_RESET_TTL_SECONDS: "3600"
+      APP_PASSWORD_RESET_MAIL_FROM: dcastel.work@gmail.com
+      APP_PASSWORD_RESET_MAIL_SUBJECT: "Recuperación de contraseña"
+
+    ports:
+      - "8080:8080"
+  frontend:
+    image: nginx:alpine
+    container_name: functions-frontend
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html
+    depends_on:
+      - backend
+volumes:
+  mysql_data:
