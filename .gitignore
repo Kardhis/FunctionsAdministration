@@ -23,6 +23,7 @@ out/
 .env.*
 !.env.development
 !.env.production
+!.env.example
 
 # ======================
 # IDE

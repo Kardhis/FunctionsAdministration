@@ -2,6 +2,7 @@ services:
   mysql:
     image: mysql:8.4
     container_name: functions-mysql
+    restart: unless-stopped
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
@@ -11,14 +12,31 @@ services:
       - "127.0.0.1:3306:3306"
     volumes:
       - functions_mysql_data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "127.0.0.1",
+          "-uroot",
+          "-p${MYSQL_ROOT_PASSWORD}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 45s
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: functions-backend
+    restart: unless-stopped
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: prod
       DB_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}?useUnicode=true&characterEncoding=utf8&connectionCollation=utf8mb4_0900_ai_ci&serverTimezone=UTC
