@@ -4,6 +4,12 @@ import { API_BASE } from '../data/api.js'
 
 const AuthContext = createContext(null)
 
+function isLocalDebugHost() {
+  if (typeof window === 'undefined') return false
+  const host = window.location.hostname
+  return host === 'localhost' || host === '127.0.0.1'
+}
+
 export function AuthProvider({ children }) {
   const [status, setStatus] = useState('loading') // loading | authenticated | unauthenticated
   const [user, setUser] = useState(null)
@@ -29,7 +35,7 @@ export function AuthProvider({ children }) {
       setRoles(nextRoles)
       setStatus('authenticated')
       // #region agent log
-      fetch('http://127.0.0.1:7799/ingest/4640c2d9-05e7-49ac-af5a-780a24bdc3b2', {
+      if (isLocalDebugHost()) fetch('http://127.0.0.1:7799/ingest/4640c2d9-05e7-49ac-af5a-780a24bdc3b2', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '877f10' },
         body: JSON.stringify({

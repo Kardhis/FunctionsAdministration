@@ -35,6 +35,12 @@ function computeApiBase() {
 
 export const API_BASE = computeApiBase()
 
+function isLocalDebugHost() {
+  if (typeof window === 'undefined') return false
+  const host = window.location.hostname
+  return host === 'localhost' || host === '127.0.0.1'
+}
+
 export async function apiFetch(path, { method = 'GET', body, headers } = {}) {
   const url = `${API_BASE}${path}`
 
@@ -48,7 +54,7 @@ export async function apiFetch(path, { method = 'GET', body, headers } = {}) {
   const data = await res.json().catch(() => null)
   if (!res.ok) {
     // #region agent log
-    if (res.status === 403 || res.status === 401) {
+    if (isLocalDebugHost() && (res.status === 403 || res.status === 401)) {
       fetch('http://127.0.0.1:7799/ingest/4640c2d9-05e7-49ac-af5a-780a24bdc3b2', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '877f10' },
