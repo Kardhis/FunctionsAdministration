@@ -17,6 +17,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import com.example.backend.debug.DebugSessionLog;
 
 @Component
 public class JwtCookieAuthenticationFilter extends OncePerRequestFilter {
@@ -55,6 +56,33 @@ public class JwtCookieAuthenticationFilter extends OncePerRequestFilter {
         }
       }
     }
+
+    // #region agent log
+    if (request.getRequestURI() != null && request.getRequestURI().startsWith("/api/")) {
+      var auth = SecurityContextHolder.getContext().getAuthentication();
+      boolean hasCookie = readCookie(request, cookieName) != null;
+      String authorities =
+          auth == null
+              ? "none"
+              : auth.getAuthorities().stream()
+                  .map(Object::toString)
+                  .reduce((a, b) -> a + "," + b)
+                  .orElse("");
+      DebugSessionLog.write(
+          "H1-H2",
+          "JwtCookieAuthenticationFilter.java:api",
+          "api request auth state",
+          "{\"path\":\""
+              + request.getRequestURI()
+              + "\",\"hasCookie\":"
+              + hasCookie
+              + ",\"authenticated\":"
+              + (auth != null && auth.isAuthenticated())
+              + ",\"authorities\":\""
+              + authorities
+              + "\"}");
+    }
+    // #endregion
 
     filterChain.doFilter(request, response);
   }

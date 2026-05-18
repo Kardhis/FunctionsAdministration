@@ -28,6 +28,20 @@ export function AuthProvider({ children }) {
       setUser(data?.user ?? null)
       setRoles(nextRoles)
       setStatus('authenticated')
+      // #region agent log
+      fetch('http://127.0.0.1:7799/ingest/4640c2d9-05e7-49ac-af5a-780a24bdc3b2', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '877f10' },
+        body: JSON.stringify({
+          sessionId: '877f10',
+          hypothesisId: 'H1',
+          location: 'AuthContext.jsx:refresh',
+          message: 'auth me ok',
+          data: { roleCount: nextRoles.length, roles: nextRoles },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {})
+      // #endregion
 
       return { ok: true, roles: nextRoles }
     } catch {

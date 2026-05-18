@@ -47,6 +47,22 @@ export async function apiFetch(path, { method = 'GET', body, headers } = {}) {
 
   const data = await res.json().catch(() => null)
   if (!res.ok) {
+    // #region agent log
+    if (res.status === 403 || res.status === 401) {
+      fetch('http://127.0.0.1:7799/ingest/4640c2d9-05e7-49ac-af5a-780a24bdc3b2', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '877f10' },
+        body: JSON.stringify({
+          sessionId: '877f10',
+          hypothesisId: 'H2-H4',
+          location: 'api.js:apiFetch',
+          message: 'api error response',
+          data: { path, status: res.status, apiBase: API_BASE },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {})
+    }
+    // #endregion
     const message = (data && (data.error || data.message)) ?? `HTTP ${res.status}`
     const err = new Error(message)
     err.status = res.status
