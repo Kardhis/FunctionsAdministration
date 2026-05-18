@@ -18,8 +18,12 @@ import StatsPage from './pages/dashboard/StatsPage.jsx'
 import CalendarPage from './pages/dashboard/CalendarPage.jsx'
 import ProfilePage from './pages/dashboard/ProfilePage.jsx'
 import AdminRoute from './routes/AdminRoute.jsx'
+import AdminOnlyRoute from './routes/AdminOnlyRoute.jsx'
+import PrivateLandingRedirect from './routes/PrivateLandingRedirect.jsx'
 import AdminUsersPage from './pages/dashboard/AdminUsersPage.jsx'
 import ObjectivesPage from './features/objectives/pages/ObjectivesPage.jsx'
+
+const adminOnlyRedirect = '/dashboard/habits/overview'
 
 function App() {
   return (
@@ -37,21 +41,77 @@ function App() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<DashboardOverviewPage />} />
+        <Route
+          index
+          element={
+            <AdminOnlyRoute redirectTo={adminOnlyRedirect}>
+              <DashboardOverviewPage />
+            </AdminOnlyRoute>
+          }
+        />
         <Route path="habits" element={<HabitsAppLayout />}>
           <Route index element={<Navigate to="overview" replace />} />
           <Route path="overview" element={<HabitsOverviewPage />} />
           <Route path="objectives" element={<ObjectivesPage />} />
           <Route path="manage" element={<HabitsManagePage />} />
           <Route path="log" element={<HabitsLogPage />} />
-          <Route path="week" element={<HabitsWeekPage />} />
-          <Route path="analytics" element={<HabitsStatsPage />} />
-          <Route path="settings" element={<HabitsSettingsPage />} />
+          <Route
+            path="week"
+            element={
+              <AdminOnlyRoute redirectTo={adminOnlyRedirect}>
+                <HabitsWeekPage />
+              </AdminOnlyRoute>
+            }
+          />
+          <Route
+            path="analytics"
+            element={
+              <AdminOnlyRoute redirectTo={adminOnlyRedirect}>
+                <HabitsStatsPage />
+              </AdminOnlyRoute>
+            }
+          />
+          <Route
+            path="settings"
+            element={
+              <AdminOnlyRoute redirectTo={adminOnlyRedirect}>
+                <HabitsSettingsPage />
+              </AdminOnlyRoute>
+            }
+          />
         </Route>
-        <Route path="daily" element={<DailyLogPage />} />
-        <Route path="stats" element={<StatsPage />} />
-        <Route path="calendar" element={<CalendarPage />} />
-        <Route path="profile" element={<ProfilePage />} />
+        <Route
+          path="daily"
+          element={
+            <AdminOnlyRoute redirectTo={adminOnlyRedirect}>
+              <DailyLogPage />
+            </AdminOnlyRoute>
+          }
+        />
+        <Route
+          path="stats"
+          element={
+            <AdminOnlyRoute redirectTo={adminOnlyRedirect}>
+              <StatsPage />
+            </AdminOnlyRoute>
+          }
+        />
+        <Route
+          path="calendar"
+          element={
+            <AdminOnlyRoute redirectTo={adminOnlyRedirect}>
+              <CalendarPage />
+            </AdminOnlyRoute>
+          }
+        />
+        <Route
+          path="profile"
+          element={
+            <AdminOnlyRoute redirectTo={adminOnlyRedirect}>
+              <ProfilePage />
+            </AdminOnlyRoute>
+          }
+        />
         <Route
           path="admin/users"
           element={
@@ -65,7 +125,7 @@ function App() {
         path="/private"
         element={
           <ProtectedRoute>
-            <Navigate to="/dashboard" replace />
+            <PrivateLandingRedirect />
           </ProtectedRoute>
         }
       />

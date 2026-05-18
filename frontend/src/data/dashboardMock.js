@@ -79,9 +79,26 @@ export const dashboardRecentActivity = [
   },
 ]
 
+/**
+ * @param {import('./types.js').NavItem[]} navItems
+ * @param {boolean} admin
+ * @returns {import('./types.js').NavItem[]}
+ */
+export function filterDashboardNavByRole(navItems, admin) {
+  return navItems
+    .filter((item) => admin || !item.requiresAdmin)
+    .map((item) => {
+      if (!item.children?.length) return item
+      const children = item.children.filter((c) => admin || !c.requiresAdmin)
+      if (children.length === 0) return null
+      return { ...item, children }
+    })
+    .filter(Boolean)
+}
+
 /** @type {import('./types.js').NavItem[]} */
 export const dashboardNav = [
-  { key: 'overview', label: 'Overview', to: '/dashboard', icon: 'grid' },
+  { key: 'overview', label: 'Overview', to: '/dashboard', icon: 'grid', requiresAdmin: true },
   {
     key: 'habits',
     label: 'Hàbits',
@@ -91,15 +108,15 @@ export const dashboardNav = [
       { key: 'habits-objectives', label: 'Objetivos', to: '/dashboard/habits/objectives' },
       { key: 'habits-manage', label: 'Hábitos', to: '/dashboard/habits/manage' },
       { key: 'habits-log', label: 'Registros', to: '/dashboard/habits/log' },
-      { key: 'habits-week', label: 'Semana', to: '/dashboard/habits/week' },
-      { key: 'habits-analytics', label: 'Analítica', to: '/dashboard/habits/analytics' },
-      { key: 'habits-settings', label: 'Ajustes', to: '/dashboard/habits/settings' },
+      { key: 'habits-week', label: 'Semana', to: '/dashboard/habits/week', requiresAdmin: true },
+      { key: 'habits-analytics', label: 'Analítica', to: '/dashboard/habits/analytics', requiresAdmin: true },
+      { key: 'habits-settings', label: 'Ajustes', to: '/dashboard/habits/settings', requiresAdmin: true },
     ],
   },
-  { key: 'daily', label: 'Registro', to: '/dashboard/daily', icon: 'check' },
-  { key: 'stats', label: 'Estadísticas', to: '/dashboard/stats', icon: 'chart' },
-  { key: 'calendar', label: 'Calendario', to: '/dashboard/calendar', icon: 'calendar' },
-  { key: 'profile', label: 'Perfil', to: '/dashboard/profile', icon: 'user' },
+  { key: 'daily', label: 'Registro', to: '/dashboard/daily', icon: 'check', requiresAdmin: true },
+  { key: 'stats', label: 'Estadísticas', to: '/dashboard/stats', icon: 'chart', requiresAdmin: true },
+  { key: 'calendar', label: 'Calendario', to: '/dashboard/calendar', icon: 'calendar', requiresAdmin: true },
+  { key: 'profile', label: 'Perfil', to: '/dashboard/profile', icon: 'user', requiresAdmin: true },
   {
     key: 'admin',
     label: 'Administració',

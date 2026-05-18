@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext.jsx'
+import { isAdmin } from '../auth/roles.js'
 import { API_BASE } from '../data/api.js'
 import './LoginPage.css'
 
@@ -49,8 +50,11 @@ export default function LoginPage() {
         return
       }
 
-      await refresh()
-      navigate('/dashboard', { replace: true })
+      const { ok, roles } = await refresh()
+      if (!ok) return
+
+      const dest = isAdmin(roles) ? '/dashboard' : '/dashboard/habits/overview'
+      navigate(dest, { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
     } finally {

@@ -18,21 +18,23 @@ export function AuthProvider({ children }) {
 
       if (!res.ok) {
         setUser(null)
+        setRoles([])
         setStatus('unauthenticated')
-        return false
+        return { ok: false, roles: [] }
       }
 
       const data = await res.json().catch(() => ({}))
+      const nextRoles = Array.isArray(data?.roles) ? data.roles : []
       setUser(data?.user ?? null)
-      setRoles(Array.isArray(data?.roles) ? data.roles : [])
+      setRoles(nextRoles)
       setStatus('authenticated')
 
-      return true
+      return { ok: true, roles: nextRoles }
     } catch {
       setUser(null)
       setRoles([])
       setStatus('unauthenticated')
-      return false
+      return { ok: false, roles: [] }
     }
   }, [])
 

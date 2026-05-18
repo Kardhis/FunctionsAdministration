@@ -4,7 +4,8 @@ import { useAuth } from '../auth/AuthContext.jsx'
 import Avatar from '../components/Avatar.jsx'
 import Button from '../components/Button.jsx'
 import Badge from '../components/Badge.jsx'
-import { dashboardNav } from '../data/dashboardMock.js'
+import { dashboardNav, filterDashboardNavByRole } from '../data/dashboardMock.js'
+import { isAdmin } from '../auth/roles.js'
 import { applyThemeToRoot, loadThemeSetting } from '../theme/theme.js'
 
 function pageTitleFromPath(pathname) {
@@ -264,10 +265,7 @@ export default function DashboardLayout() {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [navOpen, setNavOpen] = useState(false)
 
-  const navItems = useMemo(() => {
-    const isAdmin = Array.isArray(roles) && roles.includes('ADMIN')
-    return dashboardNav.filter((item) => !item.requiresAdmin || isAdmin)
-  }, [roles])
+  const navItems = useMemo(() => filterDashboardNavByRole(dashboardNav, isAdmin(roles)), [roles])
 
   const title = useMemo(() => pageTitleFromPath(location.pathname), [location.pathname])
   const displayName = useMemo(() => displayNameFromUser(user), [user])

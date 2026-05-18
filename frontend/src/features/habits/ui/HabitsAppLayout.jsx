@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../../../auth/AuthContext.jsx'
+import { isAdmin } from '../../../auth/roles.js'
 import { useHabitAppStore } from '../store/habitAppStore.js'
 import Button from '../../../components/Button.jsx'
 import HabitCreateModal from './HabitCreateModal.jsx'
@@ -25,7 +26,8 @@ function TabLink({ to, children }) {
 
 export default function HabitsAppLayout() {
   const location = useLocation()
-  const { user } = useAuth()
+  const { user, roles } = useAuth()
+  const admin = isAdmin(roles)
   const bootstrap = useHabitAppStore((s) => s.bootstrap)
   const resetSession = useHabitAppStore((s) => s.resetSession)
   const prevUserRef = useRef(user)
@@ -102,10 +104,11 @@ export default function HabitsAppLayout() {
       analytics: 'Analítica de hábitos',
       settings: 'Ajustes del módulo',
     }
-    return map[last] ?? 'Hábitos'
-  }, [location.pathname])
+    const t = map[last]
+    if (t && !admin && (last === 'week' || last === 'analytics' || last === 'settings')) return 'Hábitos'
+    return t ?? 'Hábitos'
+  }, [location.pathname, admin])
 
-  const isManageTab = useMemo(() => location.pathname.endsWith('/dashboard/habits/manage'), [location.pathname])
   const sortedCategories = useMemo(
     () => (Array.isArray(categories) ? categories.slice().sort((a, b) => String(a.name).localeCompare(String(b.name))) : []),
     [categories],
@@ -129,9 +132,13 @@ export default function HabitsAppLayout() {
           <TabLink to="/dashboard/habits/objectives">Objetivos</TabLink>
           <TabLink to="/dashboard/habits/manage">Hábitos</TabLink>
           <TabLink to="/dashboard/habits/log">Registros</TabLink>
-          <TabLink to="/dashboard/habits/week">Semana</TabLink>
-          <TabLink to="/dashboard/habits/analytics">Analítica</TabLink>
-          <TabLink to="/dashboard/habits/settings">Ajustes</TabLink>
+          {admin ? (
+            <>
+              <TabLink to="/dashboard/habits/week">Semana</TabLink>
+              <TabLink to="/dashboard/habits/analytics">Analítica</TabLink>
+              <TabLink to="/dashboard/habits/settings">Ajustes</TabLink>
+            </>
+          ) : null}
         </div>
       </div>
 

@@ -11,7 +11,7 @@
  */
 
 /**
- * @typedef {{ key: string, label: string, to: string }} NavChildItem
+ * @typedef {{ key: string, label: string, to: string, requiresAdmin?: boolean }} NavChildItem
  */
 
 /**
