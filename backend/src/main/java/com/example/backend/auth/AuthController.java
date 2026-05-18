@@ -17,7 +17,6 @@ import jakarta.validation.Valid;
 import com.example.backend.users.UserRepository;
 import com.example.backend.rbac.UserRoleRepository;
 import jakarta.servlet.http.HttpServletRequest;
-import com.example.backend.debug.DebugSessionLog;
 
 @RestController
 public class AuthController {
@@ -124,13 +123,6 @@ public class AuthController {
     var u = userRepository.findByEmailIgnoreCase(email).orElse(null);
     List<String> roles =
         (u == null) ? List.of() : userRoleRepository.findRoleNamesByUserId(u.getId());
-    // #region agent log
-    DebugSessionLog.write(
-        "H1",
-        "AuthController.java:me",
-        "auth me roles from db",
-        "{\"roleCount\":" + roles.size() + ",\"roles\":\"" + String.join(",", roles) + "\"}");
-    // #endregion
 
     var body = Map.<String, Object>of("user", email, "roles", roles);
     if (u == null || !u.isActive() || roles.isEmpty()) {
