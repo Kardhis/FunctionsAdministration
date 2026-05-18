@@ -42,6 +42,19 @@ export const useHabitAppStore = create((set, get) => ({
     theme: 'system', // system|light|dark
   },
 
+  resetSession() {
+    set({
+      bootstrapped: false,
+      loading: false,
+      error: '',
+      toasts: [],
+      habits: [],
+      entries: [],
+      categories: [],
+      settings: { enforceNoOverlap: false, theme: 'system' },
+    })
+  },
+
   async bootstrap() {
     if (get().bootstrapped) return
     set({ loading: true, error: '' })

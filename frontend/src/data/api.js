@@ -38,37 +38,12 @@ export const API_BASE = computeApiBase()
 export async function apiFetch(path, { method = 'GET', body, headers } = {}) {
   const url = `${API_BASE}${path}`
 
-  // #region agent log
-  let res
-  try {
-    res = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json', ...(headers ?? {}) },
-      credentials: 'include',
-      body: body === undefined ? undefined : JSON.stringify(body),
-    })
-  } catch (e) {
-    fetch('http://127.0.0.1:7799/ingest/4640c2d9-05e7-49ac-af5a-780a24bdc3b2', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '9d3ba5' },
-      body: JSON.stringify({
-        sessionId: '9d3ba5',
-        runId: 'pre-fix',
-        hypothesisId: 'H-net',
-        location: 'api.js:apiFetch',
-        message: 'fetch network failure',
-        data: {
-          apiBaseLen: API_BASE.length,
-          pathStart: String(path).slice(0, 48),
-          errName: e && e.name,
-          errMsg: e && String(e.message || e),
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {})
-    throw e
-  }
-  // #endregion agent log
+  const res = await fetch(url, {
+    method,
+    headers: { 'Content-Type': 'application/json', ...(headers ?? {}) },
+    credentials: 'include',
+    body: body === undefined ? undefined : JSON.stringify(body),
+  })
 
   const data = await res.json().catch(() => null)
   if (!res.ok) {

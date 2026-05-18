@@ -17,8 +17,6 @@ import com.example.backend.users.UserRepository;
 import com.example.backend.rbac.UserRoleRepository;
 import jakarta.servlet.http.HttpServletRequest;
 
-import com.example.backend.debug.AgentNdjsonLog;
-
 @RestController
 public class AuthController {
 
@@ -64,14 +62,6 @@ public class AuthController {
 
   @PostMapping("/auth/forgot-password")
   public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest req) {
-    // #region agent log
-    AgentNdjsonLog.append82787c(
-        "pre-fix",
-        "H3",
-        "AuthController.forgotPassword:entry",
-        "forgot-password reached controller",
-        "{}");
-    // #endregion agent log
     passwordResetService.requestForgotPassword(req.email());
     return ResponseEntity.ok(
         Map.of(
@@ -87,25 +77,6 @@ public class AuthController {
 
   @PostMapping("/auth/login")
   public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req, HttpServletRequest request) {
-    // #region agent log
-    AgentNdjsonLog.append82787c(
-        "pre-fix",
-        "H1",
-        "AuthController.java:login:entry",
-        "Login attempt (no secrets)",
-        String.format(
-            "{\"origin\":%s,\"host\":%s,\"scheme\":\"%s\",\"isSecure\":%s,\"cookieName\":\"%s\",\"cookieSecure\":%s,\"sameSite\":%s,\"expiresSeconds\":%d,\"emailDomain\":%s}",
-            AgentNdjsonLog.jsonStringOrNull(request.getHeader("Origin")),
-            AgentNdjsonLog.jsonStringOrNull(request.getHeader("Host")),
-            AgentNdjsonLog.safe(request.getScheme()),
-            request.isSecure(),
-            AgentNdjsonLog.safe(cookieName),
-            cookieSecure,
-            AgentNdjsonLog.jsonStringOrNull(cookieSameSite),
-            expiresSeconds,
-            AgentNdjsonLog.jsonStringOrNull(extractDomain(req.email()))));
-    // #endregion agent log
-
     String emailTrim = req.email().trim();
     var userOpt = userRepository.findByEmailIgnoreCase(emailTrim);
     if (userOpt.isEmpty()) {
@@ -140,22 +111,6 @@ public class AuthController {
             .maxAge(Duration.ofSeconds(expiresSeconds))
             .build();
 
-    // #region agent log
-    AgentNdjsonLog.append82787c(
-        "pre-fix",
-        "H2",
-        "AuthController.java:login:set_cookie",
-        "Login OK, setting cookie",
-        String.format(
-            "{\"setCookieHasSecure\":%s,\"configuredCookieSecure\":%s,\"isHttps\":%s,\"sameSite\":%s,\"maxAgeSeconds\":%d,\"setCookieHeaderLength\":%d}",
-            secureFlag,
-            cookieSecure,
-            isHttps,
-            AgentNdjsonLog.jsonStringOrNull(cookieSameSite),
-            expiresSeconds,
-            cookie.toString().length()));
-    // #endregion agent log
-
     return ResponseEntity.ok()
         .header("Set-Cookie", cookie.toString())
         .body(Map.of("message", "login_ok"));
@@ -188,14 +143,6 @@ public class AuthController {
     return ResponseEntity.ok()
         .header("Set-Cookie", cookie.toString())
         .body(Map.of("message", "logout_ok"));
-  }
-
-  private static String extractDomain(String email) {
-    if (email == null) return null;
-    String trimmed = email.trim();
-    int at = trimmed.lastIndexOf('@');
-    if (at < 0 || at == trimmed.length() - 1) return null;
-    return trimmed.substring(at + 1).toLowerCase();
   }
 }
 

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { useAuth } from '../../../auth/AuthContext.jsx'
 import { useHabitAppStore } from '../store/habitAppStore.js'
 import Button from '../../../components/Button.jsx'
 import HabitCreateModal from './HabitCreateModal.jsx'
@@ -24,7 +25,10 @@ function TabLink({ to, children }) {
 
 export default function HabitsAppLayout() {
   const location = useLocation()
+  const { user } = useAuth()
   const bootstrap = useHabitAppStore((s) => s.bootstrap)
+  const resetSession = useHabitAppStore((s) => s.resetSession)
+  const prevUserRef = useRef(user)
   const loading = useHabitAppStore((s) => s.loading)
   const error = useHabitAppStore((s) => s.error)
   const toasts = useHabitAppStore((s) => s.toasts)
@@ -38,8 +42,12 @@ export default function HabitsAppLayout() {
   const toastTimersRef = useRef(new Map())
 
   useEffect(() => {
+    if (prevUserRef.current !== user) {
+      resetSession()
+      prevUserRef.current = user
+    }
     bootstrap()
-  }, [bootstrap])
+  }, [bootstrap, resetSession, user])
 
   useEffect(() => {
     let mounted = true

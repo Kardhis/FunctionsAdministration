@@ -19,7 +19,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.example.backend.debug.AgentNdjsonLog;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -114,24 +113,8 @@ public class SecurityConfig {
         .exceptionHandling(
             eh ->
                 eh.authenticationEntryPoint(
-                    (HttpServletRequest servletReq, HttpServletResponse res, AuthenticationException ex) -> {
-                      // #region agent log
-                      AgentNdjsonLog.append82787c(
-                          "pre-fix",
-                          "H1",
-                          "SecurityConfig.authenticationEntryPoint",
-                          "401 Unauthorized entry point invoked",
-                          String.format(
-                              "{\"method\":\"%s\",\"requestURI\":\"%s\",\"servletPath\":\"%s\",\"contextPath\":\"%s\",\"authType\":%s}",
-                              AgentNdjsonLog.safe(servletReq.getMethod()),
-                              AgentNdjsonLog.safe(servletReq.getRequestURI()),
-                              AgentNdjsonLog.safe(servletReq.getServletPath()),
-                              AgentNdjsonLog.safe(servletReq.getContextPath()),
-                              AgentNdjsonLog.jsonStringOrNull(
-                                  servletReq.getAuthType() == null ? null : servletReq.getAuthType())));
-                      // #endregion agent log
-                      res.sendError(401, "Unauthorized");
-                    }));
+                    (HttpServletRequest servletReq, HttpServletResponse res, AuthenticationException ex) ->
+                        res.sendError(401, "Unauthorized")));
     http.addFilterBefore(
         jwtCookieAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     return http.build();
