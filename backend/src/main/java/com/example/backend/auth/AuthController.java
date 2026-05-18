@@ -2,6 +2,7 @@ package com.example.backend.auth;
 
 import java.time.Duration;
 import java.security.Principal;
+import java.util.List;
 import java.util.Map;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Value;
@@ -121,7 +122,8 @@ public class AuthController {
   public Map<String, Object> me(Principal principal) {
     String email = principal.getName();
     var u = userRepository.findByEmailIgnoreCase(email).orElse(null);
-    var roles = (u == null) ? java.util.List.of() : userRoleRepository.findRoleNamesByUserId(u.getId());
+    List<String> roles =
+        (u == null) ? List.of() : userRoleRepository.findRoleNamesByUserId(u.getId());
     // #region agent log
     DebugSessionLog.write(
         "H1",
