@@ -26,7 +26,7 @@ function TabLink({ to, children }) {
 
 export default function HabitsAppLayout() {
   const location = useLocation()
-  const { user, roles } = useAuth()
+  const { user, roles, status } = useAuth()
   const admin = isAdmin(roles)
   const bootstrap = useHabitAppStore((s) => s.bootstrap)
   const resetSession = useHabitAppStore((s) => s.resetSession)
@@ -44,14 +44,16 @@ export default function HabitsAppLayout() {
   const toastTimersRef = useRef(new Map())
 
   useEffect(() => {
+    if (status !== 'authenticated' || !user) return
     if (prevUserRef.current !== user) {
       resetSession()
       prevUserRef.current = user
     }
     bootstrap()
-  }, [bootstrap, resetSession, user])
+  }, [bootstrap, resetSession, user, status])
 
   useEffect(() => {
+    if (status !== 'authenticated' || !user) return
     let mounted = true
     loadThemeSetting()
       .then((t) => {
@@ -65,7 +67,7 @@ export default function HabitsAppLayout() {
     return () => {
       mounted = false
     }
-  }, [])
+  }, [status, user])
 
   useEffect(() => {
     const timers = toastTimersRef.current

@@ -119,7 +119,7 @@ public class AuthController {
   }
 
   @GetMapping("/auth/me")
-  public Map<String, Object> me(Principal principal) {
+  public ResponseEntity<Map<String, Object>> me(Principal principal, HttpServletRequest request) {
     String email = principal.getName();
     var u = userRepository.findByEmailIgnoreCase(email).orElse(null);
     List<String> roles =
@@ -131,7 +131,28 @@ public class AuthController {
         "auth me roles from db",
         "{\"roleCount\":" + roles.size() + ",\"roles\":\"" + String.join(",", roles) + "\"}");
     // #endregion
-    return Map.of("user", email, "roles", roles);
+
+    var body = Map.<String, Object>of("user", email, "roles", roles);
+    if (u == null || !u.isActive() || roles.isEmpty()) {
+      return ResponseEntity.ok(body);
+    }
+
+    String token = jwtService.createToken(u.getEmail().toLowerCase(), roles);
+    boolean isHttps =
+        request.isSecure()
+            || "https".equalsIgnoreCase(request.getHeader("X-Forwarded-Proto"))
+            || "https".equalsIgnoreCase(request.getHeader("X-Forwarded-Protocol"));
+    boolean secureFlag = cookieSecure && isHttps;
+    ResponseCookie cookie =
+        ResponseCookie.from(cookieName, token)
+            .httpOnly(true)
+            .secure(secureFlag)
+            .path("/")
+            .sameSite(cookieSameSite)
+            .maxAge(Duration.ofSeconds(expiresSeconds))
+            .build();
+
+    return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).body(body);
   }
 
   @PostMapping("/auth/logout")
