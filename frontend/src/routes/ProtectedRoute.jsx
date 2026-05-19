@@ -7,9 +7,9 @@ export default function ProtectedRoute({ children }) {
 
   if (status === 'loading') {
     return (
-      <main style={{ fontFamily: 'system-ui, sans-serif', padding: 24 }}>
-        <p>Comprobando sesión...</p>
-      </main>
+      <div className="flex min-h-[100svh] items-center justify-center bg-bg p-6">
+        <p className="text-sm text-text">Comprobando sesión…</p>
+      </div>
     )
   }
 

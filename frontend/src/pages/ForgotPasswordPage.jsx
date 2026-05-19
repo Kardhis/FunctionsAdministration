@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { API_BASE } from '../data/api.js'
-import './LoginPage.css'
+import AuthLayout from '../layouts/AuthLayout.jsx'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -43,58 +43,49 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <main className="cpLogin">
-      <div className="cpBackgroundGrid" aria-hidden="true" />
-      <div className="cpGlowOrbs" aria-hidden="true" />
+    <AuthLayout sectionLabel="Recuperar contraseña" cardLabel="Solicitar enlace">
+      <header className="cpCardTitleRow">
+        <h2 className="cpCardTitle">Recuperar contraseña</h2>
+      </header>
 
-      <section className="cpShell" aria-label="Recuperar contraseña">
-        <div className="cpCard" role="region" aria-label="Solicitar enlace">
-          <div className="cpCardInner">
-            <header className="cpCardTitleRow">
-              <h2 className="cpCardTitle">Recuperar contraseña</h2>
-            </header>
-
-            <form onSubmit={onSubmit} className="cpForm" noValidate>
-              <div className="cpField">
-                <label className="cpLabel" htmlFor="forgot-email">
-                  Email
-                </label>
-                <input
-                  id="forgot-email"
-                  className="cpInput"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoComplete="email"
-                  inputMode="email"
-                  required
-                />
-              </div>
-
-              <div className="cpActions">
-                <button className="cpButton" type="submit" disabled={isLoading} aria-busy={isLoading}>
-                  {isLoading ? 'Enviando…' : 'Enviar enlace'}
-                </button>
-                {info ? (
-                  <p className="cpInfo" role="status" aria-live="polite">
-                    {info}
-                  </p>
-                ) : null}
-                {error ? (
-                  <p className="cpError" role="alert" aria-live="polite">
-                    Error: <code>{error}</code>
-                  </p>
-                ) : null}
-              </div>
-            </form>
-
-            <nav className="cpAuthLinks" aria-label="Volver al acceso">
-              <Link className="cpAuthLink" to="/login">
-                Volver al inicio de sesión
-              </Link>
-            </nav>
-          </div>
+      <form onSubmit={onSubmit} className="cpForm" noValidate>
+        <div className="cpField">
+          <label className="cpLabel" htmlFor="forgot-email">
+            Email
+          </label>
+          <input
+            id="forgot-email"
+            className="cpInput"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            inputMode="email"
+            required
+          />
         </div>
-      </section>
-    </main>
+
+        <div className="cpActions">
+          <button className="cpButton" type="submit" disabled={isLoading} aria-busy={isLoading}>
+            {isLoading ? 'Enviando…' : 'Enviar enlace'}
+          </button>
+          {info ? (
+            <p className="cpInfo" role="status" aria-live="polite">
+              {info}
+            </p>
+          ) : null}
+          {error ? (
+            <p className="cpError" role="alert" aria-live="polite">
+              Error: <code>{error}</code>
+            </p>
+          ) : null}
+        </div>
+      </form>
+
+      <nav className="cpAuthLinks" aria-label="Volver al acceso">
+        <Link className="cpAuthLink" to="/login">
+          Volver al inicio de sesión
+        </Link>
+      </nav>
+    </AuthLayout>
   )
 }

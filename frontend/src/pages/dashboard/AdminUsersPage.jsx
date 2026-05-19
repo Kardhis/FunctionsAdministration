@@ -133,7 +133,48 @@ export default function AdminUsersPage() {
           </p>
         ) : null}
 
-        <div className="mt-4 overflow-x-auto rounded-2xl border border-border">
+        {/* Mobile / tablet — card list */}
+        <div className="mt-4 flex flex-col gap-3 lg:hidden">
+          {sorted.map((u) => (
+            <div key={u.id} className="rounded-2xl border border-border bg-bg/60 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-text-h">{u.email}</p>
+                  {u.displayName ? (
+                    <p className="mt-0.5 truncate text-xs text-text">{u.displayName}</p>
+                  ) : null}
+                </div>
+                <label className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 text-xs text-text-h">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-border"
+                    checked={Boolean(u.active)}
+                    onChange={(e) => handleToggleActive(u, e.target.checked)}
+                    aria-label="Actiu / Desactiu"
+                  />
+                  <span>{u.active ? 'Actiu' : 'Inactiu'}</span>
+                </label>
+              </div>
+              <div className="mt-3">
+                <RoleChips roles={u.roles} />
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button type="button" variant="secondary" size="sm" onClick={() => setEditUser(u)}>
+                  Editar
+                </Button>
+                <Button type="button" variant="secondary" size="sm" onClick={() => setPwdUser(u)}>
+                  Canviar Contrasenya
+                </Button>
+                <Button type="button" variant="danger" size="sm" onClick={() => setDeleteTarget(u)}>
+                  Eliminar
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop — scrollable table */}
+        <div className="mt-4 hidden overflow-x-auto rounded-2xl border border-border lg:block">
           <table className="w-full min-w-[640px] border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-border bg-bg/80">
@@ -181,6 +222,7 @@ export default function AdminUsersPage() {
             </tbody>
           </table>
         </div>
+
         {!sorted.length && !loading ? (
           <p className="p-5 text-sm text-text">No hi ha usuaris.</p>
         ) : null}
