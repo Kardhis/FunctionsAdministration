@@ -2,6 +2,8 @@ package com.example.backend.security;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.example.backend.auth.JwtService;
+import com.example.backend.rbac.UserRoleRepository;
+import com.example.backend.users.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -22,11 +24,18 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtCookieAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtService jwtService;
+  private final UserRepository userRepository;
+  private final UserRoleRepository userRoleRepository;
   private final String cookieName;
 
   public JwtCookieAuthenticationFilter(
-      JwtService jwtService, @Value("${app.auth.cookie-name}") String cookieName) {
+      JwtService jwtService,
+      UserRepository userRepository,
+      UserRoleRepository userRoleRepository,
+      @Value("${app.auth.cookie-name}") String cookieName) {
     this.jwtService = jwtService;
+    this.userRepository = userRepository;
+    this.userRoleRepository = userRoleRepository;
     this.cookieName = cookieName;
   }
 
@@ -40,7 +49,13 @@ public class JwtCookieAuthenticationFilter extends OncePerRequestFilter {
       if (token != null && !token.isBlank()) {
         try {
           String subject = jwtService.verifyAndGetSubject(token);
-          List<String> roles = jwtService.verifyAndGetRoles(token);
+          List<String> jwtRoles = jwtService.verifyAndGetRoles(token);
+          List<String> roles =
+              userRepository
+                  .findByEmailIgnoreCase(subject)
+                  .map(u -> userRoleRepository.findRoleNamesByUserId(u.getId()))
+                  .filter(list -> !list.isEmpty())
+                  .orElse(jwtRoles);
           var authorities =
               roles.stream()
                   .filter(r -> r != null && !r.isBlank())

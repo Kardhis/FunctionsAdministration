@@ -25,6 +25,7 @@ export default function HabitsOverviewPage() {
   const isLgUp = useIsLgUp()
   const habits = useHabitAppStore((s) => s.habits)
   const entries = useHabitAppStore((s) => s.entries)
+  const bootstrapped = useHabitAppStore((s) => s.bootstrapped)
 
   const [objectives, setObjectives] = useState([])
   const [objectivesError, setObjectivesError] = useState('')
@@ -100,6 +101,7 @@ export default function HabitsOverviewPage() {
   const chartTooltipLabelStyle = useMemo(() => ({ color: 'var(--text)' }), [])
 
   useEffect(() => {
+    if (!bootstrapped) return undefined
     let mounted = true
     setObjectivesError('')
     listObjectives({ status: 'IN_PROGRESS' })
@@ -135,7 +137,7 @@ export default function HabitsOverviewPage() {
     return () => {
       mounted = false
     }
-  }, [entries.length])
+  }, [bootstrapped])
 
   return (
     <div className="space-y-4">

@@ -2,6 +2,7 @@ package com.example.backend.auth;
 
 import java.time.Duration;
 import java.security.Principal;
+import java.util.List;
 import java.util.Map;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Value;
@@ -117,11 +118,33 @@ public class AuthController {
   }
 
   @GetMapping("/auth/me")
-  public Map<String, Object> me(Principal principal) {
+  public ResponseEntity<Map<String, Object>> me(Principal principal, HttpServletRequest request) {
     String email = principal.getName();
     var u = userRepository.findByEmailIgnoreCase(email).orElse(null);
-    var roles = (u == null) ? java.util.List.of() : userRoleRepository.findRoleNamesByUserId(u.getId());
-    return Map.of("user", email, "roles", roles);
+    List<String> roles =
+        (u == null) ? List.of() : userRoleRepository.findRoleNamesByUserId(u.getId());
+
+    var body = Map.<String, Object>of("user", email, "roles", roles);
+    if (u == null || !u.isActive() || roles.isEmpty()) {
+      return ResponseEntity.ok(body);
+    }
+
+    String token = jwtService.createToken(u.getEmail().toLowerCase(), roles);
+    boolean isHttps =
+        request.isSecure()
+            || "https".equalsIgnoreCase(request.getHeader("X-Forwarded-Proto"))
+            || "https".equalsIgnoreCase(request.getHeader("X-Forwarded-Protocol"));
+    boolean secureFlag = cookieSecure && isHttps;
+    ResponseCookie cookie =
+        ResponseCookie.from(cookieName, token)
+            .httpOnly(true)
+            .secure(secureFlag)
+            .path("/")
+            .sameSite(cookieSameSite)
+            .maxAge(Duration.ofSeconds(expiresSeconds))
+            .build();
+
+    return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).body(body);
   }
 
   @PostMapping("/auth/logout")
