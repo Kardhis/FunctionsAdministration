@@ -8,7 +8,7 @@ function childPathActive(child, pathname) {
 }
 
 /** @param {import('../data/types.js').NavItem} item @param {string} pathname */
-export function navGroupChildActive(item, pathname) {
+function navGroupChildActive(item, pathname) {
   return Boolean(item.children?.some((c) => childPathActive(c, pathname)))
 }
 
@@ -105,7 +105,7 @@ export default function SidebarPanel({
         )}
       </div>
 
-      <nav id={navId} className="mt-6 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto" aria-label="Principal">
+      <nav id={navId} className="mt-6 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain pr-1" aria-label="Principal">
         {navItems.map((item) => {
           if (item.children?.length) {
             const firstTo = item.children[0].to
@@ -119,7 +119,7 @@ export default function SidebarPanel({
                   onClick={mobileDrawer ? onCloseMobile : undefined}
                   className={() =>
                     [
-                      'group flex items-center justify-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition lg:py-2',
+                      'group flex items-center justify-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] lg:py-2',
                       groupActive
                         ? 'bg-[color:var(--accent-bg)] text-text-h ring-1 ring-[color:var(--accent-border)]'
                         : 'text-text-h/80 hover:bg-black/5 dark:hover:bg-white/5',
@@ -142,7 +142,7 @@ export default function SidebarPanel({
                   onClick={() => toggleGroup(item)}
                   aria-expanded={open}
                   className={[
-                    'group flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left text-sm font-medium transition lg:py-2',
+                    'group flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] lg:py-2',
                     groupActive && !open ? 'text-text-h ring-1 ring-[color:var(--accent-border)]/60' : '',
                     'text-text-h/80 hover:bg-black/5 dark:hover:bg-white/5',
                   ].join(' ')}
@@ -164,7 +164,7 @@ export default function SidebarPanel({
                         onClick={mobileDrawer ? onCloseMobile : undefined}
                         className={({ isActive }) =>
                           [
-                            'flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition',
+                            'flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] lg:py-2',
                             isActive || childPathActive(child, location.pathname)
                               ? 'bg-[color:var(--accent-bg)] text-text-h ring-1 ring-[color:var(--accent-border)]'
                               : 'text-text-h/80 hover:bg-black/5 dark:hover:bg-white/5',
@@ -189,7 +189,7 @@ export default function SidebarPanel({
               onClick={mobileDrawer ? onCloseMobile : undefined}
               className={({ isActive }) =>
                 [
-                  'group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition lg:py-2',
+                  'group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] lg:py-2',
                   isActive || (item.key === 'habits' && location.pathname.startsWith('/dashboard/habits'))
                     ? 'bg-[color:var(--accent-bg)] text-text-h ring-1 ring-[color:var(--accent-border)]'
                     : 'text-text-h/80 hover:bg-black/5 dark:hover:bg-white/5',
