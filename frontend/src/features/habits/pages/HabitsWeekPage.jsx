@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { addDays, format } from 'date-fns'
 import Card from '../../../components/Card.jsx'
 import Badge from '../../../components/Badge.jsx'
+import TableScrollWrapper from '../../../components/TableScrollWrapper.jsx'
 import { useHabitAppStore } from '../store/habitAppStore.js'
 import { getWeekRangeMonday } from '../domain/periods.js'
 import { formatDurationHuman } from '../domain/time.js'
@@ -88,8 +89,8 @@ export default function HabitsWeekPage() {
         {!matrix.length ? <p className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-text">No hay hábitos activos esta semana.</p> : null}
       </div>
 
-      <div className="mt-4 hidden overflow-x-auto lg:block">
-        <table className="min-w-[980px] w-full border-separate border-spacing-y-2">
+      <TableScrollWrapper>
+        <table className="min-w-[860px] w-full border-separate border-spacing-y-2">
           <thead>
             <tr className="text-left text-xs uppercase tracking-wide text-text">
               <th className="px-2">Hábito</th>
@@ -120,7 +121,7 @@ export default function HabitsWeekPage() {
             ))}
           </tbody>
         </table>
-      </div>
+      </TableScrollWrapper>
     </Card>
   )
 }

@@ -201,7 +201,7 @@ export default function DashboardLayout() {
         aria-modal="true"
         aria-label="Menú principal"
         aria-hidden={!navOpen}
-        inert={!navOpen ? '' : undefined}
+        inert={!navOpen || undefined}
       >
         <SidebarPanel
           location={location}
@@ -220,7 +220,7 @@ export default function DashboardLayout() {
 
       <div
         className="relative flex w-full max-w-none gap-4 px-3 py-4 sm:gap-6 sm:px-4 md:px-6 md:py-6 lg:gap-6"
-        inert={navOpen ? '' : undefined}
+        inert={navOpen || undefined}
       >
         <aside
           className={`sticky top-4 hidden h-[calc(100svh-2rem)] shrink-0 rounded-3xl border border-border bg-bg/70 shadow-soft backdrop-blur-md lg:flex lg:top-6 lg:h-[calc(100svh-3rem)] ${
