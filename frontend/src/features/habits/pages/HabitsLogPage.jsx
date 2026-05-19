@@ -2,6 +2,9 @@ import { useMemo, useState } from 'react'
 import Button from '../../../components/Button.jsx'
 import Card from '../../../components/Card.jsx'
 import Badge from '../../../components/Badge.jsx'
+import Pagination from '../../../components/Pagination.jsx'
+import TableScrollWrapper from '../../../components/TableScrollWrapper.jsx'
+import { usePagination } from '../../../hooks/usePagination.js'
 import { useHabitAppStore } from '../store/habitAppStore.js'
 import { formatDurationHuman, todayLocalDateString } from '../domain/time.js'
 import { periodPresets, resolvePeriodRange } from '../domain/periods.js'
@@ -30,6 +33,8 @@ export default function HabitsLogPage() {
 
   const range = useMemo(() => resolvePeriodRange({ preset, customFrom, customTo }), [preset, customFrom, customTo])
 
+  const PAGE_SIZE = 15
+
   const filteredEntries = useMemo(() => {
     const habitsById = new Map(habits.map((h) => [h.id, h]))
     return entries
@@ -47,6 +52,8 @@ export default function HabitsLogPage() {
       .slice()
       .sort((a, b) => `${b.date} ${b.endTime}`.localeCompare(`${a.date} ${a.endTime}`))
   }, [activeOnly, categoryId, entries, habitId, habits, range.end, range.start])
+
+  const pagination = usePagination(filteredEntries, PAGE_SIZE)
 
   return (
     <div className="space-y-4">
@@ -161,7 +168,7 @@ export default function HabitsLogPage() {
         </div>
 
         <div className="mt-4 space-y-3 lg:hidden">
-          {filteredEntries.map((e) => {
+          {pagination.pageItems.map((e) => {
             const h = habits.find((x) => x.id === e.habitId)
             return (
               <div key={e.id} className="rounded-2xl border border-border bg-bg/60 p-4 ring-1 ring-border">
@@ -208,9 +215,20 @@ export default function HabitsLogPage() {
             )
           })}
           {!filteredEntries.length ? <p className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-text">Sin registros para los filtros actuales.</p> : null}
+          <Pagination
+            page={pagination.page}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.totalItems}
+            pageSize={PAGE_SIZE}
+            hasPrev={pagination.hasPrev}
+            hasNext={pagination.hasNext}
+            onPrev={pagination.prev}
+            onNext={pagination.next}
+            onPage={pagination.setPage}
+          />
         </div>
 
-        <div className="mt-4 hidden overflow-x-auto lg:block">
+        <TableScrollWrapper>
           <table className="min-w-[720px] w-full border-separate border-spacing-y-2">
             <thead>
               <tr className="text-left text-xs uppercase tracking-wide text-text">
@@ -218,22 +236,26 @@ export default function HabitsLogPage() {
                 <th className="px-2">Hábito</th>
                 <th className="px-2">Ventana</th>
                 <th className="px-2">Duración</th>
-                <th className="px-2">Nota</th>
+                <th className="px-2 hidden xl:table-cell">Nota</th>
                 <th className="px-2 text-right">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {filteredEntries.map((e) => {
+              {pagination.pageItems.map((e) => {
                 const h = habits.find((x) => x.id === e.habitId)
                 return (
                   <tr key={e.id} className="rounded-2xl bg-bg/60 ring-1 ring-border">
                     <td className="px-2 py-3 text-sm text-text">{formatDateEs(e.date)}</td>
-                    <td className="px-2 py-3 text-sm font-medium text-text-h">{h?.name ?? '—'}</td>
+                    <td className="max-w-[160px] px-2 py-3 text-sm font-medium text-text-h">
+                      <p className="truncate">{h?.name ?? '—'}</p>
+                    </td>
                     <td className="px-2 py-3 text-sm text-text">
                       {e.startTime}–{e.endTime}
                     </td>
                     <td className="px-2 py-3 text-sm text-text">{formatDurationHuman(e.durationMinutes)}</td>
-                    <td className="px-2 py-3 text-sm text-text">{e.notes ? <span className="line-clamp-2">{e.notes}</span> : '—'}</td>
+                    <td className="px-2 py-3 text-sm text-text hidden xl:table-cell">
+                      {e.notes ? <span className="line-clamp-2">{e.notes}</span> : '—'}
+                    </td>
                     <td className="px-2 py-3">
                       <div className="flex justify-end gap-2">
                         <Button type="button" variant="secondary" size="sm" onClick={() => setEditingEntry(e)}>
@@ -266,7 +288,19 @@ export default function HabitsLogPage() {
               ) : null}
             </tbody>
           </table>
-        </div>
+        </TableScrollWrapper>
+        <Pagination
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          totalItems={pagination.totalItems}
+          pageSize={PAGE_SIZE}
+          hasPrev={pagination.hasPrev}
+          hasNext={pagination.hasNext}
+          onPrev={pagination.prev}
+          onNext={pagination.next}
+          onPage={pagination.setPage}
+          className="hidden lg:flex"
+        />
       </Card>
       </div>
     </div>

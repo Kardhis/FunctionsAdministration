@@ -1,7 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import Button from '../../../components/Button.jsx'
 import Card from '../../../components/Card.jsx'
 import Badge from '../../../components/Badge.jsx'
+import Pagination from '../../../components/Pagination.jsx'
+import TableScrollWrapper from '../../../components/TableScrollWrapper.jsx'
+import { usePagination } from '../../../hooks/usePagination.js'
 import { useHabitAppStore } from '../store/habitAppStore.js'
 import HabitCreateModal from '../ui/HabitCreateModal.jsx'
 import HabitCreatedMessageModal from '../ui/HabitCreatedMessageModal.jsx'
@@ -37,6 +40,10 @@ export default function HabitsManagePage() {
     [categories],
   )
 
+  const PAGE_SIZE = 10
+  const habitsPagination = usePagination(sorted, PAGE_SIZE)
+  const categoriesPagination = usePagination(sortedCategories, PAGE_SIZE)
+
   function startEdit(h) {
     setEditingHabit(h)
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -44,6 +51,7 @@ export default function HabitsManagePage() {
 
   return (
     <div className="space-y-4">
+      {/* ── Habits card ── */}
       <Card className="p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
@@ -64,18 +72,26 @@ export default function HabitsManagePage() {
           </div>
         </div>
 
+        {/* Mobile / tablet — card list */}
         <div className="mt-4 space-y-3 lg:hidden">
-          {sorted.map((h) => (
+          {habitsPagination.pageItems.map((h) => (
             <div key={h.id} className="rounded-2xl border border-border bg-bg/60 p-4 ring-1 ring-border">
               <div className="flex items-start gap-3">
-                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-lg" style={{ background: `${h.color}22`, color: h.color, border: `1px solid ${h.color}55` }}>
+                <span
+                  className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-lg"
+                  style={{ background: `${h.color}22`, color: h.color, border: `1px solid ${h.color}55` }}
+                >
                   {h.icon || '•'}
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-base font-semibold text-text-h">{h.name}</p>
                   {h.description ? <p className="mt-1 text-sm text-text">{h.description}</p> : null}
                   <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <span className="text-sm text-text">{Array.isArray(h.categoryIds) && h.categoryIds.length ? `${h.categoryIds.length} categoría(s)` : 'Sin categorías'}</span>
+                    <span className="text-sm text-text">
+                      {Array.isArray(h.categoryIds) && h.categoryIds.length
+                        ? `${h.categoryIds.length} categoría(s)`
+                        : 'Sin categorías'}
+                    </span>
                     <Badge tone={h.active ? 'accent' : 'neutral'}>{h.active ? 'activo' : 'inactivo'}</Badge>
                   </div>
                 </div>
@@ -84,7 +100,12 @@ export default function HabitsManagePage() {
                 <Button type="button" variant="secondary" className="min-h-11 w-full" onClick={() => startEdit(h)}>
                   Editar
                 </Button>
-                <Button type="button" variant="secondary" className="min-h-11 w-full" onClick={() => setHabitActive(h.id, !h.active)}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="min-h-11 w-full"
+                  onClick={() => setHabitActive(h.id, !h.active)}
+                >
                   {h.active ? 'Desactivar' : 'Activar'}
                 </Button>
                 <Button
@@ -92,7 +113,7 @@ export default function HabitsManagePage() {
                   variant="ghost"
                   className="min-h-11 w-full text-[crimson]"
                   onClick={() => {
-                    const ok = window.confirm(`Eliminar “${h.name}”?`)
+                    const ok = window.confirm(`Eliminar "${h.name}"?`)
                     if (!ok) return
                     deleteHabit(h.id)
                   }}
@@ -102,11 +123,25 @@ export default function HabitsManagePage() {
               </div>
             </div>
           ))}
-          {!sorted.length ? <p className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-text">No hay hábitos todavía.</p> : null}
+          {!sorted.length ? (
+            <p className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-text">No hay hábitos todavía.</p>
+          ) : null}
+          <Pagination
+            page={habitsPagination.page}
+            totalPages={habitsPagination.totalPages}
+            totalItems={habitsPagination.totalItems}
+            pageSize={PAGE_SIZE}
+            hasPrev={habitsPagination.hasPrev}
+            hasNext={habitsPagination.hasNext}
+            onPrev={habitsPagination.prev}
+            onNext={habitsPagination.next}
+            onPage={habitsPagination.setPage}
+          />
         </div>
 
-        <div className="mt-4 hidden overflow-x-auto lg:block">
-          <table className="min-w-[760px] w-full border-separate border-spacing-y-2">
+        {/* Desktop — scrollable table */}
+        <TableScrollWrapper>
+          <table className="min-w-[640px] w-full border-separate border-spacing-y-2">
             <thead>
               <tr className="text-left text-xs uppercase tracking-wide text-text">
                 <th className="px-2">Hábito</th>
@@ -116,11 +151,14 @@ export default function HabitsManagePage() {
               </tr>
             </thead>
             <tbody>
-              {sorted.map((h) => (
+              {habitsPagination.pageItems.map((h) => (
                 <tr key={h.id} className="rounded-2xl bg-bg/60 ring-1 ring-border">
                   <td className="px-2 py-3">
                     <div className="flex items-center gap-3">
-                      <span className="grid h-10 w-10 place-items-center rounded-2xl text-lg" style={{ background: `${h.color}22`, color: h.color, border: `1px solid ${h.color}55` }}>
+                      <span
+                        className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl text-lg"
+                        style={{ background: `${h.color}22`, color: h.color, border: `1px solid ${h.color}55` }}
+                      >
                         {h.icon || '•'}
                       </span>
                       <div className="min-w-0">
@@ -129,7 +167,11 @@ export default function HabitsManagePage() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-2 py-3 text-sm text-text">{Array.isArray(h.categoryIds) && h.categoryIds.length ? `${h.categoryIds.length} categoría(s)` : '—'}</td>
+                  <td className="px-2 py-3 text-sm text-text">
+                    {Array.isArray(h.categoryIds) && h.categoryIds.length
+                      ? `${h.categoryIds.length} categoría(s)`
+                      : '—'}
+                  </td>
                   <td className="px-2 py-3">
                     <Badge tone={h.active ? 'accent' : 'neutral'}>{h.active ? 'activo' : 'inactivo'}</Badge>
                   </td>
@@ -138,7 +180,12 @@ export default function HabitsManagePage() {
                       <Button type="button" variant="secondary" size="sm" onClick={() => startEdit(h)}>
                         Editar
                       </Button>
-                      <Button type="button" variant="secondary" size="sm" onClick={() => setHabitActive(h.id, !h.active)}>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setHabitActive(h.id, !h.active)}
+                      >
                         {h.active ? 'Desactivar' : 'Activar'}
                       </Button>
                       <Button
@@ -147,7 +194,7 @@ export default function HabitsManagePage() {
                         size="sm"
                         className="text-[crimson]"
                         onClick={() => {
-                          const ok = window.confirm(`Eliminar “${h.name}”?`)
+                          const ok = window.confirm(`Eliminar "${h.name}"?`)
                           if (!ok) return
                           deleteHabit(h.id)
                         }}
@@ -167,7 +214,19 @@ export default function HabitsManagePage() {
               ) : null}
             </tbody>
           </table>
-        </div>
+        </TableScrollWrapper>
+        <Pagination
+          page={habitsPagination.page}
+          totalPages={habitsPagination.totalPages}
+          totalItems={habitsPagination.totalItems}
+          pageSize={PAGE_SIZE}
+          hasPrev={habitsPagination.hasPrev}
+          hasNext={habitsPagination.hasNext}
+          onPrev={habitsPagination.prev}
+          onNext={habitsPagination.next}
+          onPage={habitsPagination.setPage}
+          className="hidden lg:flex"
+        />
       </Card>
 
       <HabitCreateModal
@@ -207,6 +266,7 @@ export default function HabitsManagePage() {
         }}
       />
 
+      {/* ── Categories card ── */}
       <Card className="p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
@@ -227,8 +287,9 @@ export default function HabitsManagePage() {
           </div>
         </div>
 
+        {/* Mobile / tablet — card list */}
         <div className="mt-4 space-y-3 lg:hidden">
-          {sortedCategories.map((c) => (
+          {categoriesPagination.pageItems.map((c) => (
             <div key={c.id} className="rounded-2xl border border-border bg-bg/60 p-4 ring-1 ring-border">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-base font-semibold text-text-h">{c.name}</p>
@@ -236,23 +297,52 @@ export default function HabitsManagePage() {
               </div>
               <p className="mt-2 text-sm text-text">Hábitos: {c.habitCount ?? 0}</p>
               <div className="mt-4 flex flex-col gap-2">
-                <Button type="button" variant="secondary" className="min-h-11 w-full" onClick={() => setEditingCategory(c)}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="min-h-11 w-full"
+                  onClick={() => setEditingCategory(c)}
+                >
                   Editar
                 </Button>
-                <Button type="button" variant="secondary" className="min-h-11 w-full" onClick={() => toggleCategoryActive(c.id)}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="min-h-11 w-full"
+                  onClick={() => toggleCategoryActive(c.id)}
+                >
                   {c.active ? 'Desactivar' : 'Activar'}
                 </Button>
-                <Button type="button" variant="ghost" className="min-h-11 w-full text-[crimson]" onClick={() => setDeletingCategory(c)}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="min-h-11 w-full text-[crimson]"
+                  onClick={() => setDeletingCategory(c)}
+                >
                   Eliminar
                 </Button>
               </div>
             </div>
           ))}
-          {!sortedCategories.length ? <p className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-text">Sin categorías todavía.</p> : null}
+          {!sortedCategories.length ? (
+            <p className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-text">Sin categorías todavía.</p>
+          ) : null}
+          <Pagination
+            page={categoriesPagination.page}
+            totalPages={categoriesPagination.totalPages}
+            totalItems={categoriesPagination.totalItems}
+            pageSize={PAGE_SIZE}
+            hasPrev={categoriesPagination.hasPrev}
+            hasNext={categoriesPagination.hasNext}
+            onPrev={categoriesPagination.prev}
+            onNext={categoriesPagination.next}
+            onPage={categoriesPagination.setPage}
+          />
         </div>
 
-        <div className="mt-4 hidden overflow-x-auto lg:block">
-          <table className="w-full border-separate border-spacing-y-2">
+        {/* Desktop — scrollable table */}
+        <TableScrollWrapper>
+          <table className="min-w-[480px] w-full border-separate border-spacing-y-2">
             <thead>
               <tr className="text-left text-xs uppercase tracking-wide text-text">
                 <th className="px-2">Categoría</th>
@@ -262,22 +352,40 @@ export default function HabitsManagePage() {
               </tr>
             </thead>
             <tbody>
-              {sortedCategories.map((c) => (
+              {categoriesPagination.pageItems.map((c) => (
                 <tr key={c.id} className="rounded-2xl bg-bg/60 ring-1 ring-border">
-                  <td className="px-2 py-3 text-sm font-medium text-text-h">{c.name}</td>
+                  <td className="max-w-[200px] px-2 py-3 text-sm font-medium text-text-h">
+                    <p className="truncate">{c.name}</p>
+                  </td>
                   <td className="px-2 py-3 text-sm text-text">{c.habitCount ?? 0}</td>
                   <td className="px-2 py-3">
                     <Badge tone={c.active ? 'accent' : 'neutral'}>{c.active ? 'activo' : 'inactivo'}</Badge>
                   </td>
                   <td className="px-2 py-3">
                     <div className="flex justify-end gap-2">
-                      <Button type="button" variant="secondary" size="sm" onClick={() => setEditingCategory(c)}>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setEditingCategory(c)}
+                      >
                         Editar
                       </Button>
-                      <Button type="button" variant="secondary" size="sm" onClick={() => toggleCategoryActive(c.id)}>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => toggleCategoryActive(c.id)}
+                      >
                         {c.active ? 'Desactivar' : 'Activar'}
                       </Button>
-                      <Button type="button" variant="ghost" size="sm" className="text-[crimson]" onClick={() => setDeletingCategory(c)}>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="text-[crimson]"
+                        onClick={() => setDeletingCategory(c)}
+                      >
                         Eliminar
                       </Button>
                     </div>
@@ -293,7 +401,19 @@ export default function HabitsManagePage() {
               ) : null}
             </tbody>
           </table>
-        </div>
+        </TableScrollWrapper>
+        <Pagination
+          page={categoriesPagination.page}
+          totalPages={categoriesPagination.totalPages}
+          totalItems={categoriesPagination.totalItems}
+          pageSize={PAGE_SIZE}
+          hasPrev={categoriesPagination.hasPrev}
+          hasNext={categoriesPagination.hasNext}
+          onPrev={categoriesPagination.prev}
+          onNext={categoriesPagination.next}
+          onPage={categoriesPagination.setPage}
+          className="hidden lg:flex"
+        />
       </Card>
 
       <HabitCategoryCreateModal
@@ -320,7 +440,7 @@ export default function HabitsManagePage() {
       <ConfirmDeleteModal
         open={Boolean(deletingCategory)}
         title="Eliminar categoría"
-        message={deletingCategory ? `¿Eliminar “${deletingCategory.name}”? Se borrarán también sus asignaciones.` : ''}
+        message={deletingCategory ? `¿Eliminar "${deletingCategory.name}"? Se borrarán también sus asignaciones.` : ''}
         onCancel={() => setDeletingCategory(null)}
         onConfirm={async () => {
           if (!deletingCategory) return

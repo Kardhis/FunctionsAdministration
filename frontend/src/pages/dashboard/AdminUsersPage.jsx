@@ -3,6 +3,9 @@ import Card from '../../components/Card.jsx'
 import Button from '../../components/Button.jsx'
 import Badge from '../../components/Badge.jsx'
 import { SectionHeader } from '../../components/Section.jsx'
+import Pagination from '../../components/Pagination.jsx'
+import TableScrollWrapper from '../../components/TableScrollWrapper.jsx'
+import { usePagination } from '../../hooks/usePagination.js'
 import * as adminRepo from '../../features/admin/data/adminUsersRepo.js'
 import AdminUserCreateModal from '../../features/admin/ui/AdminUserCreateModal.jsx'
 import AdminUserEditModal from '../../features/admin/ui/AdminUserEditModal.jsx'
@@ -38,6 +41,9 @@ export default function AdminUsersPage() {
   const [pwdUser, setPwdUser] = useState(null)
 
   const sorted = useMemo(() => [...users].sort((a, b) => String(a.email).localeCompare(String(b.email))), [users])
+
+  const PAGE_SIZE = 10
+  const pagination = usePagination(sorted, PAGE_SIZE)
 
   const refresh = useCallback(async () => {
     setLoading(true)
@@ -135,7 +141,7 @@ export default function AdminUsersPage() {
 
         {/* Mobile / tablet — card list */}
         <div className="mt-4 flex flex-col gap-3 lg:hidden">
-          {sorted.map((u) => (
+          {pagination.pageItems.map((u) => (
             <div key={u.id} className="rounded-2xl border border-border bg-bg/60 p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -171,10 +177,24 @@ export default function AdminUsersPage() {
               </div>
             </div>
           ))}
+          {!sorted.length && !loading ? (
+            <p className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-text">No hi ha usuaris.</p>
+          ) : null}
+          <Pagination
+            page={pagination.page}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.totalItems}
+            pageSize={PAGE_SIZE}
+            hasPrev={pagination.hasPrev}
+            hasNext={pagination.hasNext}
+            onPrev={pagination.prev}
+            onNext={pagination.next}
+            onPage={pagination.setPage}
+          />
         </div>
 
         {/* Desktop — scrollable table */}
-        <div className="mt-4 hidden overflow-x-auto rounded-2xl border border-border lg:block">
+        <TableScrollWrapper>
           <table className="w-full min-w-[640px] border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-border bg-bg/80">
@@ -186,10 +206,14 @@ export default function AdminUsersPage() {
               </tr>
             </thead>
             <tbody>
-              {sorted.map((u) => (
+              {pagination.pageItems.map((u) => (
                 <tr key={u.id} className="border-b border-border/80 last:border-0 hover:bg-black/[0.03] dark:hover:bg-white/[0.04]">
-                  <td className="max-w-[200px] truncate px-4 py-3 font-medium text-text-h">{u.email}</td>
-                  <td className="max-w-[160px] truncate px-4 py-3 text-text">{u.displayName ?? '—'}</td>
+                  <td className="max-w-[200px] px-4 py-3 font-medium text-text-h">
+                    <p className="truncate">{u.email}</p>
+                  </td>
+                  <td className="max-w-[160px] px-4 py-3 text-text">
+                    <p className="truncate">{u.displayName ?? '—'}</p>
+                  </td>
                   <td className="px-4 py-3">
                     <RoleChips roles={u.roles} />
                   </td>
@@ -219,13 +243,26 @@ export default function AdminUsersPage() {
                   </td>
                 </tr>
               ))}
+              {!sorted.length && !loading ? (
+                <tr>
+                  <td className="px-4 py-3 text-sm text-text" colSpan={5}>No hi ha usuaris.</td>
+                </tr>
+              ) : null}
             </tbody>
           </table>
-        </div>
-
-        {!sorted.length && !loading ? (
-          <p className="p-5 text-sm text-text">No hi ha usuaris.</p>
-        ) : null}
+        </TableScrollWrapper>
+        <Pagination
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          totalItems={pagination.totalItems}
+          pageSize={PAGE_SIZE}
+          hasPrev={pagination.hasPrev}
+          hasNext={pagination.hasNext}
+          onPrev={pagination.prev}
+          onNext={pagination.next}
+          onPage={pagination.setPage}
+          className="hidden lg:flex"
+        />
       </Card>
 
       <AdminUserCreateModal
