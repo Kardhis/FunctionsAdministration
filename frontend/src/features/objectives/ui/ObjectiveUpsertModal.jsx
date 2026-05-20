@@ -8,9 +8,11 @@ import Badge from '../../../components/Badge.jsx'
 import { objectiveCreateSchema } from '../domain/schemas.js'
 import { formatDateEs } from '../../../data/dateFormat.js'
 import DatePickerInput from '../../../components/DatePickerInput.jsx'
+import { useBodyScrollLock } from '../../../hooks/useBodyScrollLock.js'
 
 export default function ObjectiveUpsertModal({ mode, open, habits, initial, onClose, onSubmit }) {
   const allHabits = useMemo(() => (Array.isArray(habits) ? habits : []), [habits])
+  useBodyScrollLock(open)
 
   const form = useForm({
     resolver: zodResolver(objectiveCreateSchema),
@@ -134,6 +136,7 @@ export default function ObjectiveUpsertModal({ mode, open, habits, initial, onCl
                   <span className="text-xs font-medium uppercase tracking-wide text-text">Valor</span>
                   <input
                     type="number"
+                    inputMode="numeric"
                     className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40"
                     {...form.register('targetValue', { valueAsNumber: true })}
                   />

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Card from '../../../components/Card.jsx'
 import Button from '../../../components/Button.jsx'
 import { modalFooterRow, modalFooterCancelButtonClass, modalFooterPrimaryButtonClass } from '../../../components/modalFooter.js'
+import { useBodyScrollLock } from '../../../hooks/useBodyScrollLock.js'
 
 /**
  * @param {{ open: boolean, user: { id: number, displayName?: string|null, email: string }|null, onClose: () => void, onSubmit: (id: number, password: string) => Promise<void> }} props
@@ -11,6 +12,8 @@ export default function AdminUserPasswordModal({ open, user, onClose, onSubmit }
   const [confirm, setConfirm] = useState('')
   const [saving, setSaving] = useState(false)
   const [localError, setLocalError] = useState('')
+
+  useBodyScrollLock(open)
 
   useEffect(() => {
     if (!open) return

@@ -8,9 +8,11 @@ import { habitEntryCreateResolver } from '../store/habitAppStore.js'
 import { computeDurationMinutes, formatDurationHuman } from '../domain/time.js'
 import { formatDateEs } from '../../../data/dateFormat.js'
 import DatePickerInput from '../../../components/DatePickerInput.jsx'
+import { useBodyScrollLock } from '../../../hooks/useBodyScrollLock.js'
 
 export default function HabitEntryEditModal({ open, habits, entry, onClose, onSaved }) {
   const allHabits = useMemo(() => (Array.isArray(habits) ? habits : []), [habits])
+  useBodyScrollLock(open)
 
   const form = useForm({
     resolver: habitEntryCreateResolver,

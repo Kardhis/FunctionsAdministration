@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Card from '../../../components/Card.jsx'
 import Button from '../../../components/Button.jsx'
 import { modalFooterRow, modalFooterCancelButtonClass, modalFooterPrimaryButtonClass } from '../../../components/modalFooter.js'
+import { useBodyScrollLock } from '../../../hooks/useBodyScrollLock.js'
 
 /**
  * @param {{ open: boolean, rolesCatalog: string[], onClose: () => void, onSubmit: (values: { email: string, password: string, displayName: string, active: boolean, roles: string[] }) => Promise<void> }} props
@@ -14,6 +15,8 @@ export default function AdminUserCreateModal({ open, rolesCatalog = [], onClose,
   const [selectedRoles, setSelectedRoles] = useState(() => new Set())
   const [saving, setSaving] = useState(false)
   const [localError, setLocalError] = useState('')
+
+  useBodyScrollLock(open)
 
   useEffect(() => {
     if (!open) return
@@ -98,6 +101,7 @@ export default function AdminUserCreateModal({ open, rolesCatalog = [], onClose,
                 type="email"
                 required
                 autoComplete="email"
+                inputMode="email"
                 className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -109,6 +113,7 @@ export default function AdminUserCreateModal({ open, rolesCatalog = [], onClose,
               <input
                 type="text"
                 required
+                autoComplete="name"
                 className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}

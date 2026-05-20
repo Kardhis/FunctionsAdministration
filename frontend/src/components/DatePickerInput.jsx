@@ -26,8 +26,8 @@ export default function DatePickerInput({ value, onChange, placeholder = 'dd/mm/
       if (!rootRef.current) return
       if (!rootRef.current.contains(e.target)) setOpen(false)
     }
-    document.addEventListener('mousedown', onDoc)
-    return () => document.removeEventListener('mousedown', onDoc)
+    document.addEventListener('pointerdown', onDoc)
+    return () => document.removeEventListener('pointerdown', onDoc)
   }, [open])
 
   const display = selected ? format(selected, 'dd/MM/yyyy') : ''
@@ -49,7 +49,7 @@ export default function DatePickerInput({ value, onChange, placeholder = 'dd/mm/
           type="button"
           variant="ghost"
           disabled={disabled}
-          className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-xl hover:bg-white/5"
+          className="absolute right-2 top-1/2 -translate-y-1/2 h-11 w-11 rounded-xl hover:bg-white/5"
           aria-label="Obrir calendari"
           onClick={() => setOpen((v) => !v)}
         >
@@ -64,7 +64,7 @@ export default function DatePickerInput({ value, onChange, placeholder = 'dd/mm/
               <p className="text-sm font-semibold text-text-h">Selecciona fecha</p>
               <p className="mt-0.5 text-xs text-muted">{selected ? format(selected, 'dd/MM/yyyy') : '—'}</p>
             </div>
-            <Button type="button" variant="ghost" className="h-9 w-9 rounded-xl hover:bg-white/5" onClick={() => setOpen(false)} aria-label="Cerrar">
+            <Button type="button" variant="ghost" className="h-11 w-11 rounded-xl hover:bg-white/5" onClick={() => setOpen(false)} aria-label="Cerrar">
               ✕
             </Button>
           </div>
@@ -87,7 +87,7 @@ export default function DatePickerInput({ value, onChange, placeholder = 'dd/mm/
               caption_label: 'text-sm font-semibold text-text-h',
               nav: 'flex items-center gap-2',
               nav_button:
-                'h-9 w-9 rounded-xl border border-border bg-transparent text-text-h transition-[background,border-color] duration-200 ease-out hover:bg-white/5 hover:border-[color:var(--border-strong)]',
+                'h-11 w-11 rounded-xl border border-border bg-transparent text-text-h transition-[background,border-color] duration-200 ease-out hover:bg-white/5 hover:border-[color:var(--border-strong)]',
               table: 'w-full border-collapse',
               head_row: 'grid grid-cols-7 gap-1',
               head_cell: 'text-[11px] font-semibold uppercase tracking-wider text-muted text-center py-1',
@@ -105,7 +105,6 @@ export default function DatePickerInput({ value, onChange, placeholder = 'dd/mm/
             <Button
               type="button"
               variant="outline"
-              size="sm"
               onClick={() => {
                 const today = new Date()
                 onChange?.(dateToIso(today))
@@ -114,11 +113,9 @@ export default function DatePickerInput({ value, onChange, placeholder = 'dd/mm/
             >
               Hoy
             </Button>
-            <div className="flex items-center gap-2">
             <Button
               type="button"
               variant="ghost"
-              size="sm"
               onClick={() => {
                 onChange?.('')
                 setOpen(false)
@@ -126,7 +123,6 @@ export default function DatePickerInput({ value, onChange, placeholder = 'dd/mm/
             >
               Esborrar
             </Button>
-            </div>
           </div>
         </div>
       ) : null}

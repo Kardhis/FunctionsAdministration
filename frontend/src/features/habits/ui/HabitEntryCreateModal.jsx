@@ -8,6 +8,7 @@ import { habitEntryCreateResolver } from '../store/habitAppStore.js'
 import { computeDurationMinutes, formatDurationHuman, todayLocalDateString } from '../domain/time.js'
 import { formatDateEs } from '../../../data/dateFormat.js'
 import DatePickerInput from '../../../components/DatePickerInput.jsx'
+import { useBodyScrollLock } from '../../../hooks/useBodyScrollLock.js'
 
 const defaultValues = {
   habitId: '',
@@ -25,6 +26,8 @@ export default function HabitEntryCreateModal({ open, habits, onClose, onCreated
     defaultValues,
     mode: 'onChange',
   })
+
+  useBodyScrollLock(open)
 
   useEffect(() => {
     if (!open) return
