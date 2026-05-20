@@ -2,12 +2,15 @@ import { useEffect, useState } from 'react'
 import Card from '../../../components/Card.jsx'
 import Button from '../../../components/Button.jsx'
 import { modalFooterRow, modalFooterCancelButtonClass, modalFooterPrimaryButtonClass } from '../../../components/modalFooter.js'
+import { useBodyScrollLock } from '../../../hooks/useBodyScrollLock.js'
 
 /**
  * @param {{ open: boolean, user: { id: number, displayName?: string|null, email: string }|null, onCancel: () => void, onConfirm: () => Promise<void> }} props
  */
 export default function AdminUserDeleteConfirmModal({ open, user, onCancel, onConfirm }) {
   const [busy, setBusy] = useState(false)
+
+  useBodyScrollLock(open)
 
   useEffect(() => {
     if (!open) return

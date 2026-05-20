@@ -3,9 +3,12 @@ import { useForm } from 'react-hook-form'
 import Card from '../../../components/Card.jsx'
 import Button from '../../../components/Button.jsx'
 import { modalFooterRow, modalFooterCancelButtonClass, modalFooterPrimaryButtonClass } from '../../../components/modalFooter.js'
+import { useBodyScrollLock } from '../../../hooks/useBodyScrollLock.js'
 
 export default function HabitCategoryEditModal({ open, category, onClose, onSaved }) {
   const form = useForm({ defaultValues: { name: '', active: true }, mode: 'onChange' })
+
+  useBodyScrollLock(open)
 
   useEffect(() => {
     if (!open || !category) return

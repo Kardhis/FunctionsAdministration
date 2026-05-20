@@ -2,8 +2,11 @@ import { useEffect } from 'react'
 import Card from '../../../components/Card.jsx'
 import Button from '../../../components/Button.jsx'
 import { modalFooterRow, modalFooterCancelButtonClass, modalFooterPrimaryButtonClass } from '../../../components/modalFooter.js'
+import { useBodyScrollLock } from '../../../hooks/useBodyScrollLock.js'
 
 export default function ConfirmDeleteModal({ open, title = 'Confirmar', message = '¿Seguro?', onCancel, onConfirm }) {
+  useBodyScrollLock(open)
+
   useEffect(() => {
     if (!open) return
     function onKeyDown(e) {

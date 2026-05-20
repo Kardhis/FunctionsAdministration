@@ -81,7 +81,7 @@ function PaginationButton({ onClick, disabled = false, active = false, children,
       onClick={onClick}
       disabled={disabled}
       className={[
-        'inline-flex h-9 min-w-[2.25rem] items-center justify-center rounded-xl px-2 text-sm font-medium transition-[background,opacity] duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] disabled:pointer-events-none disabled:opacity-40',
+        'inline-flex h-11 min-w-[2.75rem] items-center justify-center rounded-xl px-2 text-sm font-medium transition-[background,opacity] duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] disabled:pointer-events-none disabled:opacity-40',
         active
           ? 'bg-[color:var(--accent-bg)] text-text-h ring-1 ring-[color:var(--accent-border)]'
           : 'text-text-h hover:bg-black/5 dark:hover:bg-white/5',

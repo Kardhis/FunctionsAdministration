@@ -197,6 +197,25 @@ code {
   :root[data-theme='light'] select {
     color-scheme: light;
   }
+
+  /* Prevent iOS Safari auto-zoom on input focus (triggered when font-size < 16px) */
+  @media (max-width: 767px) {
+    input:not([type='checkbox']):not([type='radio']):not([type='color']):not([type='range']),
+    select,
+    textarea {
+      font-size: 16px;
+    }
+  }
+
+  /* Base checkbox / radio sizing for touch usability */
+  input[type='checkbox'],
+  input[type='radio'] {
+    width: 1.125rem;
+    height: 1.125rem;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: var(--accent);
+  }
 }
 
 @layer components {
@@ -266,5 +285,14 @@ code {
 
   .ui-textarea {
     resize: none;
+  }
+
+  /* Accessible checkbox / radio wrapper — use instead of bare h-4 w-4 on touch targets */
+  .ui-checkbox {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: var(--accent);
   }
 }

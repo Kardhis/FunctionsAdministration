@@ -165,13 +165,13 @@ export default function AdminUsersPage() {
                 <RoleChips roles={u.roles} />
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
-                <Button type="button" variant="secondary" size="sm" onClick={() => setEditUser(u)}>
+                <Button type="button" variant="secondary" size="sm" className="flex-1 min-h-11" onClick={() => setEditUser(u)}>
                   Editar
                 </Button>
-                <Button type="button" variant="secondary" size="sm" onClick={() => setPwdUser(u)}>
+                <Button type="button" variant="secondary" size="sm" className="flex-1 min-h-11" onClick={() => setPwdUser(u)}>
                   Canviar Contrasenya
                 </Button>
-                <Button type="button" variant="danger" size="sm" onClick={() => setDeleteTarget(u)}>
+                <Button type="button" variant="danger" size="sm" className="flex-1 min-h-11" onClick={() => setDeleteTarget(u)}>
                   Eliminar
                 </Button>
               </div>

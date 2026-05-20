@@ -5,6 +5,7 @@ import Button from '../../../components/Button.jsx'
 import { modalFooterRow, modalFooterCancelButtonClass, modalFooterPrimaryButtonClass } from '../../../components/modalFooter.js'
 import Badge from '../../../components/Badge.jsx'
 import { habitCreateResolver } from '../store/habitAppStore.js'
+import { useBodyScrollLock } from '../../../hooks/useBodyScrollLock.js'
 
 const defaultValues = {
   name: '',
@@ -23,6 +24,8 @@ export default function HabitCreateModal({ open, categories = [], onClose, onCre
   })
 
   const color = form.watch('color')
+
+  useBodyScrollLock(open)
 
   useEffect(() => {
     if (!open) return
