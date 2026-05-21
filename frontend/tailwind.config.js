@@ -52,6 +52,24 @@ export default {
         '2xl': '18px',
         '3xl': '24px',
       },
+      /* Typography scale — mapped from CSS custom properties */
+      fontSize: {
+        '2xs':    ['var(--text-2xs)',    { lineHeight: 'var(--leading-tight)' }],
+        display:  ['var(--text-display)', { lineHeight: 'var(--leading-tight)' }],
+      },
+      /* Semantic line-height utilities (non-conflicting names) */
+      lineHeight: {
+        display: 'var(--leading-tight)',
+        heading: 'var(--leading-snug)',
+        body:    'var(--leading-normal)',
+      },
+      /* Semantic spacing utilities */
+      spacing: {
+        'page-x':    'var(--space-page-x)',
+        'page-y':    'var(--space-page-y)',
+        'card':      'var(--space-card)',
+        'section-gap': 'var(--space-section-gap)',
+      },
     },
   },
   plugins: [],

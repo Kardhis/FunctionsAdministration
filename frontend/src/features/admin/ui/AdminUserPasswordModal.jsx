@@ -96,7 +96,7 @@ export default function AdminUserPasswordModal({ open, user, onClose, onSubmit }
             </label>
 
             {localError ? (
-              <p className="text-sm text-[crimson] dark:text-red-400" role="alert">
+              <p className="text-sm text-danger" role="alert">
                 {localError}
               </p>
             ) : null}

@@ -90,7 +90,7 @@ export default function DatePickerInput({ value, onChange, placeholder = 'dd/mm/
                 'h-11 w-11 rounded-xl border border-border bg-transparent text-text-h transition-[background,border-color] duration-200 ease-out hover:bg-white/5 hover:border-[color:var(--border-strong)]',
               table: 'w-full border-collapse',
               head_row: 'grid grid-cols-7 gap-1',
-              head_cell: 'text-[11px] font-semibold uppercase tracking-wider text-muted text-center py-1',
+              head_cell: 'text-xs font-semibold uppercase tracking-wider text-muted text-center py-1',
               row: 'mt-1 grid grid-cols-7 gap-1',
               cell: 'grid place-items-center',
               day: 'h-10 w-10 rounded-xl text-sm font-medium text-text-h transition-[background,transform,box-shadow] duration-200 ease-out hover:bg-white/5 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)]',

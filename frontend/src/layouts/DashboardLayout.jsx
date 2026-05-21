@@ -219,7 +219,7 @@ export default function DashboardLayout() {
       </aside>
 
       <div
-        className="relative flex w-full max-w-none gap-4 px-3 py-4 sm:gap-6 sm:px-4 md:px-6 md:py-6 lg:gap-6"
+        className="relative flex w-full max-w-none gap-4 px-[var(--space-page-x)] py-[var(--space-page-y)] sm:gap-6 lg:gap-6"
         inert={navOpen || undefined}
       >
         <aside
@@ -265,8 +265,8 @@ export default function DashboardLayout() {
                 </button>
                 <div className="min-w-0">
                   <p className="hidden text-xs font-medium uppercase tracking-wide text-text sm:block">{title}</p>
-                  <h1 className="truncate text-lg font-semibold leading-tight text-text-h sm:mt-1 sm:text-2xl md:text-3xl">{title}</h1>
-                  <p className="mt-1 hidden text-sm text-text sm:block md:mt-2">
+                  <h1 className="truncate text-lg font-semibold leading-display text-text-h sm:mt-1 sm:text-2xl md:text-3xl">{title}</h1>
+                  <p className="mt-1 hidden text-sm leading-body text-text sm:block md:mt-2">
                     {greetingForNow()}, <span className="font-medium text-text-h">{displayName}</span>.
                   </p>
                 </div>

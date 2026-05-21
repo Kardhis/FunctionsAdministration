@@ -117,11 +117,11 @@ export default function HabitsAppLayout() {
   )
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-[var(--space-section-gap)]">
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-text">Módulo</p>
-          <h2 className="text-xl font-semibold text-text-h md:text-2xl">{title}</h2>
+          <h2 className="text-xl font-semibold leading-heading text-text-h md:text-2xl">{title}</h2>
           <p className="mt-1 hidden text-sm text-text sm:block">MVP con persistencia local (IndexedDB) y capa lista para API Spring Boot.</p>
         </div>
 
@@ -149,7 +149,7 @@ export default function HabitsAppLayout() {
         <div className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-text">Cargando datos locales…</div>
       ) : null}
       {error ? (
-        <div className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-[crimson]" role="alert">
+        <div className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-danger" role="alert">
           {error}
         </div>
       ) : null}
@@ -161,7 +161,7 @@ export default function HabitsAppLayout() {
               key={t.id ?? `${t.kind}-${idx}`}
               className={[
                 'rounded-2xl border px-4 py-3 text-sm shadow-soft backdrop-blur-md',
-                t.kind === 'success' ? 'border-border bg-bg/90 text-text-h' : 'border-border bg-bg/90 text-[crimson]',
+                t.kind === 'success' ? 'border-border bg-bg/90 text-text-h' : 'border-border bg-bg/90 text-danger',
               ].join(' ')}
             >
               <div className="flex items-start justify-between gap-3">
