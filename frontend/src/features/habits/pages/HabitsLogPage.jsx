@@ -201,7 +201,7 @@ export default function HabitsLogPage() {
                   <Button
                     type="button"
                     variant="ghost"
-                    className="min-h-11 w-full text-[crimson] sm:w-auto"
+                    className="min-h-11 w-full text-danger sm:w-auto"
                     onClick={() => {
                       const ok = window.confirm('Eliminar este registro?')
                       if (!ok) return
@@ -265,7 +265,7 @@ export default function HabitsLogPage() {
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="text-[crimson]"
+                          className="text-danger"
                           onClick={() => {
                             const ok = window.confirm('Eliminar este registro?')
                             if (!ok) return

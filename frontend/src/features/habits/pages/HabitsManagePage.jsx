@@ -111,7 +111,7 @@ export default function HabitsManagePage() {
                 <Button
                   type="button"
                   variant="ghost"
-                  className="min-h-11 w-full text-[crimson]"
+                  className="min-h-11 w-full text-danger"
                   onClick={() => {
                     const ok = window.confirm(`Eliminar "${h.name}"?`)
                     if (!ok) return
@@ -192,7 +192,7 @@ export default function HabitsManagePage() {
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="text-[crimson]"
+                        className="text-danger"
                         onClick={() => {
                           const ok = window.confirm(`Eliminar "${h.name}"?`)
                           if (!ok) return
@@ -316,7 +316,7 @@ export default function HabitsManagePage() {
                 <Button
                   type="button"
                   variant="ghost"
-                  className="min-h-11 w-full text-[crimson]"
+                  className="min-h-11 w-full text-danger"
                   onClick={() => setDeletingCategory(c)}
                 >
                   Eliminar
@@ -383,7 +383,7 @@ export default function HabitsManagePage() {
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="text-[crimson]"
+                        className="text-danger"
                         onClick={() => setDeletingCategory(c)}
                       >
                         Eliminar

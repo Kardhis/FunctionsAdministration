@@ -177,7 +177,7 @@ export default function ObjectivesPage() {
 
         {loading ? <div className="mt-4 rounded-2xl border border-border bg-bg/60 p-4 text-sm text-text">Cargando…</div> : null}
         {error ? (
-          <div className="mt-4 rounded-2xl border border-border bg-bg/60 p-4 text-sm text-[crimson]" role="alert">
+          <div className="mt-4 rounded-2xl border border-border bg-bg/60 p-4 text-sm text-danger" role="alert">
             {error}
           </div>
         ) : null}
@@ -238,7 +238,7 @@ export default function ObjectivesPage() {
                 >
                   Editar
                 </Button>
-                <Button type="button" variant="ghost" className="min-h-11 w-full text-[crimson] sm:w-auto" onClick={() => setDeleting(o)}>
+                <Button type="button" variant="ghost" className="min-h-11 w-full text-danger sm:w-auto" onClick={() => setDeleting(o)}>
                   Eliminar
                 </Button>
               </div>
@@ -311,7 +311,7 @@ export default function ObjectivesPage() {
                       >
                         Editar
                       </Button>
-                      <Button type="button" variant="ghost" size="sm" className="text-[crimson]" onClick={() => setDeleting(o)}>
+                      <Button type="button" variant="ghost" size="sm" className="text-danger" onClick={() => setDeleting(o)}>
                         Eliminar
                       </Button>
                     </div>

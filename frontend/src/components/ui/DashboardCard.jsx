@@ -7,7 +7,7 @@ export default function DashboardCard({ title, value, subtitle, delta, icon, ton
         <div className="min-w-0 flex-1">
           <p className="text-sm text-text">{title}</p>
           <div className="mt-2 flex flex-col items-start gap-1.5 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
-            <p className="text-2xl font-semibold leading-none text-text-h tabular-nums sm:text-3xl">{value}</p>
+            <p className="text-2xl font-semibold leading-display text-text-h tabular-nums sm:text-3xl">{value}</p>
             {delta ? (
               <Badge tone={tone}>
                 {typeof delta === 'number' ? (

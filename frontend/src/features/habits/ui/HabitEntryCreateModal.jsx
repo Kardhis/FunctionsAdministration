@@ -99,14 +99,14 @@ export default function HabitEntryCreateModal({ open, habits, onClose, onCreated
                   </option>
                 ))}
               </select>
-              {form.formState.errors.habitId ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.habitId.message}</p> : null}
+              {form.formState.errors.habitId ? <p className="mt-1 text-xs text-danger">{form.formState.errors.habitId.message}</p> : null}
               {!activeHabits.length ? <p className="mt-2 text-xs text-text">No hay hábitos activos. Activa uno para poder registrar.</p> : null}
             </label>
 
             <label className="block">
               <span className="text-sm font-medium text-text-h">Fecha</span>
               <DatePickerInput value={watchDate} onChange={(v) => form.setValue('date', v, { shouldDirty: true, shouldValidate: true })} label="Fecha" />
-              {form.formState.errors.date ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.date.message}</p> : null}
+              {form.formState.errors.date ? <p className="mt-1 text-xs text-danger">{form.formState.errors.date.message}</p> : null}
               {watchDate ? <p className="mt-1 text-xs text-text">Vista previa: {formatDateEs(watchDate)}</p> : null}
             </label>
 
@@ -114,12 +114,12 @@ export default function HabitEntryCreateModal({ open, habits, onClose, onCreated
               <label className="block">
                 <span className="text-sm font-medium text-text-h">Inicio (24h)</span>
                 <input type="time" className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" {...form.register('startTime')} />
-                {form.formState.errors.startTime ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.startTime.message}</p> : null}
+                {form.formState.errors.startTime ? <p className="mt-1 text-xs text-danger">{form.formState.errors.startTime.message}</p> : null}
               </label>
               <label className="block">
                 <span className="text-sm font-medium text-text-h">Fin (24h)</span>
                 <input type="time" className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" {...form.register('endTime')} />
-                {form.formState.errors.endTime ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.endTime.message}</p> : null}
+                {form.formState.errors.endTime ? <p className="mt-1 text-xs text-danger">{form.formState.errors.endTime.message}</p> : null}
               </label>
             </div>
 

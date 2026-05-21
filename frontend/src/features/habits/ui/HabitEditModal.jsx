@@ -77,7 +77,7 @@ export default function HabitEditModal({ open, habit, categories = [], onClose, 
             <label className="block">
               <span className="text-sm font-medium text-text-h">Nombre</span>
               <input className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" {...form.register('name')} />
-              {form.formState.errors.name ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.name.message}</p> : null}
+              {form.formState.errors.name ? <p className="mt-1 text-xs text-danger">{form.formState.errors.name.message}</p> : null}
             </label>
 
             <label className="block">
@@ -97,7 +97,7 @@ export default function HabitEditModal({ open, habit, categories = [], onClose, 
                   />
                   <input className="w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" {...form.register('color')} />
                 </div>
-                {form.formState.errors.color ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.color.message}</p> : null}
+                {form.formState.errors.color ? <p className="mt-1 text-xs text-danger">{form.formState.errors.color.message}</p> : null}
               </label>
 
               <label className="block">

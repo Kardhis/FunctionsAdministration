@@ -70,10 +70,10 @@ export default function HabitsWeekPage() {
             <div className="mt-3 grid grid-cols-7 gap-1.5 text-center">
               {m.row.map((cell) => (
                 <div key={cell.day} className="min-w-0">
-                  <p className="text-[10px] font-medium uppercase leading-tight text-text">{formatDateEs(cell.day).slice(0, 5)}</p>
+                  <p className="text-2xs font-medium uppercase leading-tight text-text">{formatDateEs(cell.day).slice(0, 5)}</p>
                   <div className="mt-1 min-h-[2rem]">
                     {cell.minutes > 0 ? (
-                      <Badge tone="accent" className="max-w-full justify-center px-1 py-0.5 text-[10px]">
+                      <Badge tone="accent" className="max-w-full justify-center px-1 py-0.5 text-2xs">
                         {formatDurationHuman(cell.minutes)}
                       </Badge>
                     ) : (

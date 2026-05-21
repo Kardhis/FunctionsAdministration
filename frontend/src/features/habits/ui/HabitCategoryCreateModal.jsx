@@ -67,7 +67,7 @@ export default function HabitCategoryCreateModal({ open, onClose, onCreated }) {
                 className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40"
                 {...form.register('name')}
               />
-              {nameErr ? <p className="mt-1 text-xs text-[crimson]">{nameErr}</p> : null}
+              {nameErr ? <p className="mt-1 text-xs text-danger">{nameErr}</p> : null}
             </label>
 
             <label className="flex items-center gap-3">

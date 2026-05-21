@@ -92,7 +92,7 @@ export default function ObjectiveUpsertModal({ mode, open, habits, initial, onCl
                   </option>
                 ))}
               </select>
-              {form.formState.errors.habitId ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.habitId.message}</p> : null}
+              {form.formState.errors.habitId ? <p className="mt-1 text-xs text-danger">{form.formState.errors.habitId.message}</p> : null}
             </label>
 
             <label className="block">
@@ -102,20 +102,20 @@ export default function ObjectiveUpsertModal({ mode, open, habits, initial, onCl
                 className="mt-2 w-full resize-none rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40"
                 {...form.register('notes')}
               />
-              {form.formState.errors.notes ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.notes.message}</p> : null}
+              {form.formState.errors.notes ? <p className="mt-1 text-xs text-danger">{form.formState.errors.notes.message}</p> : null}
             </label>
 
             <label className="block">
               <span className="text-sm font-medium text-text-h">Fecha de inicio</span>
               <DatePickerInput value={watchStartDate} onChange={(v) => form.setValue('startDate', v, { shouldDirty: true, shouldValidate: true })} label="Fecha de inicio" />
-              {form.formState.errors.startDate ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.startDate.message}</p> : null}
+              {form.formState.errors.startDate ? <p className="mt-1 text-xs text-danger">{form.formState.errors.startDate.message}</p> : null}
               {watchStartDate ? <p className="mt-1 text-xs text-text">Vista previa: {formatDateEs(watchStartDate)}</p> : null}
             </label>
 
             <label className="block">
               <span className="text-sm font-medium text-text-h">Fecha de finalización</span>
               <DatePickerInput value={watchEndDate} onChange={(v) => form.setValue('endDate', v, { shouldDirty: true, shouldValidate: true })} label="Fecha de finalización" />
-              {form.formState.errors.endDate ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.endDate.message}</p> : null}
+              {form.formState.errors.endDate ? <p className="mt-1 text-xs text-danger">{form.formState.errors.endDate.message}</p> : null}
               {watchEndDate ? <p className="mt-1 text-xs text-text">Vista prèvia: {formatDateEs(watchEndDate)}</p> : null}
             </label>
 
@@ -140,7 +140,7 @@ export default function ObjectiveUpsertModal({ mode, open, habits, initial, onCl
                     className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40"
                     {...form.register('targetValue', { valueAsNumber: true })}
                   />
-                  {form.formState.errors.targetValue ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.targetValue.message}</p> : null}
+                  {form.formState.errors.targetValue ? <p className="mt-1 text-xs text-danger">{form.formState.errors.targetValue.message}</p> : null}
                 </label>
               </div>
             </div>

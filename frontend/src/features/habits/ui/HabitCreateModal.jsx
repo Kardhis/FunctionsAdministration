@@ -74,7 +74,7 @@ export default function HabitCreateModal({ open, categories = [], onClose, onCre
                 {...form.register('name')}
               />
               {form.formState.errors.name ? (
-                <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.name.message}</p>
+                <p className="mt-1 text-xs text-danger">{form.formState.errors.name.message}</p>
               ) : null}
             </label>
 
@@ -103,7 +103,7 @@ export default function HabitCreateModal({ open, categories = [], onClose, onCre
                   />
                 </div>
                 {form.formState.errors.color ? (
-                  <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.color.message}</p>
+                  <p className="mt-1 text-xs text-danger">{form.formState.errors.color.message}</p>
                 ) : null}
               </label>
 

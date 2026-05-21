@@ -140,7 +140,7 @@ export default function HabitsOverviewPage() {
   }, [bootstrapped])
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-[var(--space-section-gap)]">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <DashboardCard
           title="Tiempo hoy"
