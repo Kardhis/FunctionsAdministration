@@ -26,7 +26,7 @@ function formatRelative(iso) {
 export default function DashboardOverviewPage() {
   return (
     <div className="space-y-6">
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {dashboardMetrics.map((m) => (
           <DashboardCard
             key={m.key}
@@ -83,6 +83,7 @@ export default function DashboardOverviewPage() {
                   as={Link}
                   to={a.to}
                   variant={a.variant === 'primary' ? 'primary' : 'secondary'}
+                  className="w-full sm:w-auto"
                 >
                   {a.label}
                 </Button>
