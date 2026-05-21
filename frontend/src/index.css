@@ -228,6 +228,10 @@ code {
     box-shadow: var(--shadow-card);
   }
 
+  .ui-hover {
+    transition: transform 200ms ease-out, box-shadow 200ms ease-out, border-color 200ms ease-out;
+  }
+
   .ui-panel {
     border-radius: 18px;
     border-width: 1px;

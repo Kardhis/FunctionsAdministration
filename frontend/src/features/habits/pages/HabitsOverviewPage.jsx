@@ -141,7 +141,7 @@ export default function HabitsOverviewPage() {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <DashboardCard
           title="Tiempo hoy"
           value={formatDurationHuman(todayMinutes)}
@@ -297,7 +297,7 @@ export default function HabitsOverviewPage() {
             )}
         </Card>
 
-        <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           <Card className="p-5 xl:col-span-2">
             <div className="flex items-start justify-between gap-3">
               <div>

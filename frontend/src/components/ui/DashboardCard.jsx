@@ -2,12 +2,12 @@ import Badge from '../Badge.jsx'
 
 export default function DashboardCard({ title, value, subtitle, delta, icon, tone = 'neutral', className = '', children }) {
   return (
-    <section className={`ui-card ui-hover p-5 ${className}`}>
+    <section className={`ui-card ui-hover p-4 sm:p-5 ${className}`}>
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="text-sm text-text">{title}</p>
-          <div className="mt-2 flex items-end justify-between gap-3">
-            <p className="text-3xl font-semibold leading-none text-text-h tabular-nums">{value}</p>
+          <div className="mt-2 flex flex-col items-start gap-1.5 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
+            <p className="text-2xl font-semibold leading-none text-text-h tabular-nums sm:text-3xl">{value}</p>
             {delta ? (
               <Badge tone={tone}>
                 {typeof delta === 'number' ? (
