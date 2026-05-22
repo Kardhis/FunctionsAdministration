@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { listEntries, putEntry, deleteEntry as deleteEntryDb } from '../data/entriesRepo.js'
+import { listEntries, putEntry, updateEntry as updateEntryDb, deleteEntry as deleteEntryDb } from '../data/entriesRepo.js'
 import { deleteHabit as deleteHabitDb, listHabits, putHabit } from '../data/habitsRepo.js'
 import { createCategory, deleteCategory, listCategories, updateCategory } from '../data/categoriesRepo.js'
 import { getSetting, setSetting } from '../data/settingsRepo.js'
@@ -302,7 +302,7 @@ export const useHabitAppStore = create((set, get) => ({
       updatedAt: toIsoNow(),
     })
 
-    await putEntry(next)
+    await updateEntryDb(next)
     set({ entries: await listEntries(), toasts: pushLimited(get().toasts, { kind: 'success', message: 'Registro actualizado.' }) })
     return { ok: true, entry: next }
   },
