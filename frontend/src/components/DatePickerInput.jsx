@@ -1,8 +1,44 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { DayPicker } from 'react-day-picker'
+import { DayPicker, useDayPicker } from 'react-day-picker'
 import { ca } from 'date-fns/locale'
 import { format, isValid, parse } from 'date-fns'
 import Button from './Button.jsx'
+
+const NAV_BTN_CLASS =
+  'flex h-7 w-7 cursor-pointer items-center justify-center border-0 bg-transparent p-0 text-lg font-bold text-[color:var(--accent)] transition-opacity duration-150 hover:opacity-70 active:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] disabled:cursor-not-allowed disabled:opacity-30'
+
+function CalendarCaption({ calendarMonth }) {
+  const { goToMonth, nextMonth, previousMonth } = useDayPicker()
+  return (
+    <div className="flex h-8 items-center justify-center gap-2">
+      <button
+        type="button"
+        disabled={!previousMonth}
+        onClick={() => previousMonth && goToMonth(previousMonth)}
+        className={NAV_BTN_CLASS}
+        aria-label="Mes anterior"
+      >
+        ‹
+      </button>
+      <span className="min-w-[6rem] text-center text-sm font-semibold text-text-h">
+        {format(calendarMonth.date, 'LLLL yyyy', { locale: ca })}
+      </span>
+      <button
+        type="button"
+        disabled={!nextMonth}
+        onClick={() => nextMonth && goToMonth(nextMonth)}
+        className={NAV_BTN_CLASS}
+        aria-label="Mes siguiente"
+      >
+        ›
+      </button>
+    </div>
+  )
+}
+
+function CalendarNav() {
+  return null
+}
 
 function isoToDate(iso) {
   if (!iso) return null
@@ -78,13 +114,11 @@ export default function DatePickerInput({ value, onChange, placeholder = 'dd/mm/
       </div>
 
       {open ? (
-        <div className="absolute right-0 z-50 mt-2 w-[min(340px,calc(100dvw-1.5rem))] max-w-[calc(100dvw-1.5rem)] rounded-2xl border border-border bg-[color:var(--surface-2)] p-3 shadow-float sm:left-0 sm:right-auto sm:p-4">
-          <div className="flex items-center justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-text-h">Selecciona fecha</p>
-              <p className="mt-0.5 text-xs text-muted">{selected ? format(selected, 'dd/MM/yyyy') : '—'}</p>
-            </div>
-            <Button type="button" variant="ghost" className="h-11 w-11 rounded-xl hover:bg-white/5" onClick={() => setOpen(false)} aria-label="Cerrar">
+        <div className="absolute left-1/2 z-50 mt-2 w-[min(300px,calc(100dvw-1.5rem))] -translate-x-1/2 rounded-2xl border border-border bg-[color:var(--surface-2)] p-3 shadow-float sm:w-[280px]">
+          <div className="flex items-center">
+            <div className="w-9 shrink-0" aria-hidden="true" />
+            <p className="flex-1 text-center text-sm font-semibold text-text-h">Selecciona una fecha</p>
+            <Button type="button" variant="ghost" className="h-9 w-9 shrink-0 rounded-xl hover:bg-white/5" onClick={() => setOpen(false)} aria-label="Cerrar">
               ✕
             </Button>
           </div>
@@ -100,31 +134,29 @@ export default function DatePickerInput({ value, onChange, placeholder = 'dd/mm/
               onChange?.(dateToIso(d))
               setOpen(false)
             }}
+            components={{ MonthCaption: CalendarCaption, Nav: CalendarNav }}
             classNames={{
-              months: 'mt-3',
-              month: 'space-y-3',
-              caption: 'flex items-center justify-between',
-              caption_label: 'text-sm font-semibold text-text-h',
-              nav: 'flex items-center gap-2',
-              nav_button:
-                'h-11 w-11 rounded-xl border border-border bg-transparent text-text-h transition-[background,border-color] duration-200 ease-out hover:bg-white/5 hover:border-[color:var(--border-strong)]',
-              table: 'w-full border-collapse',
-              head_row: 'grid grid-cols-7 gap-1',
-              head_cell: 'text-xs font-semibold uppercase tracking-wider text-muted text-center py-1',
-              row: 'mt-1 grid grid-cols-7 gap-1',
-              cell: 'grid place-items-center',
-              day: 'h-10 w-10 rounded-xl text-sm font-medium text-text-h transition-[background,transform,box-shadow] duration-200 ease-out hover:bg-white/5 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)]',
-              day_today: 'ring-1 ring-[color:var(--border-strong)]',
-              day_outside: 'text-muted opacity-60',
-              day_disabled: 'text-muted opacity-40 cursor-not-allowed',
-              day_selected:
-                'bg-[color:var(--accent)] text-[#061018] shadow-[0_0_0_1px_var(--accent-border),0_8px_24px_rgba(0,0,0,0.35)] hover:bg-[color:var(--accent)]',
+              months: 'mt-2',
+              month: 'space-y-1',
+              month_grid: 'w-full border-collapse',
+              weekdays: 'grid grid-cols-7 gap-0.5',
+              weekday: 'text-xs font-semibold uppercase tracking-wider text-muted text-center py-0.5',
+              week: 'mt-0.5 grid grid-cols-7 gap-0.5',
+              day: 'grid place-items-center',
+              day_button:
+                'h-8 w-8 rounded-lg text-xs font-medium text-text-h transition-[background,transform,box-shadow] duration-200 ease-out hover:bg-[color:var(--accent)] hover:text-[#061018] hover:brightness-110 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)]',
+              today: 'ring-1 ring-[color:var(--border-strong)]',
+              outside: 'text-muted opacity-50',
+              disabled: 'text-muted opacity-40 cursor-not-allowed',
+              selected:
+                'bg-[color:var(--accent)] text-[#061018] shadow-[0_0_0_1px_var(--accent-border),0_4px_12px_rgba(0,0,0,0.25)] hover:bg-[color:var(--accent)] hover:brightness-110',
             }}
           />
-          <div className="mt-3 flex items-center justify-between gap-2">
+          <div className="mt-2 flex items-center justify-between gap-2">
             <Button
               type="button"
               variant="outline"
+              size="sm"
               onClick={() => {
                 const today = new Date()
                 onChange?.(dateToIso(today))
@@ -136,6 +168,7 @@ export default function DatePickerInput({ value, onChange, placeholder = 'dd/mm/
             <Button
               type="button"
               variant="ghost"
+              size="sm"
               onClick={() => {
                 onChange?.('')
                 setOpen(false)
