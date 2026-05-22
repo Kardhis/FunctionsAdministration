@@ -5,12 +5,13 @@ import { modalFooterRow, modalFooterCancelButtonClass, modalFooterPrimaryButtonC
 import { useBodyScrollLock } from '../../../hooks/useBodyScrollLock.js'
 
 /**
- * @param {{ open: boolean, user: { id: number, email: string, displayName?: string|null, active: boolean }|null, onClose: () => void, onSubmit: (id: number, values: { email: string, displayName: string, active: boolean }) => Promise<void> }} props
+ * @param {{ open: boolean, user: { id: number, email: string, displayName?: string|null, active: boolean, roles?: string[] }|null, rolesCatalog: string[], onClose: () => void, onSubmit: (id: number, values: { email: string, displayName: string, active: boolean, roles: string[] }) => Promise<void> }} props
  */
-export default function AdminUserEditModal({ open, user, onClose, onSubmit }) {
+export default function AdminUserEditModal({ open, user, rolesCatalog = [], onClose, onSubmit }) {
   const [email, setEmail] = useState('')
   const [displayName, setDisplayName] = useState('')
   const [active, setActive] = useState(true)
+  const [selectedRoles, setSelectedRoles] = useState(() => new Set())
   const [saving, setSaving] = useState(false)
   const [localError, setLocalError] = useState('')
 
@@ -21,6 +22,7 @@ export default function AdminUserEditModal({ open, user, onClose, onSubmit }) {
     setEmail(user.email ?? '')
     setDisplayName(user.displayName ?? '')
     setActive(Boolean(user.active))
+    setSelectedRoles(new Set(Array.isArray(user.roles) ? user.roles : []))
     setLocalError('')
     setSaving(false)
   }, [open, user])
@@ -36,6 +38,17 @@ export default function AdminUserEditModal({ open, user, onClose, onSubmit }) {
 
   if (!open || !user) return null
 
+  const sortedRoles = [...rolesCatalog].sort((a, b) => String(a).localeCompare(String(b)))
+
+  function toggleRole(name) {
+    setSelectedRoles((prev) => {
+      const next = new Set(prev)
+      if (next.has(name)) next.delete(name)
+      else next.add(name)
+      return next
+    })
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     setLocalError('')
@@ -45,9 +58,14 @@ export default function AdminUserEditModal({ open, user, onClose, onSubmit }) {
       setLocalError('Email i Nom Usuari són obligatoris.')
       return
     }
+    const roles = [...selectedRoles]
+    if (!roles.length) {
+      setLocalError("Selecciona almenys un rol als 'Rols'.")
+      return
+    }
     setSaving(true)
     try {
-      await onSubmit(user.id, { email: em, displayName: dn, active })
+      await onSubmit(user.id, { email: em, displayName: dn, active, roles })
       onClose?.()
     } catch (err) {
       setLocalError(err instanceof Error ? err.message : String(err))
@@ -60,7 +78,7 @@ export default function AdminUserEditModal({ open, user, onClose, onSubmit }) {
     <div className="fixed inset-0 z-[55]">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" onClick={() => onClose?.()} />
       <div className="relative mx-auto flex min-h-[100svh] w-full max-w-lg items-center justify-center px-3 py-4 sm:px-4 sm:py-10">
-        <Card className="max-h-[min(88dvh,720px)] w-full overflow-y-auto overscroll-y-contain p-5 sm:p-6">
+        <Card className="max-h-[min(92dvh,900px)] w-full overflow-y-auto overscroll-y-contain p-5 sm:p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-xs font-medium uppercase tracking-wide text-text">Administració</p>
@@ -97,6 +115,22 @@ export default function AdminUserEditModal({ open, user, onClose, onSubmit }) {
                 onChange={(e) => setDisplayName(e.target.value)}
               />
             </label>
+
+            <div>
+              <span className="text-sm font-medium text-text-h">Rols</span>
+              <div className="mt-2 max-h-40 space-y-2 overflow-y-auto rounded-2xl border border-border bg-bg/60 p-3">
+                {sortedRoles.length ? (
+                  sortedRoles.map((r) => (
+                    <label key={r} className="flex items-center justify-between gap-3 text-sm text-text-h">
+                      <span className="truncate font-mono text-xs">{r}</span>
+                      <input type="checkbox" className="ui-checkbox" checked={selectedRoles.has(r)} onChange={() => toggleRole(r)} />
+                    </label>
+                  ))
+                ) : (
+                  <p className="text-sm text-text">No hi ha rols disponibles.</p>
+                )}
+              </div>
+            </div>
 
             <label className="flex items-center gap-3">
               <input type="checkbox" className="ui-checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} />

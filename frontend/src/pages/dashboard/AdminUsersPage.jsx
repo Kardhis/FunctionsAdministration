@@ -74,12 +74,13 @@ export default function AdminUsersPage() {
     await refresh()
   }
 
-  async function handleEditSubmit(id, { email, displayName, active }) {
+  async function handleEditSubmit(id, { email, displayName, active, roles }) {
     const prev = users.find((u) => u.id === id)
     await adminRepo.updateUserBasics(id, { email, displayName })
     if (prev && prev.active !== active) {
       await adminRepo.updateUserStatus(id, active)
     }
+    await adminRepo.updateUserRoles(id, roles)
     await refresh()
   }
 
@@ -275,6 +276,7 @@ export default function AdminUsersPage() {
       <AdminUserEditModal
         open={Boolean(editUser)}
         user={editUser}
+        rolesCatalog={rolesCatalog}
         onClose={() => setEditUser(null)}
         onSubmit={handleEditSubmit}
       />
