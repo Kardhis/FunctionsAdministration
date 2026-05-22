@@ -21,6 +21,11 @@ export async function putEntry(entry) {
   }
 }
 
+export async function updateEntry(entry) {
+  if (!entry?.id) throw new Error('Entry id is required')
+  return apiFetch(`/api/habit-entries/${encodeURIComponent(entry.id)}`, { method: 'PUT', body: entry })
+}
+
 export async function deleteEntry(id) {
   await apiFetch(`/api/habit-entries/${encodeURIComponent(id)}`, { method: 'DELETE' })
 }
