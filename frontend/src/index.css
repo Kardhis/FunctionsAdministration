@@ -158,25 +158,6 @@ body {
   box-sizing: border-box;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: var(--text-display);
-  letter-spacing: -0.03em;
-  line-height: var(--leading-tight);
-  margin: clamp(20px, calc(15.3px + 1.304vw), 32px) 0;
-}
-h2 {
-  font-size: var(--text-2xl);
-  line-height: var(--leading-snug);
-  letter-spacing: -0.01em;
-  margin: 0 0 8px;
-}
 p {
   margin: 0;
 }
@@ -197,6 +178,28 @@ code {
 }
 
 @layer base {
+  /* Default heading styles — Tailwind utilities will override when needed */
+  h1,
+  h2 {
+    font-family: var(--heading);
+    font-weight: 500;
+    color: var(--text-h);
+  }
+
+  h1 {
+    font-size: var(--text-display);
+    letter-spacing: -0.03em;
+    line-height: var(--leading-tight);
+    margin: clamp(20px, calc(15.3px + 1.304vw), 32px) 0;
+  }
+
+  h2 {
+    font-size: var(--text-2xl);
+    line-height: var(--leading-snug);
+    letter-spacing: -0.01em;
+    margin: 0 0 8px;
+  }
+
   ::selection {
     background: var(--accent-bg);
   }

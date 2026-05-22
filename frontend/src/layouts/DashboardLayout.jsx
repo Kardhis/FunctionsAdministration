@@ -171,6 +171,14 @@ export default function DashboardLayout() {
 
   return (
     <div className="min-h-[100svh] bg-bg text-text">
+      {/* Skip link — keyboard users jump directly to main content */}
+      <a
+        href="#main-content"
+        className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-[100] focus-visible:rounded-2xl focus-visible:border focus-visible:border-border focus-visible:bg-bg focus-visible:px-4 focus-visible:py-3 focus-visible:text-sm focus-visible:font-medium focus-visible:text-text-h focus-visible:shadow-float focus-visible:ring-2 focus-visible:ring-[color:var(--ring)]"
+      >
+        Saltar al contingut principal
+      </a>
+
       <div
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 opacity-70"
@@ -194,7 +202,7 @@ export default function DashboardLayout() {
       <aside
         ref={mobileDrawerRef}
         className={[
-          'fixed left-0 top-0 z-50 flex h-[100svh] w-[min(280px,92vw)] flex-col border-r border-border bg-bg/95 shadow-float backdrop-blur-md transition-transform duration-200 ease-out lg:hidden',
+          'fixed left-0 top-0 z-50 flex h-[100svh] w-[min(280px,92vw)] flex-col border-r border-border bg-bg/95 shadow-float backdrop-blur-md transition-transform duration-200 ease-out motion-reduce:transition-none lg:hidden',
           navOpen ? 'translate-x-0' : '-translate-x-full',
         ].join(' ')}
         role="dialog"
@@ -202,6 +210,10 @@ export default function DashboardLayout() {
         aria-label="Menú principal"
         aria-hidden={!navOpen}
         inert={!navOpen || undefined}
+        style={{
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        }}
       >
         <SidebarPanel
           location={location}
@@ -247,7 +259,8 @@ export default function DashboardLayout() {
                 <button
                   ref={mobileMenuButtonRef}
                   type="button"
-                  className="mt-0.5 inline-flex h-11 min-w-[44px] shrink-0 items-center justify-center rounded-xl border border-border bg-bg/80 text-text-h shadow-soft hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-accent/40 lg:hidden dark:hover:bg-white/5"
+                  className="mt-0.5 inline-flex h-11 min-w-[44px] shrink-0 items-center justify-center rounded-xl border border-border bg-bg/80 text-text-h shadow-soft hover:bg-black/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] lg:hidden dark:hover:bg-white/5"
+                  aria-label={navOpen ? 'Cerrar menú' : 'Abrir menú'}
                   aria-expanded={navOpen}
                   aria-controls="dashboard-mobile-nav"
                   onClick={() => {
@@ -258,14 +271,13 @@ export default function DashboardLayout() {
                     }
                   }}
                 >
-                  <span className="sr-only">Abrir menú</span>
-                  <span className="text-base" aria-hidden>
-                    ☰
+                  <span className="text-base" aria-hidden="true">
+                    {navOpen ? '✕' : '☰'}
                   </span>
                 </button>
                 <div className="min-w-0">
                   <p className="hidden text-xs font-medium uppercase tracking-wide text-text sm:block">{title}</p>
-                  <h1 className="truncate text-lg font-semibold leading-display text-text-h sm:mt-1 sm:text-2xl md:text-3xl">{title}</h1>
+                  <h1 className="m-0 truncate text-lg font-semibold leading-display text-text-h sm:mt-1 sm:text-2xl md:text-3xl">{title}</h1>
                   <p className="mt-1 hidden text-sm leading-body text-text sm:block md:mt-2">
                     {greetingForNow()}, <span className="font-medium text-text-h">{displayName}</span>.
                   </p>
@@ -298,7 +310,7 @@ export default function DashboardLayout() {
             </div>
           </header>
 
-          <main className="mt-4 sm:mt-6">
+          <main id="main-content" className="mt-4 sm:mt-6">
             <Outlet />
           </main>
         </div>
