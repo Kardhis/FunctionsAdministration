@@ -61,7 +61,7 @@ export default function HabitEntryEditModal({ open, habits, entry, onClose, onSa
   if (!open || !entry) return null
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-0 z-[55]">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" onClick={() => onClose?.()} />
       <div className="relative mx-auto flex min-h-[100svh] w-full max-w-2xl items-center justify-center px-3 py-4 sm:px-4 sm:py-10">
         <Card className="max-h-[min(92dvh,900px)] w-full overflow-y-auto overscroll-y-contain p-5 sm:p-6">
@@ -71,7 +71,7 @@ export default function HabitEntryEditModal({ open, habits, entry, onClose, onSa
               <p className="mt-1 text-xl font-semibold text-text-h">Registro</p>
               <p className="mt-1 text-sm text-text">Actualiza hábito, fecha y ventana de tiempo.</p>
             </div>
-            <Button variant="ghost" type="button" onClick={() => onClose?.()} aria-label="Cerrar">
+            <Button variant="ghost" type="button" className="min-h-11 min-w-[44px]" onClick={() => onClose?.()} aria-label="Cerrar">
               ✕
             </Button>
           </div>

@@ -19,7 +19,7 @@ export default function ConfirmDeleteModal({ open, title = 'Confirmar', message 
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-0 z-[55]">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" onClick={() => onCancel?.()} />
       <div className="relative mx-auto flex min-h-[100svh] w-full max-w-lg items-center justify-center px-3 py-4 sm:px-4 sm:py-10">
         <Card className="max-h-[min(88dvh,720px)] w-full overflow-y-auto overscroll-y-contain p-5 sm:p-6">
@@ -29,7 +29,7 @@ export default function ConfirmDeleteModal({ open, title = 'Confirmar', message 
               <p className="mt-1 text-xl font-semibold text-text-h">{title}</p>
               <p className="mt-2 text-sm text-text">{message}</p>
             </div>
-            <Button variant="ghost" type="button" onClick={() => onCancel?.()} aria-label="Cerrar">
+            <Button variant="ghost" type="button" className="min-h-11 min-w-[44px]" onClick={() => onCancel?.()} aria-label="Cerrar">
               ✕
             </Button>
           </div>

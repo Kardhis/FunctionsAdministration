@@ -49,7 +49,7 @@ export default function HabitEditModal({ open, habit, categories = [], onClose, 
   if (!open || !habit) return null
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-0 z-[55]">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" onClick={() => onClose?.()} />
       <div className="relative mx-auto flex min-h-[100svh] w-full max-w-2xl items-center justify-center px-3 py-4 sm:px-4 sm:py-10">
         <Card className="max-h-[min(92dvh,900px)] w-full overflow-y-auto overscroll-y-contain p-5 sm:p-6">
@@ -61,7 +61,7 @@ export default function HabitEditModal({ open, habit, categories = [], onClose, 
             </div>
             <div className="flex items-center gap-2">
               <Badge tone="neutral">ID</Badge>
-              <Button variant="ghost" type="button" onClick={() => onClose?.()} aria-label="Cerrar">
+              <Button variant="ghost" type="button" className="min-h-11 min-w-[44px]" onClick={() => onClose?.()} aria-label="Cerrar">
                 ✕
               </Button>
             </div>
@@ -120,7 +120,7 @@ export default function HabitEditModal({ open, habit, categories = [], onClose, 
                             <span className="truncate">{c.name}</span>
                             <input
                               type="checkbox"
-                              className="h-4 w-4"
+                              className="ui-checkbox"
                               checked={selected}
                               onChange={(e) => {
                                 const prev = form.getValues('categoryIds') ?? []
@@ -138,7 +138,7 @@ export default function HabitEditModal({ open, habit, categories = [], onClose, 
               </label>
 
               <label className="flex items-center gap-3 pt-7">
-                <input type="checkbox" className="h-4 w-4" checked={Boolean(form.watch('active'))} onChange={(e) => form.setValue('active', e.target.checked, { shouldValidate: true })} />
+                <input type="checkbox" className="ui-checkbox" checked={Boolean(form.watch('active'))} onChange={(e) => form.setValue('active', e.target.checked, { shouldValidate: true })} />
                 <span className="text-sm font-medium text-text-h">Activo</span>
               </label>
             </div>

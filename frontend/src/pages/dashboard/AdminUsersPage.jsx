@@ -153,7 +153,7 @@ export default function AdminUsersPage() {
                 <label className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 text-xs text-text-h">
                   <input
                     type="checkbox"
-                    className="h-4 w-4 rounded border-border"
+                    className="ui-checkbox"
                     checked={Boolean(u.active)}
                     onChange={(e) => handleToggleActive(u, e.target.checked)}
                     aria-label="Actiu / Desactiu"
@@ -221,7 +221,7 @@ export default function AdminUsersPage() {
                     <label className="inline-flex cursor-pointer items-center gap-2 text-text-h">
                       <input
                         type="checkbox"
-                        className="h-4 w-4 rounded border-border"
+                        className="ui-checkbox"
                         checked={Boolean(u.active)}
                         onChange={(e) => handleToggleActive(u, e.target.checked)}
                         aria-label="Actiu / Desactiu"

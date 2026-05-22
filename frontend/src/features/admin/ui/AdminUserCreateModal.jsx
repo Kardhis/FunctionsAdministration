@@ -79,7 +79,7 @@ export default function AdminUserCreateModal({ open, rolesCatalog = [], onClose,
   }
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-0 z-[55]">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" onClick={() => onClose?.()} />
       <div className="relative mx-auto flex min-h-[100svh] w-full max-w-lg items-center justify-center px-3 py-4 sm:px-4 sm:py-10">
         <Card className="max-h-[min(92dvh,900px)] w-full overflow-y-auto overscroll-y-contain p-5 sm:p-6">
@@ -89,7 +89,7 @@ export default function AdminUserCreateModal({ open, rolesCatalog = [], onClose,
               <p className="mt-1 text-xl font-semibold text-text-h">Crear Usuari</p>
               <p className="mt-1 text-sm text-text">Omple tots els camps obligatoris.</p>
             </div>
-            <Button variant="ghost" type="button" onClick={() => onClose?.()} aria-label="Tancar">
+            <Button variant="ghost" type="button" className="min-h-11 min-w-[44px]" onClick={() => onClose?.()} aria-label="Tancar">
               ✕
             </Button>
           </div>
@@ -139,7 +139,7 @@ export default function AdminUserCreateModal({ open, rolesCatalog = [], onClose,
                   sortedRoles.map((r) => (
                     <label key={r} className="flex items-center justify-between gap-3 text-sm text-text-h">
                       <span className="truncate font-mono text-xs">{r}</span>
-                      <input type="checkbox" className="h-4 w-4 shrink-0" checked={selectedRoles.has(r)} onChange={() => toggleRole(r)} />
+                      <input type="checkbox" className="ui-checkbox" checked={selectedRoles.has(r)} onChange={() => toggleRole(r)} />
                     </label>
                   ))
                 ) : (
@@ -149,7 +149,7 @@ export default function AdminUserCreateModal({ open, rolesCatalog = [], onClose,
             </div>
 
             <label className="flex items-center gap-3">
-              <input type="checkbox" className="h-4 w-4" checked={active} onChange={(e) => setActive(e.target.checked)} />
+              <input type="checkbox" className="ui-checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} />
               <span className="text-sm font-medium text-text-h">Actiu / Desactiu</span>
             </label>
 
