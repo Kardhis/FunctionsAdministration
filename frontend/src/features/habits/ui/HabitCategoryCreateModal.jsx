@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import Card from '../../../components/Card.jsx'
 import Button from '../../../components/Button.jsx'
 import { modalFooterRow, modalFooterCancelButtonClass, modalFooterPrimaryButtonClass } from '../../../components/modalFooter.js'
+import { useBodyScrollLock } from '../../../hooks/useBodyScrollLock.js'
 
 const defaultValues = {
   name: '',
@@ -11,6 +12,8 @@ const defaultValues = {
 
 export default function HabitCategoryCreateModal({ open, onClose, onCreated }) {
   const form = useForm({ defaultValues, mode: 'onChange' })
+
+  useBodyScrollLock(open)
 
   useEffect(() => {
     if (!open) return
@@ -31,7 +34,7 @@ export default function HabitCategoryCreateModal({ open, onClose, onCreated }) {
   const nameErr = form.formState.errors.name?.message
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-0 z-[55]">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" onClick={() => onClose?.()} />
       <div className="relative mx-auto flex min-h-[100svh] w-full max-w-lg items-center justify-center px-3 py-4 sm:px-4 sm:py-10">
         <Card className="max-h-[min(88dvh,720px)] w-full overflow-y-auto overscroll-y-contain p-5 sm:p-6">
@@ -41,7 +44,7 @@ export default function HabitCategoryCreateModal({ open, onClose, onCreated }) {
               <p className="mt-1 text-xl font-semibold text-text-h">Nueva categoría</p>
               <p className="mt-1 text-sm text-text">Nombre + estado.</p>
             </div>
-            <Button variant="ghost" type="button" onClick={() => onClose?.()} aria-label="Cerrar">
+            <Button variant="ghost" type="button" className="min-h-11 min-w-[44px]" onClick={() => onClose?.()} aria-label="Cerrar">
               ✕
             </Button>
           </div>
@@ -64,13 +67,13 @@ export default function HabitCategoryCreateModal({ open, onClose, onCreated }) {
                 className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40"
                 {...form.register('name')}
               />
-              {nameErr ? <p className="mt-1 text-xs text-[crimson]">{nameErr}</p> : null}
+              {nameErr ? <p className="mt-1 text-xs text-danger">{nameErr}</p> : null}
             </label>
 
             <label className="flex items-center gap-3">
               <input
                 type="checkbox"
-                className="h-4 w-4"
+                className="ui-checkbox"
                 checked={Boolean(form.watch('active'))}
                 onChange={(e) => form.setValue('active', e.target.checked)}
               />

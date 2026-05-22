@@ -9,11 +9,11 @@ export default function AccountSummary() {
       <div className="mt-3 space-y-2 text-sm text-text">
         <p>
           <span className="text-text-h">Usuario:</span>{' '}
-          <code>{typeof user === 'string' ? user : user?.name ?? '—'}</code>
+          <code className="break-all">{typeof user === 'string' ? user : user?.name ?? '—'}</code>
         </p>
         <p>
           <span className="text-text-h">Email:</span>{' '}
-          <code>{typeof user === 'string' ? '—' : user?.email ?? '—'}</code>
+          <code className="break-all">{typeof user === 'string' ? '—' : user?.email ?? '—'}</code>
         </p>
       </div>
     </div>

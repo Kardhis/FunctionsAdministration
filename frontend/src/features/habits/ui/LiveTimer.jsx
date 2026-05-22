@@ -64,7 +64,7 @@ export default function LiveTimer({ habits, onComplete }) {
         <Badge tone={running ? 'accent' : 'neutral'}>{running ? 'en curso' : 'parado'}</Badge>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
         <label className="block">
           <span className="text-xs font-medium uppercase tracking-wide text-text">Hábito</span>
             <select
@@ -83,15 +83,16 @@ export default function LiveTimer({ habits, onComplete }) {
           </label>
 
         <div className="flex items-end justify-between gap-3">
-          <div>
+          <div className="min-w-0">
             <p className="text-xs font-medium uppercase tracking-wide text-text">Tiempo</p>
             <p className="mt-2 font-mono text-3xl font-semibold text-text-h">{formatClock(elapsedSec)}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {!running ? (
               <Button
                 variant="primary"
                 type="button"
+                className="min-h-11"
                 onClick={() => {
                   setStartedAt(Date.now())
                   setRunning(true)
@@ -102,7 +103,7 @@ export default function LiveTimer({ habits, onComplete }) {
                 Iniciar
               </Button>
             ) : (
-              <Button variant="secondary" type="button" onClick={stopAndSave}>
+              <Button variant="secondary" type="button" className="min-h-11" onClick={stopAndSave}>
                 Parar y guardar
               </Button>
             )}

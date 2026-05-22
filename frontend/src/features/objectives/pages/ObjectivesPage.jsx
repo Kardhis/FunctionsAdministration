@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import Card from '../../../components/Card.jsx'
 import Button from '../../../components/Button.jsx'
 import Badge from '../../../components/Badge.jsx'
+import Pagination from '../../../components/Pagination.jsx'
+import TableScrollWrapper from '../../../components/TableScrollWrapper.jsx'
+import { usePagination } from '../../../hooks/usePagination.js'
 import { useHabitAppStore } from '../../habits/store/habitAppStore.js'
-import { toIsoNow } from '../../habits/domain/time.js'
 import { createObjective, deleteObjective, listObjectives, updateObjective } from '../data/objectivesRepo.js'
 import ObjectiveUpsertModal from '../ui/ObjectiveUpsertModal.jsx'
 import ConfirmDeleteModal from '../../habits/ui/ConfirmDeleteModal.jsx'
@@ -32,6 +34,9 @@ export default function ObjectivesPage() {
   const [deleting, setDeleting] = useState(null)
 
   const filteredHabits = useMemo(() => (Array.isArray(habits) ? habits.slice().sort((a, b) => a.name.localeCompare(b.name)) : []), [habits])
+
+  const PAGE_SIZE = 10
+  const pagination = usePagination(rows, PAGE_SIZE)
 
   async function refresh() {
     setLoading(true)
@@ -172,13 +177,13 @@ export default function ObjectivesPage() {
 
         {loading ? <div className="mt-4 rounded-2xl border border-border bg-bg/60 p-4 text-sm text-text">Cargando…</div> : null}
         {error ? (
-          <div className="mt-4 rounded-2xl border border-border bg-bg/60 p-4 text-sm text-[crimson]" role="alert">
+          <div className="mt-4 rounded-2xl border border-border bg-bg/60 p-4 text-sm text-danger" role="alert">
             {error}
           </div>
         ) : null}
 
         <div className="mt-4 space-y-3 lg:hidden">
-          {rows.map((o) => (
+          {pagination.pageItems.map((o) => (
             <div key={o.id} className="rounded-2xl border border-border bg-bg/60 p-4 ring-1 ring-border">
               <p className="text-base font-semibold text-text-h">{o.habitName ?? '—'}</p>
               <dl className="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
@@ -233,39 +238,54 @@ export default function ObjectivesPage() {
                 >
                   Editar
                 </Button>
-                <Button type="button" variant="ghost" className="min-h-11 w-full text-[crimson] sm:w-auto" onClick={() => setDeleting(o)}>
+                <Button type="button" variant="ghost" className="min-h-11 w-full text-danger sm:w-auto" onClick={() => setDeleting(o)}>
                   Eliminar
                 </Button>
               </div>
             </div>
           ))}
           {!loading && !rows.length ? <p className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-text">Sin objetivos para los filtros actuales.</p> : null}
+          <Pagination
+            page={pagination.page}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.totalItems}
+            pageSize={PAGE_SIZE}
+            hasPrev={pagination.hasPrev}
+            hasNext={pagination.hasNext}
+            onPrev={pagination.prev}
+            onNext={pagination.next}
+            onPage={pagination.setPage}
+          />
         </div>
 
-        <div className="mt-4 hidden overflow-x-auto lg:block">
+        <TableScrollWrapper>
           <table className="min-w-[860px] w-full border-separate border-spacing-y-2">
             <thead>
               <tr className="text-left text-xs uppercase tracking-wide text-text">
                 <th className="px-2">Hábito</th>
                 <th className="px-2">Notas</th>
-                <th className="px-2">Creado</th>
+                <th className="px-2 hidden xl:table-cell">Creado</th>
                 <th className="px-2">Inicio</th>
                 <th className="px-2">Fin</th>
-                <th className="px-2">Tipo</th>
+                <th className="px-2 hidden xl:table-cell">Tipo</th>
                 <th className="px-2">Progreso</th>
                 <th className="px-2">Estado</th>
                 <th className="px-2 text-right">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {rows.map((o) => (
+              {pagination.pageItems.map((o) => (
                 <tr key={o.id} className="rounded-2xl bg-bg/60 ring-1 ring-border">
-                  <td className="px-2 py-3 text-sm font-medium text-text-h">{o.habitName ?? '—'}</td>
-                  <td className="px-2 py-3 text-sm text-text">{o.notes ? <span className="line-clamp-2">{o.notes}</span> : '—'}</td>
-                  <td className="px-2 py-3 text-sm text-text">{formatDateEs(o.createdAt)}</td>
+                  <td className="max-w-[140px] px-2 py-3 text-sm font-medium text-text-h">
+                    <p className="truncate">{o.habitName ?? '—'}</p>
+                  </td>
+                  <td className="max-w-[180px] px-2 py-3 text-sm text-text">
+                    {o.notes ? <span className="line-clamp-2">{o.notes}</span> : '—'}
+                  </td>
+                  <td className="px-2 py-3 text-sm text-text hidden xl:table-cell">{formatDateEs(o.createdAt)}</td>
                   <td className="px-2 py-3 text-sm text-text">{formatDateEs(o.startDate)}</td>
                   <td className="px-2 py-3 text-sm text-text">{formatDateEs(o.endDate)}</td>
-                  <td className="px-2 py-3 text-sm text-text">{o.metricType === 'REPETITIONS' ? 'Repeticiones' : 'Minutos'}</td>
+                  <td className="px-2 py-3 text-sm text-text hidden xl:table-cell">{o.metricType === 'REPETITIONS' ? 'Repeticiones' : 'Minutos'}</td>
                   <td className="px-2 py-3 text-sm text-text">
                     {o.progressValue} / {o.targetValue}
                   </td>
@@ -291,7 +311,7 @@ export default function ObjectivesPage() {
                       >
                         Editar
                       </Button>
-                      <Button type="button" variant="ghost" size="sm" className="text-[crimson]" onClick={() => setDeleting(o)}>
+                      <Button type="button" variant="ghost" size="sm" className="text-danger" onClick={() => setDeleting(o)}>
                         Eliminar
                       </Button>
                     </div>
@@ -307,7 +327,19 @@ export default function ObjectivesPage() {
               ) : null}
             </tbody>
           </table>
-        </div>
+        </TableScrollWrapper>
+        <Pagination
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          totalItems={pagination.totalItems}
+          pageSize={PAGE_SIZE}
+          hasPrev={pagination.hasPrev}
+          hasNext={pagination.hasNext}
+          onPrev={pagination.prev}
+          onNext={pagination.next}
+          onPage={pagination.setPage}
+          className="hidden lg:flex"
+        />
       </Card>
     </div>
   )

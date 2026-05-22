@@ -8,9 +8,11 @@ import Badge from '../../../components/Badge.jsx'
 import { objectiveCreateSchema } from '../domain/schemas.js'
 import { formatDateEs } from '../../../data/dateFormat.js'
 import DatePickerInput from '../../../components/DatePickerInput.jsx'
+import { useBodyScrollLock } from '../../../hooks/useBodyScrollLock.js'
 
 export default function ObjectiveUpsertModal({ mode, open, habits, initial, onClose, onSubmit }) {
   const allHabits = useMemo(() => (Array.isArray(habits) ? habits : []), [habits])
+  useBodyScrollLock(open)
 
   const form = useForm({
     resolver: zodResolver(objectiveCreateSchema),
@@ -54,7 +56,7 @@ export default function ObjectiveUpsertModal({ mode, open, habits, initial, onCl
   const title = mode === 'edit' ? 'Editar objetivo' : 'Nuevo objetivo'
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-0 z-[55]">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" onClick={() => onClose?.()} />
       <div className="relative mx-auto flex min-h-[100svh] w-full max-w-2xl items-center justify-center px-3 py-4 sm:px-4 sm:py-10">
         <Card className="max-h-[min(92dvh,900px)] w-full overflow-y-auto overscroll-y-contain p-5 sm:p-6">
@@ -64,7 +66,7 @@ export default function ObjectiveUpsertModal({ mode, open, habits, initial, onCl
               <p className="mt-1 text-xl font-semibold text-text-h">{title}</p>
               <p className="mt-1 text-sm text-text">Define un hábito, una fecha fin y el objetivo (repeticiones o minutos).</p>
             </div>
-            <Button variant="ghost" type="button" onClick={() => onClose?.()} aria-label="Cerrar">
+            <Button variant="ghost" type="button" className="min-h-11 min-w-[44px]" onClick={() => onClose?.()} aria-label="Cerrar">
               ✕
             </Button>
           </div>
@@ -90,7 +92,7 @@ export default function ObjectiveUpsertModal({ mode, open, habits, initial, onCl
                   </option>
                 ))}
               </select>
-              {form.formState.errors.habitId ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.habitId.message}</p> : null}
+              {form.formState.errors.habitId ? <p className="mt-1 text-xs text-danger">{form.formState.errors.habitId.message}</p> : null}
             </label>
 
             <label className="block">
@@ -100,20 +102,20 @@ export default function ObjectiveUpsertModal({ mode, open, habits, initial, onCl
                 className="mt-2 w-full resize-none rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40"
                 {...form.register('notes')}
               />
-              {form.formState.errors.notes ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.notes.message}</p> : null}
+              {form.formState.errors.notes ? <p className="mt-1 text-xs text-danger">{form.formState.errors.notes.message}</p> : null}
             </label>
 
             <label className="block">
               <span className="text-sm font-medium text-text-h">Fecha de inicio</span>
               <DatePickerInput value={watchStartDate} onChange={(v) => form.setValue('startDate', v, { shouldDirty: true, shouldValidate: true })} label="Fecha de inicio" />
-              {form.formState.errors.startDate ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.startDate.message}</p> : null}
+              {form.formState.errors.startDate ? <p className="mt-1 text-xs text-danger">{form.formState.errors.startDate.message}</p> : null}
               {watchStartDate ? <p className="mt-1 text-xs text-text">Vista previa: {formatDateEs(watchStartDate)}</p> : null}
             </label>
 
             <label className="block">
               <span className="text-sm font-medium text-text-h">Fecha de finalización</span>
               <DatePickerInput value={watchEndDate} onChange={(v) => form.setValue('endDate', v, { shouldDirty: true, shouldValidate: true })} label="Fecha de finalización" />
-              {form.formState.errors.endDate ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.endDate.message}</p> : null}
+              {form.formState.errors.endDate ? <p className="mt-1 text-xs text-danger">{form.formState.errors.endDate.message}</p> : null}
               {watchEndDate ? <p className="mt-1 text-xs text-text">Vista prèvia: {formatDateEs(watchEndDate)}</p> : null}
             </label>
 
@@ -134,10 +136,11 @@ export default function ObjectiveUpsertModal({ mode, open, habits, initial, onCl
                   <span className="text-xs font-medium uppercase tracking-wide text-text">Valor</span>
                   <input
                     type="number"
+                    inputMode="numeric"
                     className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40"
                     {...form.register('targetValue', { valueAsNumber: true })}
                   />
-                  {form.formState.errors.targetValue ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.targetValue.message}</p> : null}
+                  {form.formState.errors.targetValue ? <p className="mt-1 text-xs text-danger">{form.formState.errors.targetValue.message}</p> : null}
                 </label>
               </div>
             </div>

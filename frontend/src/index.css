@@ -47,7 +47,48 @@
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
-  font: 16px/150% var(--sans);
+  /* ─── Typography scale ────────────────────────────────────────────────────
+   * Fluid from ~360 px (mobile) to ~1280 px (desktop).
+   * Formula: clamp(min, calc(intercept + slope·vw), max)
+   * where slope = (max−min)/(1280−360)·100  and  intercept = min − slope·3.6
+   * ──────────────────────────────────────────────────────────────────────── */
+  --text-2xs:     10px;
+  --text-xs:      clamp(11px, calc(10.61px + 0.109vw), 12px);
+  --text-sm:      clamp(13px, calc(12.61px + 0.109vw), 14px);
+  --text-base:    clamp(14px, calc(13.22px + 0.217vw), 16px);
+  --text-lg:      clamp(15px, calc(13.83px + 0.326vw), 18px);
+  --text-xl:      clamp(17px, calc(15.83px + 0.326vw), 20px);
+  --text-2xl:     clamp(20px, calc(18.43px + 0.435vw), 24px);
+  --text-3xl:     clamp(24px, calc(20.87px + 0.870vw), 32px);
+  --text-display: clamp(36px, calc(28.17px + 2.174vw), 56px);
+
+  /* ─── Line-height scale ───────────────────────────────────────────────── */
+  --leading-tight:   1.15;
+  --leading-snug:    1.35;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.65;
+
+  /* ─── Base spacing tokens ─────────────────────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* ─── Semantic layout spacing (fluid) ────────────────────────────────────
+   * --space-page-x / -y : outer shell padding
+   * --space-card        : card body padding
+   * --space-section-gap : vertical gap between page sections
+   * ──────────────────────────────────────────────────────────────────────── */
+  --space-page-x:    clamp(12px, calc(7.3px + 1.304vw), 24px);
+  --space-page-y:    clamp(16px, calc(12.87px + 0.87vw), 24px);
+  --space-card:      clamp(16px, calc(14.43px + 0.435vw), 20px);
+  --space-section-gap: clamp(12px, calc(7.3px + 1.304vw), 24px);
+
+  /* Base font: fluid 15 px (mobile) → 16 px (desktop ≥1024 px) */
+  font: clamp(15px, calc(14.46px + 0.151vw), 16px)/var(--leading-normal) var(--sans);
   letter-spacing: 0.18px;
   color-scheme: dark;
   color: var(--text);
@@ -56,10 +97,6 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 15px;
-  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -121,31 +158,6 @@ body {
   box-sizing: border-box;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
 p {
   margin: 0;
 }
@@ -166,6 +178,28 @@ code {
 }
 
 @layer base {
+  /* Default heading styles — Tailwind utilities will override when needed */
+  h1,
+  h2 {
+    font-family: var(--heading);
+    font-weight: 500;
+    color: var(--text-h);
+  }
+
+  h1 {
+    font-size: var(--text-display);
+    letter-spacing: -0.03em;
+    line-height: var(--leading-tight);
+    margin: clamp(20px, calc(15.3px + 1.304vw), 32px) 0;
+  }
+
+  h2 {
+    font-size: var(--text-2xl);
+    line-height: var(--leading-snug);
+    letter-spacing: -0.01em;
+    margin: 0 0 8px;
+  }
+
   ::selection {
     background: var(--accent-bg);
   }
@@ -197,6 +231,25 @@ code {
   :root[data-theme='light'] select {
     color-scheme: light;
   }
+
+  /* Prevent iOS Safari auto-zoom on input focus (triggered when font-size < 16px) */
+  @media (max-width: 767px) {
+    input:not([type='checkbox']):not([type='radio']):not([type='color']):not([type='range']),
+    select,
+    textarea {
+      font-size: 16px;
+    }
+  }
+
+  /* Base checkbox / radio sizing for touch usability */
+  input[type='checkbox'],
+  input[type='radio'] {
+    width: 1.125rem;
+    height: 1.125rem;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: var(--accent);
+  }
 }
 
 @layer components {
@@ -207,6 +260,10 @@ code {
     border-color: var(--border);
     background: var(--surface);
     box-shadow: var(--shadow-card);
+  }
+
+  .ui-hover {
+    transition: transform 200ms ease-out, box-shadow 200ms ease-out, border-color 200ms ease-out;
   }
 
   .ui-panel {
@@ -249,6 +306,7 @@ code {
     background: var(--surface-2);
     padding: 12px 16px;
     font-size: 14px;
+    line-height: var(--leading-normal);
     color: var(--text-h);
     box-shadow: var(--shadow-soft);
     transition: background 200ms ease-out, border-color 200ms ease-out, box-shadow 200ms ease-out, transform 200ms ease-out, color 200ms ease-out, opacity 200ms ease-out;
@@ -266,5 +324,14 @@ code {
 
   .ui-textarea {
     resize: none;
+  }
+
+  /* Accessible checkbox / radio wrapper — use instead of bare h-4 w-4 on touch targets */
+  .ui-checkbox {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: var(--accent);
   }
 }

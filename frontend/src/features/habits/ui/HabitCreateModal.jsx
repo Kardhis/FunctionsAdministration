@@ -5,6 +5,7 @@ import Button from '../../../components/Button.jsx'
 import { modalFooterRow, modalFooterCancelButtonClass, modalFooterPrimaryButtonClass } from '../../../components/modalFooter.js'
 import Badge from '../../../components/Badge.jsx'
 import { habitCreateResolver } from '../store/habitAppStore.js'
+import { useBodyScrollLock } from '../../../hooks/useBodyScrollLock.js'
 
 const defaultValues = {
   name: '',
@@ -24,6 +25,8 @@ export default function HabitCreateModal({ open, categories = [], onClose, onCre
 
   const color = form.watch('color')
 
+  useBodyScrollLock(open)
+
   useEffect(() => {
     if (!open) return
     function onKeyDown(e) {
@@ -36,7 +39,7 @@ export default function HabitCreateModal({ open, categories = [], onClose, onCre
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-0 z-[55]">
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         aria-hidden="true"
@@ -50,7 +53,7 @@ export default function HabitCreateModal({ open, categories = [], onClose, onCre
               <p className="mt-1 text-xl font-semibold text-text-h">Nuevo hábito</p>
               <p className="mt-1 text-sm text-text">Completa los datos y guarda en la base local (IndexedDB).</p>
             </div>
-            <Button variant="ghost" type="button" onClick={() => onClose?.()} aria-label="Cerrar">
+            <Button variant="ghost" type="button" className="min-h-11 min-w-[44px]" onClick={() => onClose?.()} aria-label="Cerrar">
               ✕
             </Button>
           </div>
@@ -71,7 +74,7 @@ export default function HabitCreateModal({ open, categories = [], onClose, onCre
                 {...form.register('name')}
               />
               {form.formState.errors.name ? (
-                <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.name.message}</p>
+                <p className="mt-1 text-xs text-danger">{form.formState.errors.name.message}</p>
               ) : null}
             </label>
 
@@ -100,7 +103,7 @@ export default function HabitCreateModal({ open, categories = [], onClose, onCre
                   />
                 </div>
                 {form.formState.errors.color ? (
-                  <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.color.message}</p>
+                  <p className="mt-1 text-xs text-danger">{form.formState.errors.color.message}</p>
                 ) : null}
               </label>
 
@@ -128,7 +131,7 @@ export default function HabitCreateModal({ open, categories = [], onClose, onCre
                             <span className="truncate">{c.name}</span>
                             <input
                               type="checkbox"
-                              className="h-4 w-4"
+                              className="ui-checkbox"
                               checked={selected}
                               onChange={(e) => {
                                 const prev = form.getValues('categoryIds') ?? []
@@ -148,7 +151,7 @@ export default function HabitCreateModal({ open, categories = [], onClose, onCre
               <label className="flex items-center gap-3 pt-7">
                 <input
                   type="checkbox"
-                  className="h-4 w-4"
+                  className="ui-checkbox"
                   checked={Boolean(form.watch('active'))}
                   onChange={(e) => form.setValue('active', e.target.checked, { shouldValidate: true })}
                 />

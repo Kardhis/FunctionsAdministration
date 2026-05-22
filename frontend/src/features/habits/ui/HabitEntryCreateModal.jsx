@@ -8,6 +8,7 @@ import { habitEntryCreateResolver } from '../store/habitAppStore.js'
 import { computeDurationMinutes, formatDurationHuman, todayLocalDateString } from '../domain/time.js'
 import { formatDateEs } from '../../../data/dateFormat.js'
 import DatePickerInput from '../../../components/DatePickerInput.jsx'
+import { useBodyScrollLock } from '../../../hooks/useBodyScrollLock.js'
 
 const defaultValues = {
   habitId: '',
@@ -25,6 +26,8 @@ export default function HabitEntryCreateModal({ open, habits, onClose, onCreated
     defaultValues,
     mode: 'onChange',
   })
+
+  useBodyScrollLock(open)
 
   useEffect(() => {
     if (!open) return
@@ -55,7 +58,7 @@ export default function HabitEntryCreateModal({ open, habits, onClose, onCreated
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-0 z-[55]">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" onClick={() => onClose?.()} />
       <div className="relative mx-auto flex min-h-[100svh] w-full max-w-2xl items-center justify-center px-3 py-4 sm:px-4 sm:py-10">
         <Card className="max-h-[min(92dvh,900px)] w-full overflow-y-auto overscroll-y-contain p-5 sm:p-6">
@@ -65,7 +68,7 @@ export default function HabitEntryCreateModal({ open, habits, onClose, onCreated
               <p className="mt-1 text-xl font-semibold text-text-h">Nuevo registro</p>
               <p className="mt-1 text-sm text-text">Selecciona un hábito activo y registra una ventana de tiempo.</p>
             </div>
-            <Button variant="ghost" type="button" onClick={() => onClose?.()} aria-label="Cerrar">
+            <Button variant="ghost" type="button" className="min-h-11 min-w-[44px]" onClick={() => onClose?.()} aria-label="Cerrar">
               ✕
             </Button>
           </div>
@@ -96,14 +99,14 @@ export default function HabitEntryCreateModal({ open, habits, onClose, onCreated
                   </option>
                 ))}
               </select>
-              {form.formState.errors.habitId ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.habitId.message}</p> : null}
+              {form.formState.errors.habitId ? <p className="mt-1 text-xs text-danger">{form.formState.errors.habitId.message}</p> : null}
               {!activeHabits.length ? <p className="mt-2 text-xs text-text">No hay hábitos activos. Activa uno para poder registrar.</p> : null}
             </label>
 
             <label className="block">
               <span className="text-sm font-medium text-text-h">Fecha</span>
               <DatePickerInput value={watchDate} onChange={(v) => form.setValue('date', v, { shouldDirty: true, shouldValidate: true })} label="Fecha" />
-              {form.formState.errors.date ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.date.message}</p> : null}
+              {form.formState.errors.date ? <p className="mt-1 text-xs text-danger">{form.formState.errors.date.message}</p> : null}
               {watchDate ? <p className="mt-1 text-xs text-text">Vista previa: {formatDateEs(watchDate)}</p> : null}
             </label>
 
@@ -111,12 +114,12 @@ export default function HabitEntryCreateModal({ open, habits, onClose, onCreated
               <label className="block">
                 <span className="text-sm font-medium text-text-h">Inicio (24h)</span>
                 <input type="time" className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" {...form.register('startTime')} />
-                {form.formState.errors.startTime ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.startTime.message}</p> : null}
+                {form.formState.errors.startTime ? <p className="mt-1 text-xs text-danger">{form.formState.errors.startTime.message}</p> : null}
               </label>
               <label className="block">
                 <span className="text-sm font-medium text-text-h">Fin (24h)</span>
                 <input type="time" className="mt-2 w-full rounded-2xl border border-border bg-bg px-4 py-3 text-sm text-text-h shadow-soft focus:outline-none focus:ring-2 focus:ring-accent/40" {...form.register('endTime')} />
-                {form.formState.errors.endTime ? <p className="mt-1 text-xs text-[crimson]">{form.formState.errors.endTime.message}</p> : null}
+                {form.formState.errors.endTime ? <p className="mt-1 text-xs text-danger">{form.formState.errors.endTime.message}</p> : null}
               </label>
             </div>
 

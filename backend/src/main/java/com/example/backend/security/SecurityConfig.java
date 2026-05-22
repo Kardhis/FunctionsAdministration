@@ -10,6 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -115,8 +116,11 @@ public class SecurityConfig {
         .exceptionHandling(
             eh ->
                 eh.authenticationEntryPoint(
-                    (HttpServletRequest servletReq, HttpServletResponse res, AuthenticationException ex) ->
-                        res.sendError(401, "Unauthorized")));
+                        (HttpServletRequest servletReq, HttpServletResponse res, AuthenticationException ex) ->
+                            res.sendError(401, "Unauthorized"))
+                    .accessDeniedHandler(
+                        (HttpServletRequest servletReq, HttpServletResponse res, AccessDeniedException ex) ->
+                            res.sendError(403, "Forbidden")));
     http.addFilterBefore(
         jwtCookieAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     return http.build();

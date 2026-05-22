@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { API_BASE } from '../data/api.js'
-import './LoginPage.css'
+import AuthLayout from '../layouts/AuthLayout.jsx'
 
 export default function ResetPasswordPage() {
   const navigate = useNavigate()
@@ -70,86 +70,77 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <main className="cpLogin">
-      <div className="cpBackgroundGrid" aria-hidden="true" />
-      <div className="cpGlowOrbs" aria-hidden="true" />
+    <AuthLayout sectionLabel="Nueva contraseña" cardLabel="Restablecer contraseña">
+      <header className="cpCardTitleRow">
+        <h2 className="cpCardTitle">Nueva contraseña</h2>
+      </header>
 
-      <section className="cpShell" aria-label="Nueva contraseña">
-        <div className="cpCard" role="region" aria-label="Restablecer contraseña">
-          <div className="cpCardInner">
-            <header className="cpCardTitleRow">
-              <h2 className="cpCardTitle">Nueva contraseña</h2>
-            </header>
+      {!tokenFromUrl ? (
+        <p className="cpError" role="alert">
+          Falta el token en la URL. Abre el enlace que recibiste por correo.
+        </p>
+      ) : null}
 
-            {!tokenFromUrl ? (
-              <p className="cpError" role="alert">
-                Falta el token en la URL. Abre el enlace que recibiste por correo.
-              </p>
-            ) : null}
-
-            <form onSubmit={onSubmit} className="cpForm" noValidate>
-              <div className="cpField">
-                <label className="cpLabel" htmlFor="reset-password">
-                  Nueva contraseña
-                </label>
-                <input
-                  id="reset-password"
-                  className="cpInput"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  type="password"
-                  autoComplete="new-password"
-                  minLength={8}
-                  required
-                  disabled={!tokenFromUrl}
-                />
-              </div>
-
-              <div className="cpField">
-                <label className="cpLabel" htmlFor="reset-password2">
-                  Repetir contraseña
-                </label>
-                <input
-                  id="reset-password2"
-                  className="cpInput"
-                  value={password2}
-                  onChange={(e) => setPassword2(e.target.value)}
-                  type="password"
-                  autoComplete="new-password"
-                  minLength={8}
-                  required
-                  disabled={!tokenFromUrl}
-                />
-              </div>
-
-              <div className="cpActions">
-                <button
-                  className="cpButton"
-                  type="submit"
-                  disabled={isLoading || !tokenFromUrl}
-                  aria-busy={isLoading}
-                >
-                  {isLoading ? 'Guardando…' : 'Guardar contraseña'}
-                </button>
-                {error ? (
-                  <p className="cpError" role="alert" aria-live="polite">
-                    Error: <code>{error}</code>
-                  </p>
-                ) : null}
-              </div>
-            </form>
-
-            <nav className="cpAuthLinks" aria-label="Volver al acceso">
-              <Link className="cpAuthLink" to="/login">
-                Volver al inicio de sesión
-              </Link>
-              <Link className="cpAuthLink" to="/forgot-password">
-                Solicitar otro enlace
-              </Link>
-            </nav>
-          </div>
+      <form onSubmit={onSubmit} className="cpForm" noValidate>
+        <div className="cpField">
+          <label className="cpLabel" htmlFor="reset-password">
+            Nueva contraseña
+          </label>
+          <input
+            id="reset-password"
+            className="cpInput"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            type="password"
+            autoComplete="new-password"
+            minLength={8}
+            required
+            disabled={!tokenFromUrl}
+          />
         </div>
-      </section>
-    </main>
+
+        <div className="cpField">
+          <label className="cpLabel" htmlFor="reset-password2">
+            Repetir contraseña
+          </label>
+          <input
+            id="reset-password2"
+            className="cpInput"
+            value={password2}
+            onChange={(e) => setPassword2(e.target.value)}
+            type="password"
+            autoComplete="new-password"
+            minLength={8}
+            required
+            disabled={!tokenFromUrl}
+          />
+        </div>
+
+        <div className="cpActions">
+          <button
+            className="cpButton"
+            type="submit"
+            disabled={isLoading || !tokenFromUrl}
+            aria-busy={isLoading}
+          >
+            {isLoading ? 'Guardando…' : 'Guardar contraseña'}
+          </button>
+          {error ? (
+            <p className="cpError" role="alert" aria-live="polite">
+              Error: <code>{error}</code>
+            </p>
+          ) : null}
+        </div>
+      </form>
+
+      <nav className="cpAuthLinks" aria-label="Volver al acceso">
+        <Link className="cpAuthLink" to="/login">
+          Volver al inicio de sesión
+        </Link>
+        <Link className="cpAuthLink" to="/forgot-password">
+          Solicitar otro enlace
+        </Link>
+      </nav>
+    </AuthLayout>
   )
 }

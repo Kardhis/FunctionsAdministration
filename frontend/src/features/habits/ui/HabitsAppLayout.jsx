@@ -6,7 +6,6 @@ import { useHabitAppStore } from '../store/habitAppStore.js'
 import Button from '../../../components/Button.jsx'
 import HabitCreateModal from './HabitCreateModal.jsx'
 import HabitCreatedMessageModal from './HabitCreatedMessageModal.jsx'
-import { applyThemeToRoot, loadThemeSetting } from '../../../theme/theme.js'
 
 function TabLink({ to, children }) {
   return (
@@ -14,7 +13,7 @@ function TabLink({ to, children }) {
       to={to}
       className={({ isActive }) =>
         [
-          'shrink-0 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm font-medium ring-1 transition lg:py-2',
+          'shrink-0 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm font-medium ring-1 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] lg:py-2',
           isActive ? 'bg-[color:var(--accent-bg)] text-text-h ring-[color:var(--accent-border)]' : 'text-text-h/80 ring-transparent hover:bg-black/5 dark:hover:bg-white/5',
         ].join(' ')
       }
@@ -26,7 +25,7 @@ function TabLink({ to, children }) {
 
 export default function HabitsAppLayout() {
   const location = useLocation()
-  const { user, roles } = useAuth()
+  const { user, roles, status } = useAuth()
   const admin = isAdmin(roles)
   const bootstrap = useHabitAppStore((s) => s.bootstrap)
   const resetSession = useHabitAppStore((s) => s.resetSession)
@@ -44,28 +43,13 @@ export default function HabitsAppLayout() {
   const toastTimersRef = useRef(new Map())
 
   useEffect(() => {
+    if (status !== 'authenticated' || !user) return
     if (prevUserRef.current !== user) {
       resetSession()
       prevUserRef.current = user
     }
     bootstrap()
-  }, [bootstrap, resetSession, user])
-
-  useEffect(() => {
-    let mounted = true
-    loadThemeSetting()
-      .then((t) => {
-        if (!mounted) return
-        applyThemeToRoot(t)
-      })
-      .catch(() => {
-        if (!mounted) return
-        applyThemeToRoot('system')
-      })
-    return () => {
-      mounted = false
-    }
-  }, [])
+  }, [bootstrap, resetSession, user, status])
 
   useEffect(() => {
     const timers = toastTimersRef.current
@@ -115,16 +99,16 @@ export default function HabitsAppLayout() {
   )
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-[var(--space-section-gap)]">
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-text">Módulo</p>
-          <h2 className="text-xl font-semibold text-text-h md:text-2xl">{title}</h2>
-          <p className="mt-1 text-sm text-text">MVP con persistencia local (IndexedDB) y capa lista para API Spring Boot.</p>
+          <h2 className="text-xl font-semibold leading-heading text-text-h md:text-2xl">{title}</h2>
+          <p className="mt-1 hidden text-sm text-text sm:block">MVP con persistencia local (IndexedDB) y capa lista para API Spring Boot.</p>
         </div>
 
         <div
-          className="-mx-1 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:thin] lg:mx-0 lg:flex-wrap lg:overflow-visible lg:pb-0 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border"
+          className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:thin] lg:flex-wrap lg:overflow-visible lg:pb-0 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border"
           role="navigation"
           aria-label="Secciones del módulo hábitos"
         >
@@ -147,24 +131,27 @@ export default function HabitsAppLayout() {
         <div className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-text">Cargando datos locales…</div>
       ) : null}
       {error ? (
-        <div className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-[crimson]" role="alert">
+        <div className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-danger" role="alert">
           {error}
         </div>
       ) : null}
 
       {toasts.length ? (
-        <div className="fixed bottom-4 right-4 z-50 flex w-[min(420px,calc(100vw-2rem))] flex-col gap-2">
+        <div
+          className="fixed right-4 z-[60] flex w-[min(420px,calc(100dvw-2rem))] flex-col gap-2"
+          style={{ bottom: 'max(1rem, env(safe-area-inset-bottom, 0px))' }}
+        >
           {toasts.map((t, idx) => (
             <div
               key={t.id ?? `${t.kind}-${idx}`}
               className={[
                 'rounded-2xl border px-4 py-3 text-sm shadow-soft backdrop-blur-md',
-                t.kind === 'success' ? 'border-border bg-bg/90 text-text-h' : 'border-border bg-bg/90 text-[crimson]',
+                t.kind === 'success' ? 'border-border bg-bg/90 text-text-h' : 'border-border bg-bg/90 text-danger',
               ].join(' ')}
             >
               <div className="flex items-start justify-between gap-3">
                 <p className="font-medium">{t.message}</p>
-                <button type="button" className="text-text-h/70 hover:text-text-h" onClick={() => dismissToast(idx)} aria-label="Cerrar">
+                <button type="button" className="inline-flex min-h-11 min-w-[44px] items-center justify-center text-text-h/70 hover:text-text-h" onClick={() => dismissToast(idx)} aria-label="Cerrar">
                   ✕
                 </button>
               </div>
