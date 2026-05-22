@@ -7,7 +7,11 @@ export default function ProtectedRoute({ children }) {
 
   if (status === 'loading') {
     return (
-      <div className="flex min-h-[100svh] items-center justify-center bg-bg p-6">
+      <div
+        className="flex min-h-[100svh] items-center justify-center bg-bg p-6"
+        role="status"
+        aria-live="polite"
+      >
         <p className="text-sm text-text">Comprobando sesión…</p>
       </div>
     )

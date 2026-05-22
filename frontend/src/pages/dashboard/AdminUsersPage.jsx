@@ -115,7 +115,7 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-[var(--space-section-gap)]">
       <Card className="p-5">
         <SectionHeader
           title="Administració · Usuaris"

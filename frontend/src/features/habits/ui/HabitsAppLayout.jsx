@@ -6,7 +6,6 @@ import { useHabitAppStore } from '../store/habitAppStore.js'
 import Button from '../../../components/Button.jsx'
 import HabitCreateModal from './HabitCreateModal.jsx'
 import HabitCreatedMessageModal from './HabitCreatedMessageModal.jsx'
-import { applyThemeToRoot, loadThemeSetting } from '../../../theme/theme.js'
 
 function TabLink({ to, children }) {
   return (
@@ -14,7 +13,7 @@ function TabLink({ to, children }) {
       to={to}
       className={({ isActive }) =>
         [
-          'shrink-0 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm font-medium ring-1 transition lg:py-2',
+          'shrink-0 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm font-medium ring-1 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] lg:py-2',
           isActive ? 'bg-[color:var(--accent-bg)] text-text-h ring-[color:var(--accent-border)]' : 'text-text-h/80 ring-transparent hover:bg-black/5 dark:hover:bg-white/5',
         ].join(' ')
       }
@@ -51,23 +50,6 @@ export default function HabitsAppLayout() {
     }
     bootstrap()
   }, [bootstrap, resetSession, user, status])
-
-  useEffect(() => {
-    if (status !== 'authenticated' || !user) return
-    let mounted = true
-    loadThemeSetting()
-      .then((t) => {
-        if (!mounted) return
-        applyThemeToRoot(t)
-      })
-      .catch(() => {
-        if (!mounted) return
-        applyThemeToRoot('system')
-      })
-    return () => {
-      mounted = false
-    }
-  }, [status, user])
 
   useEffect(() => {
     const timers = toastTimersRef.current
@@ -155,7 +137,10 @@ export default function HabitsAppLayout() {
       ) : null}
 
       {toasts.length ? (
-        <div className="fixed bottom-4 right-4 z-[60] flex w-[min(420px,calc(100vw-2rem))] flex-col gap-2">
+        <div
+          className="fixed right-4 z-[60] flex w-[min(420px,calc(100vw-2rem))] flex-col gap-2"
+          style={{ bottom: 'max(1rem, env(safe-area-inset-bottom, 0px))' }}
+        >
           {toasts.map((t, idx) => (
             <div
               key={t.id ?? `${t.kind}-${idx}`}

@@ -127,7 +127,7 @@ export default function SidebarPanel({
                   }
                   title={item.label}
                 >
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-black/5 text-text-h ring-1 ring-border transition group-hover:bg-black/10 dark:bg-white/5 dark:group-hover:bg-white/10">
+                  <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-black/5 text-text-h ring-1 ring-border transition group-hover:bg-black/10 dark:bg-white/5 dark:group-hover:bg-white/10">
                     <NavGlyph icon={item.icon} />
                   </span>
                 </NavLink>
@@ -135,28 +135,30 @@ export default function SidebarPanel({
             }
 
             const open = isGroupOpen(item)
+            const groupMenuId = `nav-submenu-${item.key}`
             return (
               <div key={item.key} className="flex flex-col gap-0.5">
                 <button
                   type="button"
                   onClick={() => toggleGroup(item)}
                   aria-expanded={open}
+                  aria-controls={groupMenuId}
                   className={[
                     'group flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] lg:py-2',
                     groupActive && !open ? 'text-text-h ring-1 ring-[color:var(--accent-border)]/60' : '',
                     'text-text-h/80 hover:bg-black/5 dark:hover:bg-white/5',
                   ].join(' ')}
                 >
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-black/5 text-text-h ring-1 ring-border transition group-hover:bg-black/10 dark:bg-white/5 dark:group-hover:bg-white/10">
+                  <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-black/5 text-text-h ring-1 ring-border transition group-hover:bg-black/10 dark:bg-white/5 dark:group-hover:bg-white/10">
                     <NavGlyph icon={item.icon} />
                   </span>
                   <span className="min-w-0 flex-1 truncate">{item.label}</span>
-                  <span className="shrink-0 text-xs text-text-h/70" aria-hidden>
+                  <span className="shrink-0 text-xs text-text-h/70" aria-hidden="true">
                     {open ? '▾' : '▸'}
                   </span>
                 </button>
                 {open ? (
-                  <div className="ml-3 flex flex-col gap-0.5 border-l border-border pl-3">
+                  <div id={groupMenuId} className="ml-3 flex flex-col gap-0.5 border-l border-border pl-3">
                     {item.children.map((child) => (
                       <NavLink
                         key={child.key}
@@ -196,7 +198,7 @@ export default function SidebarPanel({
                 ].join(' ')
               }
             >
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-black/5 text-text-h ring-1 ring-border transition group-hover:bg-black/10 dark:bg-white/5 dark:group-hover:bg-white/10">
+              <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-black/5 text-text-h ring-1 ring-border transition group-hover:bg-black/10 dark:bg-white/5 dark:group-hover:bg-white/10">
                 <NavGlyph icon={item.icon} />
               </span>
               {showLabels ? <span className="truncate">{item.label}</span> : null}

@@ -30,6 +30,18 @@ export default function DatePickerInput({ value, onChange, placeholder = 'dd/mm/
     return () => document.removeEventListener('pointerdown', onDoc)
   }, [open])
 
+  useEffect(() => {
+    if (!open) return
+    function onKey(e) {
+      if (e.key === 'Escape') {
+        e.stopPropagation()
+        setOpen(false)
+      }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [open])
+
   const display = selected ? format(selected, 'dd/MM/yyyy') : ''
 
   return (
@@ -40,10 +52,18 @@ export default function DatePickerInput({ value, onChange, placeholder = 'dd/mm/
           readOnly
           disabled={disabled}
           aria-label={label}
+          aria-haspopup="dialog"
+          aria-expanded={open}
           placeholder={placeholder}
           className="ui-input cursor-pointer pr-11 disabled:cursor-not-allowed disabled:opacity-60"
           value={display}
           onClick={() => setOpen((v) => !v)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              setOpen((v) => !v)
+            }
+          }}
         />
         <Button
           type="button"
