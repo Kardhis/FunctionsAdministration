@@ -96,22 +96,22 @@ export default function HabitsManagePage() {
                   </div>
                 </div>
               </div>
-              <div className="mt-4 flex flex-col gap-2">
-                <Button type="button" variant="secondary" className="min-h-11 w-full" onClick={() => startEdit(h)}>
+              <div className="mt-4 grid grid-cols-3 gap-2">
+                <Button type="button" variant="secondary" className="min-h-11 w-full px-2 text-xs" onClick={() => startEdit(h)}>
                   Editar
                 </Button>
                 <Button
                   type="button"
                   variant="secondary"
-                  className="min-h-11 w-full"
+                  className="min-h-11 w-full px-2 text-xs"
                   onClick={() => setHabitActive(h.id, !h.active)}
                 >
                   {h.active ? 'Desactivar' : 'Activar'}
                 </Button>
                 <Button
                   type="button"
-                  variant="ghost"
-                  className="min-h-11 w-full text-danger"
+                  variant="danger"
+                  className="min-h-11 w-full px-2 text-xs"
                   onClick={() => {
                     const ok = window.confirm(`Eliminar "${h.name}"?`)
                     if (!ok) return
@@ -190,9 +190,8 @@ export default function HabitsManagePage() {
                       </Button>
                       <Button
                         type="button"
-                        variant="ghost"
+                        variant="danger"
                         size="sm"
-                        className="text-danger"
                         onClick={() => {
                           const ok = window.confirm(`Eliminar "${h.name}"?`)
                           if (!ok) return
@@ -296,11 +295,11 @@ export default function HabitsManagePage() {
                 <Badge tone={c.active ? 'accent' : 'neutral'}>{c.active ? 'activo' : 'inactivo'}</Badge>
               </div>
               <p className="mt-2 text-sm text-text">Hábitos: {c.habitCount ?? 0}</p>
-              <div className="mt-4 flex flex-col gap-2">
+              <div className="mt-4 grid grid-cols-3 gap-2">
                 <Button
                   type="button"
                   variant="secondary"
-                  className="min-h-11 w-full"
+                  className="min-h-11 w-full px-2 text-xs"
                   onClick={() => setEditingCategory(c)}
                 >
                   Editar
@@ -308,15 +307,15 @@ export default function HabitsManagePage() {
                 <Button
                   type="button"
                   variant="secondary"
-                  className="min-h-11 w-full"
+                  className="min-h-11 w-full px-2 text-xs"
                   onClick={() => toggleCategoryActive(c.id)}
                 >
                   {c.active ? 'Desactivar' : 'Activar'}
                 </Button>
                 <Button
                   type="button"
-                  variant="ghost"
-                  className="min-h-11 w-full text-danger"
+                  variant="danger"
+                  className="min-h-11 w-full px-2 text-xs"
                   onClick={() => setDeletingCategory(c)}
                 >
                   Eliminar
@@ -381,9 +380,8 @@ export default function HabitsManagePage() {
                       </Button>
                       <Button
                         type="button"
-                        variant="ghost"
+                        variant="danger"
                         size="sm"
-                        className="text-danger"
                         onClick={() => setDeletingCategory(c)}
                       >
                         Eliminar

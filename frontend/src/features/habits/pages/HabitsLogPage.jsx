@@ -194,14 +194,14 @@ export default function HabitsLogPage() {
                     </div>
                   ) : null}
                 </dl>
-                <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
-                  <Button type="button" variant="secondary" className="min-h-11 w-full sm:w-auto" onClick={() => setEditingEntry(e)}>
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  <Button type="button" variant="secondary" className="min-h-11 w-full" onClick={() => setEditingEntry(e)}>
                     Editar
                   </Button>
                   <Button
                     type="button"
-                    variant="ghost"
-                    className="min-h-11 w-full text-danger sm:w-auto"
+                    variant="danger"
+                    className="min-h-11 w-full"
                     onClick={() => {
                       const ok = window.confirm('Eliminar este registro?')
                       if (!ok) return
@@ -263,9 +263,8 @@ export default function HabitsLogPage() {
                         </Button>
                         <Button
                           type="button"
-                          variant="ghost"
+                          variant="danger"
                           size="sm"
-                          className="text-danger"
                           onClick={() => {
                             const ok = window.confirm('Eliminar este registro?')
                             if (!ok) return

@@ -35,6 +35,7 @@ function NavGlyph({ icon }) {
  *   email: string
  *   navId: string | undefined
  *   navItems: import('../data/types.js').NavItem[]
+ *   onLogout: () => void
  * }} props
  */
 export default function SidebarPanel({
@@ -47,6 +48,7 @@ export default function SidebarPanel({
   email,
   navId,
   navItems,
+  onLogout,
 }) {
   const showLabels = mobileDrawer || !isCollapsed
   const [groupOpenOverride, setGroupOpenOverride] = useState({})
@@ -70,7 +72,7 @@ export default function SidebarPanel({
   }
 
   return (
-    <div className="flex h-full flex-col p-4">
+    <div className="flex h-full w-full min-w-0 flex-col overflow-hidden p-4">
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3 overflow-hidden">
           <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[color:var(--accent-bg)] text-text-h ring-1 ring-[color:var(--accent-border)]">
@@ -105,7 +107,7 @@ export default function SidebarPanel({
         )}
       </div>
 
-      <nav id={navId} className="mt-6 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain pr-1" aria-label="Principal">
+      <nav id={navId} className="mt-6 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain" aria-label="Principal">
         {navItems.map((item) => {
           if (item.children?.length) {
             const firstTo = item.children[0].to
@@ -211,12 +213,32 @@ export default function SidebarPanel({
         <div className={`flex items-center gap-3 rounded-2xl border border-border bg-bg/80 p-3 ${showLabels ? '' : 'justify-center'}`}>
           <Avatar name={displayName} size="sm" />
           {showLabels ? (
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-text-h">{displayName}</p>
               {email ? <p className="truncate text-xs text-text">{email}</p> : null}
             </div>
           ) : null}
         </div>
+        {showLabels ? (
+          <button
+            type="button"
+            onClick={onLogout}
+            className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl border border-border px-3 py-2.5 text-sm font-medium text-text-h/80 transition hover:bg-black/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] dark:hover:bg-white/5"
+          >
+            <span aria-hidden="true">⏻</span>
+            Logout
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={onLogout}
+            title="Logout"
+            className="mt-2 flex w-full items-center justify-center rounded-2xl border border-border py-2.5 text-sm text-text-h/80 transition hover:bg-black/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] dark:hover:bg-white/5"
+            aria-label="Logout"
+          >
+            <span aria-hidden="true">⏻</span>
+          </button>
+        )}
       </div>
     </div>
   )

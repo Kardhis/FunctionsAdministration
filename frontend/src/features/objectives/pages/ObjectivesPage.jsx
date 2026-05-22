@@ -17,6 +17,13 @@ function newId() {
   return `id_${Math.random().toString(16).slice(2)}_${Date.now().toString(16)}`
 }
 
+function objectiveStatusTone(statusCode) {
+  if (statusCode === 'DONE') return 'success'
+  if (statusCode === 'NOT_DONE') return 'danger'
+  if (statusCode === 'IN_PROGRESS') return 'warning'
+  return 'neutral'
+}
+
 export default function ObjectivesPage() {
   const habits = useHabitAppStore((s) => s.habits)
 
@@ -185,44 +192,52 @@ export default function ObjectivesPage() {
         <div className="mt-4 space-y-3 lg:hidden">
           {pagination.pageItems.map((o) => (
             <div key={o.id} className="rounded-2xl border border-border bg-bg/60 p-4 ring-1 ring-border">
-              <p className="text-base font-semibold text-text-h">{o.habitName ?? '—'}</p>
-              <dl className="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
-                <div>
-                  <dt className="text-xs uppercase tracking-wide text-text">Notas</dt>
-                  <dd className="mt-0.5 text-text">{o.notes ? <span className="line-clamp-3">{o.notes}</span> : '—'}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs uppercase tracking-wide text-text">Creado</dt>
-                  <dd className="mt-0.5 text-text">{formatDateEs(o.createdAt)}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs uppercase tracking-wide text-text">Inicio</dt>
-                  <dd className="mt-0.5 text-text">{formatDateEs(o.startDate)}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs uppercase tracking-wide text-text">Fin</dt>
-                  <dd className="mt-0.5 text-text">{formatDateEs(o.endDate)}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs uppercase tracking-wide text-text">Tipo</dt>
-                  <dd className="mt-0.5 text-text">{o.metricType === 'REPETITIONS' ? 'Repeticiones' : 'Minutos'}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs uppercase tracking-wide text-text">Progreso</dt>
-                  <dd className="mt-0.5 text-text">
-                    {o.progressValue} / {o.targetValue}
-                  </dd>
-                </div>
-                <div className="sm:col-span-2">
-                  <dt className="text-xs uppercase tracking-wide text-text">Estado</dt>
-                  <dd className="mt-0.5 text-text">{o.statusLabel ?? o.statusCode}</dd>
+              <p className="text-center text-base font-semibold text-text-h">{o.habitName ?? '—'}</p>
+              <dl className="mt-3 text-sm">
+                {o.notes ? (
+                  <div className="mb-3">
+                    <dt className="text-xs uppercase tracking-wide text-text">Notas</dt>
+                    <dd className="mt-0.5 text-text">
+                      <span className="line-clamp-3">{o.notes}</span>
+                    </dd>
+                  </div>
+                ) : null}
+                <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                  <div>
+                    <dt className="text-xs uppercase tracking-wide text-text">Creado</dt>
+                    <dd className="mt-0.5 text-text">{formatDateEs(o.createdAt)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs uppercase tracking-wide text-[color:var(--warning)]">Estado</dt>
+                    <dd className="mt-1">
+                      <Badge tone={objectiveStatusTone(o.statusCode)}>{o.statusLabel ?? o.statusCode}</Badge>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs uppercase tracking-wide text-text">Inicio</dt>
+                    <dd className="mt-0.5 text-text">{formatDateEs(o.startDate)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs uppercase tracking-wide text-text">Fin</dt>
+                    <dd className="mt-0.5 text-text">{formatDateEs(o.endDate)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs uppercase tracking-wide text-text">Tipo</dt>
+                    <dd className="mt-0.5 text-text">{o.metricType === 'REPETITIONS' ? 'Repeticiones' : 'Minutos'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs uppercase tracking-wide text-text">Progreso</dt>
+                    <dd className="mt-0.5 text-text">
+                      {o.progressValue} / {o.targetValue}
+                    </dd>
+                  </div>
                 </div>
               </dl>
-              <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
+              <div className="mt-4 grid grid-cols-2 gap-2">
                 <Button
                   type="button"
                   variant="secondary"
-                  className="min-h-11 w-full sm:w-auto"
+                  className="min-h-11 w-full"
                   onClick={() =>
                     setEditing({
                       id: o.id,
@@ -238,7 +253,7 @@ export default function ObjectivesPage() {
                 >
                   Editar
                 </Button>
-                <Button type="button" variant="ghost" className="min-h-11 w-full text-danger sm:w-auto" onClick={() => setDeleting(o)}>
+                <Button type="button" variant="danger" className="min-h-11 w-full" onClick={() => setDeleting(o)}>
                   Eliminar
                 </Button>
               </div>
@@ -311,7 +326,7 @@ export default function ObjectivesPage() {
                       >
                         Editar
                       </Button>
-                      <Button type="button" variant="ghost" size="sm" className="text-danger" onClick={() => setDeleting(o)}>
+                      <Button type="button" variant="danger" size="sm" onClick={() => setDeleting(o)}>
                         Eliminar
                       </Button>
                     </div>
@@ -344,4 +359,3 @@ export default function ObjectivesPage() {
     </div>
   )
 }
-
