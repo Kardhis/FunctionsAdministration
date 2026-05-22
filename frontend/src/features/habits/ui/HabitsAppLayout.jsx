@@ -138,7 +138,7 @@ export default function HabitsAppLayout() {
 
       {toasts.length ? (
         <div
-          className="fixed right-4 z-[60] flex w-[min(420px,calc(100vw-2rem))] flex-col gap-2"
+          className="fixed right-4 z-[60] flex w-[min(420px,calc(100dvw-2rem))] flex-col gap-2"
           style={{ bottom: 'max(1rem, env(safe-area-inset-bottom, 0px))' }}
         >
           {toasts.map((t, idx) => (
@@ -151,7 +151,7 @@ export default function HabitsAppLayout() {
             >
               <div className="flex items-start justify-between gap-3">
                 <p className="font-medium">{t.message}</p>
-                <button type="button" className="text-text-h/70 hover:text-text-h" onClick={() => dismissToast(idx)} aria-label="Cerrar">
+                <button type="button" className="inline-flex min-h-11 min-w-[44px] items-center justify-center text-text-h/70 hover:text-text-h" onClick={() => dismissToast(idx)} aria-label="Cerrar">
                   ✕
                 </button>
               </div>

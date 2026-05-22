@@ -178,7 +178,7 @@ export default function HabitsStatsPage() {
             </div>
             <Badge tone="neutral">Pie</Badge>
           </div>
-          <div className={`mt-4 ${isLgUp ? 'h-72' : 'h-64 sm:h-72'}`}>
+          <div className={`mt-4 min-w-0 overflow-hidden ${isLgUp ? 'h-72' : 'h-64 sm:h-72'}`}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -208,7 +208,7 @@ export default function HabitsStatsPage() {
             </div>
             <Badge tone="accent">Bar</Badge>
           </div>
-          <div className={`mt-4 ${isLgUp ? 'h-72' : 'h-60 sm:h-72'}`}>
+          <div className={`mt-4 min-w-0 overflow-hidden ${isLgUp ? 'h-72' : 'h-60 sm:h-72'}`}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={bars} margin={{ left: 4, right: 8, bottom: isLgUp ? 8 : 18, top: 8 }}>
                 <XAxis
@@ -235,7 +235,7 @@ export default function HabitsStatsPage() {
           </div>
           <Badge tone="neutral">Line</Badge>
         </div>
-        <div className={`mt-4 ${isLgUp ? 'h-72' : 'h-60 sm:h-72'}`}>
+        <div className={`mt-4 min-w-0 overflow-hidden ${isLgUp ? 'h-72' : 'h-60 sm:h-72'}`}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={lineByHabitTop} margin={{ left: 4, right: 8, bottom: isLgUp ? 8 : 18, top: 8 }}>
               <XAxis
