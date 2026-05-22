@@ -30,7 +30,7 @@ export default function HabitsAppLayout() {
   const admin = isAdmin(roles)
   const bootstrap = useHabitAppStore((s) => s.bootstrap)
   const resetSession = useHabitAppStore((s) => s.resetSession)
-  const prevUserRef = useRef(user)
+  const prevUserRef = useRef(null)
   const loading = useHabitAppStore((s) => s.loading)
   const error = useHabitAppStore((s) => s.error)
   const toasts = useHabitAppStore((s) => s.toasts)
