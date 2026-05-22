@@ -1,5 +1,5 @@
 .cpLogin {
-  min-height: 100vh;
+  min-height: 100svh;
   display: grid;
   place-items: center;
   padding: clamp(18px, 4vw, 44px);
@@ -74,12 +74,6 @@
   justify-items: center;
   position: relative;
   z-index: 1;
-}
-
-@media (max-width: 860px) {
-  .cpShell {
-    grid-template-columns: 1fr;
-  }
 }
 
 .cpHero {
@@ -214,11 +208,13 @@
 
 .cpInput {
   width: 100%;
+  min-height: 44px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(5, 6, 18, 0.55);
   color: rgba(255, 255, 255, 0.92);
-  padding: 12px 12px;
+  padding: 12px;
+  font-size: 16px;
   outline: none;
   transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
@@ -242,6 +238,7 @@
 
 .cpButton {
   width: 100%;
+  min-height: 44px;
   border: none;
   border-radius: 12px;
   padding: 12px 14px;
@@ -340,6 +337,12 @@
   text-decoration: underline;
 }
 
+.cpAuthLink:focus-visible {
+  outline: 2px solid rgba(0, 255, 209, 0.55);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .cpDetails {
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -359,4 +362,3 @@
   font-size: 13px;
   line-height: 1.45;
 }
-

@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext.jsx'
 import { isAdmin } from '../auth/roles.js'
 import { API_BASE } from '../data/api.js'
-import './LoginPage.css'
+import AuthLayout from '../layouts/AuthLayout.jsx'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -63,83 +63,74 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="cpLogin">
-      <div className="cpBackgroundGrid" aria-hidden="true" />
-      <div className="cpGlowOrbs" aria-hidden="true" />
+    <AuthLayout sectionLabel="Login" cardLabel="Panel de acceso">
+      <header className="cpCardTitleRow">
+        <h2 className="cpCardTitle">Acceso</h2>
+      </header>
 
-      <section className="cpShell" aria-label="Login">
-        <div className="cpCard" role="region" aria-label="Panel de acceso">
-          <div className="cpCardInner">
-            <header className="cpCardTitleRow">
-              <h2 className="cpCardTitle">Acceso</h2>
-            </header>
-
-            <form onSubmit={onSubmit} className="cpForm" noValidate>
-              {info ? (
-                <p className="cpInfo" role="status" aria-live="polite">
-                  {info}
-                </p>
-              ) : null}
-              <div className="cpField">
-                <label className="cpLabel" htmlFor="login-email">
-                  Email
-                </label>
-                <input
-                  id="login-email"
-                  className="cpInput"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoComplete="email"
-                  inputMode="email"
-                  required
-                />
-              </div>
-
-              <div className="cpField">
-                <label className="cpLabel" htmlFor="login-password">
-                  Password
-                </label>
-                <input
-                  id="login-password"
-                  className="cpInput"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                />
-              </div>
-
-              <div className="cpActions">
-                <button
-                  className="cpButton"
-                  type="submit"
-                  disabled={isLoading}
-                  aria-busy={isLoading}
-                >
-                  {isLoading ? 'Entrando…' : 'Entrar'}
-                </button>
-
-                {error ? (
-                  <p className="cpError" role="alert" aria-live="polite">
-                    Error: <code>{error}</code>
-                  </p>
-                ) : null}
-              </div>
-            </form>
-
-            <nav className="cpAuthLinks" aria-label="Otras opciones">
-              <Link className="cpAuthLink" to="/register">
-                Crear cuenta
-              </Link>
-              <Link className="cpAuthLink" to="/forgot-password">
-                ¿Has olvidado la contraseña?
-              </Link>
-            </nav>
-          </div>
+      <form onSubmit={onSubmit} className="cpForm" noValidate>
+        {info ? (
+          <p className="cpInfo" role="status" aria-live="polite">
+            {info}
+          </p>
+        ) : null}
+        <div className="cpField">
+          <label className="cpLabel" htmlFor="login-email">
+            Email
+          </label>
+          <input
+            id="login-email"
+            className="cpInput"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            inputMode="email"
+            required
+          />
         </div>
-      </section>
-    </main>
+
+        <div className="cpField">
+          <label className="cpLabel" htmlFor="login-password">
+            Password
+          </label>
+          <input
+            id="login-password"
+            className="cpInput"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            type="password"
+            autoComplete="current-password"
+            required
+          />
+        </div>
+
+        <div className="cpActions">
+          <button
+            className="cpButton"
+            type="submit"
+            disabled={isLoading}
+            aria-busy={isLoading}
+          >
+            {isLoading ? 'Entrando…' : 'Entrar'}
+          </button>
+
+          {error ? (
+            <p className="cpError" role="alert" aria-live="polite">
+              Error: <code>{error}</code>
+            </p>
+          ) : null}
+        </div>
+      </form>
+
+      <nav className="cpAuthLinks" aria-label="Otras opciones">
+        <Link className="cpAuthLink" to="/register">
+          Crear cuenta
+        </Link>
+        <Link className="cpAuthLink" to="/forgot-password">
+          ¿Has olvidado la contraseña?
+        </Link>
+      </nav>
+    </AuthLayout>
   )
 }
 

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { API_BASE } from '../data/api.js'
-import './LoginPage.css'
+import AuthLayout from '../layouts/AuthLayout.jsx'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
@@ -52,82 +52,73 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="cpLogin">
-      <div className="cpBackgroundGrid" aria-hidden="true" />
-      <div className="cpGlowOrbs" aria-hidden="true" />
+    <AuthLayout sectionLabel="Registro" cardLabel="Crear cuenta">
+      <header className="cpCardTitleRow">
+        <h2 className="cpCardTitle">Crear cuenta</h2>
+      </header>
 
-      <section className="cpShell" aria-label="Registro">
-        <div className="cpCard" role="region" aria-label="Crear cuenta">
-          <div className="cpCardInner">
-            <header className="cpCardTitleRow">
-              <h2 className="cpCardTitle">Crear cuenta</h2>
-            </header>
-
-            <form onSubmit={onSubmit} className="cpForm" noValidate>
-              <div className="cpField">
-                <label className="cpLabel" htmlFor="register-email">
-                  Email
-                </label>
-                <input
-                  id="register-email"
-                  className="cpInput"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoComplete="email"
-                  inputMode="email"
-                  required
-                />
-              </div>
-
-              <div className="cpField">
-                <label className="cpLabel" htmlFor="register-name">
-                  Nombre (opcional)
-                </label>
-                <input
-                  id="register-name"
-                  className="cpInput"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  autoComplete="name"
-                />
-              </div>
-
-              <div className="cpField">
-                <label className="cpLabel" htmlFor="register-password">
-                  Contraseña (mín. 8 caracteres)
-                </label>
-                <input
-                  id="register-password"
-                  className="cpInput"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  type="password"
-                  autoComplete="new-password"
-                  minLength={8}
-                  required
-                />
-              </div>
-
-              <div className="cpActions">
-                <button className="cpButton" type="submit" disabled={isLoading} aria-busy={isLoading}>
-                  {isLoading ? 'Creando…' : 'Registrarse'}
-                </button>
-                {error ? (
-                  <p className="cpError" role="alert" aria-live="polite">
-                    Error: <code>{error}</code>
-                  </p>
-                ) : null}
-              </div>
-            </form>
-
-            <nav className="cpAuthLinks" aria-label="Enlace a acceso">
-              <Link className="cpAuthLink" to="/login">
-                ¿Ya tienes cuenta? Iniciar sesión
-              </Link>
-            </nav>
-          </div>
+      <form onSubmit={onSubmit} className="cpForm" noValidate>
+        <div className="cpField">
+          <label className="cpLabel" htmlFor="register-email">
+            Email
+          </label>
+          <input
+            id="register-email"
+            className="cpInput"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            inputMode="email"
+            required
+          />
         </div>
-      </section>
-    </main>
+
+        <div className="cpField">
+          <label className="cpLabel" htmlFor="register-name">
+            Nombre (opcional)
+          </label>
+          <input
+            id="register-name"
+            className="cpInput"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            autoComplete="name"
+          />
+        </div>
+
+        <div className="cpField">
+          <label className="cpLabel" htmlFor="register-password">
+            Contraseña (mín. 8 caracteres)
+          </label>
+          <input
+            id="register-password"
+            className="cpInput"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            type="password"
+            autoComplete="new-password"
+            minLength={8}
+            required
+          />
+        </div>
+
+        <div className="cpActions">
+          <button className="cpButton" type="submit" disabled={isLoading} aria-busy={isLoading}>
+            {isLoading ? 'Creando…' : 'Registrarse'}
+          </button>
+          {error ? (
+            <p className="cpError" role="alert" aria-live="polite">
+              Error: <code>{error}</code>
+            </p>
+          ) : null}
+        </div>
+      </form>
+
+      <nav className="cpAuthLinks" aria-label="Enlace a acceso">
+        <Link className="cpAuthLink" to="/login">
+          ¿Ya tienes cuenta? Iniciar sesión
+        </Link>
+      </nav>
+    </AuthLayout>
   )
 }

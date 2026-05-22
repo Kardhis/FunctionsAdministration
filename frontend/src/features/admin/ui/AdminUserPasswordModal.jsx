@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Card from '../../../components/Card.jsx'
 import Button from '../../../components/Button.jsx'
 import { modalFooterRow, modalFooterCancelButtonClass, modalFooterPrimaryButtonClass } from '../../../components/modalFooter.js'
+import { useBodyScrollLock } from '../../../hooks/useBodyScrollLock.js'
 
 /**
  * @param {{ open: boolean, user: { id: number, displayName?: string|null, email: string }|null, onClose: () => void, onSubmit: (id: number, password: string) => Promise<void> }} props
@@ -11,6 +12,8 @@ export default function AdminUserPasswordModal({ open, user, onClose, onSubmit }
   const [confirm, setConfirm] = useState('')
   const [saving, setSaving] = useState(false)
   const [localError, setLocalError] = useState('')
+
+  useBodyScrollLock(open)
 
   useEffect(() => {
     if (!open) return
@@ -52,7 +55,7 @@ export default function AdminUserPasswordModal({ open, user, onClose, onSubmit }
   }
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-0 z-[55]">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" onClick={() => onClose?.()} />
       <div className="relative mx-auto flex min-h-[100svh] w-full max-w-lg items-center justify-center px-3 py-4 sm:px-4 sm:py-10">
         <Card className="max-h-[min(88dvh,720px)] w-full overflow-y-auto overscroll-y-contain p-5 sm:p-6">
@@ -62,7 +65,7 @@ export default function AdminUserPasswordModal({ open, user, onClose, onSubmit }
               <p className="mt-1 text-xl font-semibold text-text-h">Canviar Contrasenya · {labelName}</p>
               <p className="mt-1 text-sm text-text">Introdueix la nova contrasenya dues vegades.</p>
             </div>
-            <Button variant="ghost" type="button" onClick={() => onClose?.()} aria-label="Tancar">
+            <Button variant="ghost" type="button" className="min-h-11 min-w-[44px]" onClick={() => onClose?.()} aria-label="Tancar">
               ✕
             </Button>
           </div>
@@ -93,7 +96,7 @@ export default function AdminUserPasswordModal({ open, user, onClose, onSubmit }
             </label>
 
             {localError ? (
-              <p className="text-sm text-[crimson] dark:text-red-400" role="alert">
+              <p className="text-sm text-danger" role="alert">
                 {localError}
               </p>
             ) : null}

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { addDays, format } from 'date-fns'
 import Card from '../../../components/Card.jsx'
 import Badge from '../../../components/Badge.jsx'
+import TableScrollWrapper from '../../../components/TableScrollWrapper.jsx'
 import { useHabitAppStore } from '../store/habitAppStore.js'
 import { getWeekRangeMonday } from '../domain/periods.js'
 import { formatDurationHuman } from '../domain/time.js'
@@ -66,13 +67,14 @@ export default function HabitsWeekPage() {
               <span className="text-xl">{m.habit.icon || '•'}</span>
               <span className="min-w-0 text-base font-semibold text-text-h">{m.habit.name}</span>
             </div>
-            <div className="mt-3 grid grid-cols-7 gap-1.5 text-center">
+            <div className="mt-3 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1">
+            <div className="grid min-w-[360px] grid-cols-7 gap-1.5 text-center">
               {m.row.map((cell) => (
                 <div key={cell.day} className="min-w-0">
-                  <p className="text-[10px] font-medium uppercase leading-tight text-text">{formatDateEs(cell.day).slice(0, 5)}</p>
+                  <p className="text-2xs font-medium uppercase leading-tight text-text">{formatDateEs(cell.day).slice(0, 5)}</p>
                   <div className="mt-1 min-h-[2rem]">
                     {cell.minutes > 0 ? (
-                      <Badge tone="accent" className="max-w-full justify-center px-1 py-0.5 text-[10px]">
+                      <Badge tone="accent" className="max-w-full justify-center px-1 py-0.5 text-2xs">
                         {formatDurationHuman(cell.minutes)}
                       </Badge>
                     ) : (
@@ -82,14 +84,15 @@ export default function HabitsWeekPage() {
                 </div>
               ))}
             </div>
+            </div>
             <p className="mt-3 border-t border-border pt-3 text-sm font-semibold text-text-h">Total: {formatDurationHuman(m.total)}</p>
           </div>
         ))}
         {!matrix.length ? <p className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-text">No hay hábitos activos esta semana.</p> : null}
       </div>
 
-      <div className="mt-4 hidden overflow-x-auto lg:block">
-        <table className="min-w-[980px] w-full border-separate border-spacing-y-2">
+      <TableScrollWrapper>
+        <table className="min-w-[860px] w-full border-separate border-spacing-y-2">
           <thead>
             <tr className="text-left text-xs uppercase tracking-wide text-text">
               <th className="px-2">Hábito</th>
@@ -120,7 +123,7 @@ export default function HabitsWeekPage() {
             ))}
           </tbody>
         </table>
-      </div>
+      </TableScrollWrapper>
     </Card>
   )
 }

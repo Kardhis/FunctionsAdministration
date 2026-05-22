@@ -2,12 +2,15 @@ import { useEffect, useState } from 'react'
 import Card from '../../../components/Card.jsx'
 import Button from '../../../components/Button.jsx'
 import { modalFooterRow, modalFooterCancelButtonClass, modalFooterPrimaryButtonClass } from '../../../components/modalFooter.js'
+import { useBodyScrollLock } from '../../../hooks/useBodyScrollLock.js'
 
 /**
  * @param {{ open: boolean, user: { id: number, displayName?: string|null, email: string }|null, onCancel: () => void, onConfirm: () => Promise<void> }} props
  */
 export default function AdminUserDeleteConfirmModal({ open, user, onCancel, onConfirm }) {
   const [busy, setBusy] = useState(false)
+
+  useBodyScrollLock(open)
 
   useEffect(() => {
     if (!open) return
@@ -37,7 +40,7 @@ export default function AdminUserDeleteConfirmModal({ open, user, onCancel, onCo
   }
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-0 z-[55]">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" onClick={() => onCancel?.()} />
       <div className="relative mx-auto flex min-h-[100svh] w-full max-w-lg items-center justify-center px-3 py-4 sm:px-4 sm:py-10">
         <Card className="max-h-[min(88dvh,720px)] w-full overflow-y-auto overscroll-y-contain p-5 sm:p-6">
@@ -49,7 +52,7 @@ export default function AdminUserDeleteConfirmModal({ open, user, onCancel, onCo
                 Estàs segur que vols eliminar a <span className="font-semibold text-text-h">{display}</span>?
               </p>
             </div>
-            <Button variant="ghost" type="button" onClick={() => onCancel?.()} aria-label="Tancar">
+            <Button variant="ghost" type="button" className="min-h-11 min-w-[44px]" onClick={() => onCancel?.()} aria-label="Tancar">
               ✕
             </Button>
           </div>

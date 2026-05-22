@@ -3,6 +3,9 @@ import Card from '../../components/Card.jsx'
 import Button from '../../components/Button.jsx'
 import Badge from '../../components/Badge.jsx'
 import { SectionHeader } from '../../components/Section.jsx'
+import Pagination from '../../components/Pagination.jsx'
+import TableScrollWrapper from '../../components/TableScrollWrapper.jsx'
+import { usePagination } from '../../hooks/usePagination.js'
 import * as adminRepo from '../../features/admin/data/adminUsersRepo.js'
 import AdminUserCreateModal from '../../features/admin/ui/AdminUserCreateModal.jsx'
 import AdminUserEditModal from '../../features/admin/ui/AdminUserEditModal.jsx'
@@ -38,6 +41,9 @@ export default function AdminUsersPage() {
   const [pwdUser, setPwdUser] = useState(null)
 
   const sorted = useMemo(() => [...users].sort((a, b) => String(a.email).localeCompare(String(b.email))), [users])
+
+  const PAGE_SIZE = 10
+  const pagination = usePagination(sorted, PAGE_SIZE)
 
   const refresh = useCallback(async () => {
     setLoading(true)
@@ -109,7 +115,7 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-[var(--space-section-gap)]">
       <Card className="p-5">
         <SectionHeader
           title="Administració · Usuaris"
@@ -133,7 +139,62 @@ export default function AdminUsersPage() {
           </p>
         ) : null}
 
-        <div className="mt-4 overflow-x-auto rounded-2xl border border-border">
+        {/* Mobile / tablet — card list */}
+        <div className="mt-4 flex flex-col gap-3 lg:hidden">
+          {pagination.pageItems.map((u) => (
+            <div key={u.id} className="rounded-2xl border border-border bg-bg/60 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-text-h">{u.email}</p>
+                  {u.displayName ? (
+                    <p className="mt-0.5 truncate text-xs text-text">{u.displayName}</p>
+                  ) : null}
+                </div>
+                <label className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 text-xs text-text-h">
+                  <input
+                    type="checkbox"
+                    className="ui-checkbox"
+                    checked={Boolean(u.active)}
+                    onChange={(e) => handleToggleActive(u, e.target.checked)}
+                    aria-label="Actiu / Desactiu"
+                  />
+                  <span>{u.active ? 'Actiu' : 'Inactiu'}</span>
+                </label>
+              </div>
+              <div className="mt-3">
+                <RoleChips roles={u.roles} />
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button type="button" variant="secondary" size="sm" className="flex-1 min-h-11" onClick={() => setEditUser(u)}>
+                  Editar
+                </Button>
+                <Button type="button" variant="secondary" size="sm" className="flex-1 min-h-11" onClick={() => setPwdUser(u)}>
+                  Canviar Contrasenya
+                </Button>
+                <Button type="button" variant="danger" size="sm" className="flex-1 min-h-11" onClick={() => setDeleteTarget(u)}>
+                  Eliminar
+                </Button>
+              </div>
+            </div>
+          ))}
+          {!sorted.length && !loading ? (
+            <p className="rounded-2xl border border-border bg-bg/60 p-4 text-sm text-text">No hi ha usuaris.</p>
+          ) : null}
+          <Pagination
+            page={pagination.page}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.totalItems}
+            pageSize={PAGE_SIZE}
+            hasPrev={pagination.hasPrev}
+            hasNext={pagination.hasNext}
+            onPrev={pagination.prev}
+            onNext={pagination.next}
+            onPage={pagination.setPage}
+          />
+        </div>
+
+        {/* Desktop — scrollable table */}
+        <TableScrollWrapper>
           <table className="w-full min-w-[640px] border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-border bg-bg/80">
@@ -145,10 +206,14 @@ export default function AdminUsersPage() {
               </tr>
             </thead>
             <tbody>
-              {sorted.map((u) => (
+              {pagination.pageItems.map((u) => (
                 <tr key={u.id} className="border-b border-border/80 last:border-0 hover:bg-black/[0.03] dark:hover:bg-white/[0.04]">
-                  <td className="max-w-[200px] truncate px-4 py-3 font-medium text-text-h">{u.email}</td>
-                  <td className="max-w-[160px] truncate px-4 py-3 text-text">{u.displayName ?? '—'}</td>
+                  <td className="max-w-[200px] px-4 py-3 font-medium text-text-h">
+                    <p className="truncate">{u.email}</p>
+                  </td>
+                  <td className="max-w-[160px] px-4 py-3 text-text">
+                    <p className="truncate">{u.displayName ?? '—'}</p>
+                  </td>
                   <td className="px-4 py-3">
                     <RoleChips roles={u.roles} />
                   </td>
@@ -156,7 +221,7 @@ export default function AdminUsersPage() {
                     <label className="inline-flex cursor-pointer items-center gap-2 text-text-h">
                       <input
                         type="checkbox"
-                        className="h-4 w-4 rounded border-border"
+                        className="ui-checkbox"
                         checked={Boolean(u.active)}
                         onChange={(e) => handleToggleActive(u, e.target.checked)}
                         aria-label="Actiu / Desactiu"
@@ -178,12 +243,26 @@ export default function AdminUsersPage() {
                   </td>
                 </tr>
               ))}
+              {!sorted.length && !loading ? (
+                <tr>
+                  <td className="px-4 py-3 text-sm text-text" colSpan={5}>No hi ha usuaris.</td>
+                </tr>
+              ) : null}
             </tbody>
           </table>
-        </div>
-        {!sorted.length && !loading ? (
-          <p className="p-5 text-sm text-text">No hi ha usuaris.</p>
-        ) : null}
+        </TableScrollWrapper>
+        <Pagination
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          totalItems={pagination.totalItems}
+          pageSize={PAGE_SIZE}
+          hasPrev={pagination.hasPrev}
+          hasNext={pagination.hasNext}
+          onPrev={pagination.prev}
+          onNext={pagination.next}
+          onPage={pagination.setPage}
+          className="hidden lg:flex"
+        />
       </Card>
 
       <AdminUserCreateModal

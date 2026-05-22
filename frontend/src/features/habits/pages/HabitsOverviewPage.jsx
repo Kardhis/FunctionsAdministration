@@ -140,8 +140,8 @@ export default function HabitsOverviewPage() {
   }, [bootstrapped])
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+    <div className="space-y-[var(--space-section-gap)]">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <DashboardCard
           title="Tiempo hoy"
           value={formatDurationHuman(todayMinutes)}
@@ -247,12 +247,12 @@ export default function HabitsOverviewPage() {
             </div>
 
             {weekHabitBars.length ? (
-              <div className={`mt-4 ${isLgUp ? 'h-[320px]' : 'h-[260px] sm:h-[300px]'}`}>
+              <div className={`mt-4 min-w-0 overflow-hidden ${isLgUp ? 'h-[320px]' : 'h-[260px] sm:h-[300px]'}`}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={weekHabitBars}
                     layout="vertical"
-                    margin={{ left: isLgUp ? 8 : 4, right: isLgUp ? 8 : 4, top: 8, bottom: 8 }}
+                    margin={{ left: isLgUp ? 8 : 4, right: isLgUp ? 72 : 4, top: 8, bottom: 8 }}
                   >
                     <XAxis
                       type="number"
@@ -279,12 +279,14 @@ export default function HabitsOverviewPage() {
                       {weekHabitBars.map((row) => (
                         <Cell key={row.habitId} fill={row.color} />
                       ))}
-                      <LabelList
-                        dataKey="minutes"
-                        position="right"
-                        formatter={(v) => formatDurationHuman(Number(v) || 0)}
-                        style={{ fill: 'var(--text-h)', fontSize: isLgUp ? 12 : 10, fontWeight: 600 }}
-                      />
+                      {isLgUp ? (
+                        <LabelList
+                          dataKey="minutes"
+                          position="right"
+                          formatter={(v) => formatDurationHuman(Number(v) || 0)}
+                          style={{ fill: 'var(--text-h)', fontSize: 12, fontWeight: 600 }}
+                        />
+                      ) : null}
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
@@ -297,7 +299,7 @@ export default function HabitsOverviewPage() {
             )}
         </Card>
 
-        <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           <Card className="p-5 xl:col-span-2">
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -306,7 +308,7 @@ export default function HabitsOverviewPage() {
               </div>
               <Badge tone="accent">Bar</Badge>
             </div>
-            <div className={`mt-4 ${isLgUp ? 'h-64' : 'h-52 sm:h-60'}`}>
+            <div className={`mt-4 min-w-0 overflow-hidden ${isLgUp ? 'h-64' : 'h-52 sm:h-60'}`}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={bars} margin={{ left: 4, right: 8, bottom: isLgUp ? 8 : 20, top: 8 }}>
                   <XAxis
@@ -340,7 +342,7 @@ export default function HabitsOverviewPage() {
               </div>
               <Badge tone="neutral">Pie</Badge>
             </div>
-            <div className={`mt-4 ${isLgUp ? 'h-64' : 'h-56 sm:h-64'}`}>
+            <div className={`mt-4 min-w-0 overflow-hidden ${isLgUp ? 'h-64' : 'h-56 sm:h-64'}`}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
