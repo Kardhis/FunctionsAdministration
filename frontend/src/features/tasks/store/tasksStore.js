@@ -43,7 +43,7 @@ export const useTasksStore = create((set, get) => ({
   },
 
   resetSession() {
-    set({ projects: [], categories: [], bootstrapped: false, bootstrapError: '', toasts: [] })
+    set({ projects: [], categories: [], bootstrapped: false, bootstrapError: '' })
   },
 
   async refreshProjects() {
@@ -121,7 +121,10 @@ export const useTasksStore = create((set, get) => ({
   },
 
   addToast(message, kind = 'success') {
-    const id = crypto.randomUUID()
+    const id =
+      typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `toast-${Date.now()}-${Math.random().toString(16).slice(2)}`
     set((s) => ({
       toasts: [...s.toasts, { id, message, kind, createdAt: Date.now() }],
     }))
