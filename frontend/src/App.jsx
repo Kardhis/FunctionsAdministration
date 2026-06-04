@@ -22,6 +22,13 @@ import AdminOnlyRoute from './routes/AdminOnlyRoute.jsx'
 import PrivateLandingRedirect from './routes/PrivateLandingRedirect.jsx'
 import AdminUsersPage from './pages/dashboard/AdminUsersPage.jsx'
 import ObjectivesPage from './features/objectives/pages/ObjectivesPage.jsx'
+import TasksAppLayout from './features/tasks/TasksAppLayout.jsx'
+import TasksListPage from './features/tasks/pages/TasksListPage.jsx'
+import TasksTodayPage from './features/tasks/pages/TasksTodayPage.jsx'
+import TasksEisenhowerPage from './features/tasks/pages/TasksEisenhowerPage.jsx'
+import TasksCalendarPage from './features/tasks/pages/TasksCalendarPage.jsx'
+import TasksBacklogPage from './features/tasks/pages/TasksBacklogPage.jsx'
+import TasksManagePage from './features/tasks/pages/TasksManagePage.jsx'
 
 const adminOnlyRedirect = '/dashboard/habits/overview'
 
@@ -112,6 +119,17 @@ function App() {
             </AdminOnlyRoute>
           }
         />
+        {/* Tasks module — accessible by ADMIN and USER */}
+        <Route path="tasks" element={<TasksAppLayout />}>
+          <Route index element={<Navigate to="list" replace />} />
+          <Route path="list" element={<TasksListPage />} />
+          <Route path="today" element={<TasksTodayPage />} />
+          <Route path="eisenhower" element={<TasksEisenhowerPage />} />
+          <Route path="calendar" element={<TasksCalendarPage />} />
+          <Route path="backlog" element={<TasksBacklogPage />} />
+          <Route path="manage" element={<TasksManagePage />} />
+        </Route>
+
         <Route
           path="admin/users"
           element={
