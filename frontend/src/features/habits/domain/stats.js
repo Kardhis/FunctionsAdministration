@@ -55,6 +55,18 @@ export function pieDataFromMinutesByHabit(minutesByHabit, habits) {
   return { rows, total }
 }
 
+export function percentRowsByHabit(entries, habits) {
+  const byHabit = minutesByHabit(entries)
+  const { rows, total: totalMinutes } = pieDataFromMinutesByHabit(byHabit, habits)
+  const mapped = rows
+    .filter((r) => (r.minutes ?? 0) > 0)
+    .map((r) => ({
+      ...r,
+      percent: totalMinutes > 0 ? (r.minutes / totalMinutes) * 100 : 0,
+    }))
+  return { rows: mapped, totalMinutes }
+}
+
 export function barSeriesByDay({ range, entries }) {
   const byDay = minutesByDay(entries)
   const days = eachLocalDayBetween(range.start, range.end)

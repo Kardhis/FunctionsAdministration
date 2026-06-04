@@ -1,15 +1,35 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { format } from 'date-fns'
 import { useIsLgUp } from '../../../hooks/useMediaQuery.js'
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, Bar, BarChart, XAxis, YAxis, LabelList } from 'recharts'
+import Button from '../../../components/Button.jsx'
 import Card from '../../../components/Card.jsx'
 import Badge from '../../../components/Badge.jsx'
+import DatePickerInput from '../../../components/DatePickerInput.jsx'
 import DashboardCard from '../../../components/ui/DashboardCard.jsx'
 import { useHabitAppStore } from '../store/habitAppStore.js'
-import { filterEntries, minutesByHabit, pieDataFromMinutesByHabit, barSeriesByDay, summaryStats, computeHabitStreakDays } from '../domain/stats.js'
-import { resolvePeriodRange } from '../domain/periods.js'
+import {
+  filterEntries,
+  minutesByHabit,
+  pieDataFromMinutesByHabit,
+  percentRowsByHabit,
+  barSeriesByDay,
+  summaryStats,
+  computeHabitStreakDays,
+} from '../domain/stats.js'
+import { formatRangeLabel, resolvePeriodRange } from '../domain/periods.js'
 import { formatDurationHuman, todayLocalDateString } from '../domain/time.js'
 import { formatDateEs } from '../../../data/dateFormat.js'
 import { listObjectives } from '../../objectives/data/objectivesRepo.js'
+
+function initialMonthRangeState() {
+  const range = resolvePeriodRange({ preset: 'this_month' })
+  return {
+    range,
+    from: format(range.start, 'yyyy-MM-dd'),
+    to: format(range.end, 'yyyy-MM-dd'),
+  }
+}
 
 function clamp(n, min, max) {
   return Math.max(min, Math.min(max, n))
@@ -29,6 +49,12 @@ export default function HabitsOverviewPage() {
 
   const [objectives, setObjectives] = useState([])
   const [objectivesError, setObjectivesError] = useState('')
+
+  const monthInit = useMemo(() => initialMonthRangeState(), [])
+  const [draftFrom, setDraftFrom] = useState(monthInit.from)
+  const [draftTo, setDraftTo] = useState(monthInit.to)
+  const [appliedRange, setAppliedRange] = useState(monthInit.range)
+  const [rangeError, setRangeError] = useState('')
 
   const today = todayLocalDateString()
   const todayEntries = useMemo(() => entries.filter((e) => e.date === today), [entries, today])
@@ -86,6 +112,41 @@ export default function HabitsOverviewPage() {
   const bars = useMemo(() => barSeriesByDay({ range: last7, entries: last7Entries }), [last7, last7Entries])
 
   const weekSummary = useMemo(() => summaryStats({ entries: weekEntries, range: weekRange }), [weekEntries, weekRange])
+
+  const percentEntries = useMemo(() => {
+    return filterEntries(entries, habits, { activeOnly: true }).filter((e) => {
+      const t = new Date(`${e.date}T00:00:00`)
+      return t >= appliedRange.start && t <= appliedRange.end
+    })
+  }, [appliedRange.end, appliedRange.start, entries, habits])
+
+  const percentStats = useMemo(() => percentRowsByHabit(percentEntries, habits), [percentEntries, habits])
+  const percentPieData = useMemo(
+    () =>
+      percentStats.rows.map((r) => ({
+        habitId: r.habitId,
+        name: r.name,
+        value: r.percent,
+        color: r.color,
+        minutes: r.minutes,
+      })),
+    [percentStats.rows],
+  )
+
+  const appliedRangeLabel = useMemo(() => formatRangeLabel(appliedRange), [appliedRange])
+
+  const handleRecalculatePercentages = useCallback(() => {
+    if (!draftFrom || !draftTo) {
+      setRangeError('Indica fecha desde y fecha hasta.')
+      return
+    }
+    if (draftFrom > draftTo) {
+      setRangeError('La fecha desde no puede ser posterior a la fecha hasta.')
+      return
+    }
+    setRangeError('')
+    setAppliedRange(resolvePeriodRange({ preset: 'custom', customFrom: draftFrom, customTo: draftTo }))
+  }, [draftFrom, draftTo])
 
   const chartTooltipStyle = useMemo(
     () => ({
@@ -235,6 +296,112 @@ export default function HabitsOverviewPage() {
               <p className="mt-1 text-sm text-text">Crea un objetivo para ver aquí tu avance en %.</p>
             </div>
           )}
+        </Card>
+
+        <Card className="p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-text-h">Distribución del tiempo (%)</p>
+              <p className="mt-1 text-sm text-text">
+                Porcentaje sobre el tiempo imputado en el periodo. Por defecto, mes en curso ({appliedRangeLabel}).
+              </p>
+            </div>
+            <Badge tone="accent">{appliedRangeLabel}</Badge>
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-12 lg:items-end">
+            <label className="lg:col-span-4">
+              <span className="text-xs font-medium uppercase tracking-wide text-text">Fecha desde</span>
+              <DatePickerInput value={draftFrom} onChange={setDraftFrom} label="Fecha desde" />
+            </label>
+            <label className="lg:col-span-4">
+              <span className="text-xs font-medium uppercase tracking-wide text-text">Fecha hasta</span>
+              <DatePickerInput value={draftTo} onChange={setDraftTo} label="Fecha hasta" />
+            </label>
+            <div className="lg:col-span-4">
+              <Button
+                id="habit-percent-recalculate"
+                type="button"
+                variant="primary"
+                className="w-full"
+                onClick={handleRecalculatePercentages}
+                disabled={!draftFrom || !draftTo}
+              >
+                Recalcular porcentajes
+              </Button>
+            </div>
+          </div>
+
+          {rangeError ? (
+            <p className="mt-3 text-sm text-[color:var(--danger)]" role="alert">
+              {rangeError}
+            </p>
+          ) : null}
+
+          {percentPieData.length ? (
+            <>
+              <div
+                id="habit-percent-chart"
+                className={`mt-4 min-w-0 overflow-hidden ${isLgUp ? 'h-[300px]' : 'h-[240px] sm:h-[280px]'}`}
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={percentPieData}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={isLgUp ? 50 : 40}
+                      outerRadius={isLgUp ? 88 : 70}
+                      paddingAngle={2}
+                    >
+                      {percentPieData.map((entry) => (
+                        <Cell key={entry.habitId} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={chartTooltipStyle}
+                      labelStyle={chartTooltipLabelStyle}
+                      formatter={(value, _name, item) => {
+                        const minutes = item?.payload?.minutes ?? 0
+                        return [`${Number(value).toFixed(1)}% · ${formatDurationHuman(minutes)}`, 'Tiempo']
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <ul className="mt-4 space-y-2" aria-label="Desglose por hábito">
+                {percentStats.rows.map((r) => (
+                  <li
+                    key={r.habitId}
+                    className="flex items-center justify-between gap-3 rounded-xl border border-border bg-[color:var(--surface-2)] px-3 py-2 text-sm"
+                  >
+                    <span className="flex min-w-0 items-center gap-2">
+                      <span
+                        className="h-2.5 w-2.5 shrink-0 rounded-full"
+                        style={{ background: r.color }}
+                        aria-hidden="true"
+                      />
+                      <span className="truncate font-medium text-text-h">{r.name}</span>
+                    </span>
+                    <span className="shrink-0 tabular-nums text-text">
+                      {r.percent.toFixed(1)}% · {formatDurationHuman(r.minutes)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <div className="mt-4 rounded-2xl border border-border bg-[color:var(--surface-2)] p-4">
+              <p className="text-sm font-medium text-text-h">Sin tiempo imputado en este periodo</p>
+              <p className="mt-1 text-sm text-text">
+                Registra sesiones en el periodo ({appliedRangeLabel}) o ajusta las fechas y pulsa «Recalcular porcentajes».
+              </p>
+            </div>
+          )}
+
+          <p className="mt-2 text-xs text-text">
+            Total imputado ({appliedRangeLabel}): {formatDurationHuman(percentStats.totalMinutes)}
+          </p>
         </Card>
 
         <Card className="p-5">
