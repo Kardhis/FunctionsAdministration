@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthContext.jsx'
 import { useTasksStore } from './store/tasksStore.js'
+import TasksToastHost from './ui/TasksToastHost.jsx'
 
 const ROUTE_TITLES = {
   list:        'Totes les tasques',
@@ -36,16 +37,15 @@ export default function TasksAppLayout() {
   const bootstrap = useTasksStore((s) => s.bootstrap)
   const resetSession = useTasksStore((s) => s.resetSession)
   const bootstrapError = useTasksStore((s) => s.bootstrapError)
-  const toasts = useTasksStore((s) => s.toasts)
-  const dismissToastById = useTasksStore((s) => s.dismissToastById)
   const prevUserRef = useRef(null)
 
   useEffect(() => {
     if (status !== 'authenticated' || !user) return
-    if (prevUserRef.current !== user) {
+    const prevUser = prevUserRef.current
+    if (prevUser != null && prevUser !== user) {
       resetSession()
-      prevUserRef.current = user
     }
+    prevUserRef.current = user
     bootstrap()
   }, [bootstrap, resetSession, user, status])
 
@@ -83,38 +83,7 @@ export default function TasksAppLayout() {
         </div>
       )}
 
-      {/* Toast notifications */}
-      {toasts.length > 0 && (
-        <div
-          className="fixed right-4 z-[60] flex w-[min(420px,calc(100dvw-2rem))] flex-col gap-2"
-          style={{ bottom: 'max(1rem, env(safe-area-inset-bottom, 0px))' }}
-          aria-live="polite"
-        >
-          {toasts.map((t, idx) => (
-            <div
-              key={t.id ?? `toast-${idx}`}
-              className={[
-                'rounded-2xl border px-4 py-3 text-sm backdrop-blur-md',
-                t.kind === 'success'
-                  ? 'border-border bg-bg/90 text-text-h'
-                  : 'border-border bg-bg/90 text-danger',
-              ].join(' ')}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <p className="font-medium">{t.message}</p>
-                <button
-                  type="button"
-                  className="inline-flex min-h-11 min-w-[44px] items-center justify-center text-text-h/70 hover:text-text-h"
-                  onClick={() => dismissToastById(t.id)}
-                  aria-label="Tancar notificació"
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <TasksToastHost />
 
       <Outlet />
     </div>

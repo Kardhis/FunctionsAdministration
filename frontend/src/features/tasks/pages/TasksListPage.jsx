@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Card from '../../../components/Card.jsx'
 import Button from '../../../components/Button.jsx'
 import Pagination from '../../../components/Pagination.jsx'
@@ -41,6 +41,7 @@ export default function TasksListPage() {
   const [editing,      setEditing]      = useState(null)
   const [deleting,     setDeleting]     = useState(null)
   const [actionLoading,setActionLoading]= useState(false)
+  const createInFlightRef = useRef(false)
 
   async function refresh(p = page) {
     setLoading(true)
@@ -77,13 +78,19 @@ export default function TasksListPage() {
   }, [page])
 
   async function handleCreate(values) {
+    if (createInFlightRef.current) {
+      return { ok: false, error: 'create_in_flight' }
+    }
+    createInFlightRef.current = true
     try {
       await createTask(buildPayload(values))
-      await refresh()
       addToast('Tasca creada correctament')
+      void refresh()
       return { ok: true }
     } catch (e) {
       return { ok: false, error: e.message }
+    } finally {
+      createInFlightRef.current = false
     }
   }
 
