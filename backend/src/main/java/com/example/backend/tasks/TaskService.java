@@ -109,6 +109,7 @@ public class TaskService {
   public PagedTasksResponse findFiltered(
       Long userId,
       String status,
+      boolean includeAll,
       Long projectId,
       Long categoryId,
       Boolean important,
@@ -120,10 +121,20 @@ public class TaskService {
 
     String titleQuery = (q != null && !q.isBlank()) ? "%" + q.trim().toLowerCase() + "%" : null;
     Pageable pageable = PageRequest.of(page, Math.min(size, 100));
+    String statusCode = emptyToNull(status);
 
-    Page<Task> result = taskRepository.findFiltered(
-        userId, emptyToNull(status), projectId, categoryId,
-        important, urgent, isRecurring, titleQuery, pageable);
+    Page<Task> result;
+    if (statusCode != null) {
+      result = taskRepository.findFilteredByStatus(
+          userId, statusCode, projectId, categoryId,
+          important, urgent, isRecurring, titleQuery, pageable);
+    } else if (includeAll) {
+      result = taskRepository.findFilteredAll(
+          userId, projectId, categoryId, important, urgent, isRecurring, titleQuery, pageable);
+    } else {
+      result = taskRepository.findFilteredExcludingCompleted(
+          userId, projectId, categoryId, important, urgent, isRecurring, titleQuery, pageable);
+    }
 
     LocalDate today = LocalDate.now();
     List<TaskDto> content = result.getContent().stream().map(t -> toDto(t, today)).toList();
@@ -296,6 +307,8 @@ public class TaskService {
     if (req.recurrenceEndDate() != null)  t.setRecurrenceEndDate(req.recurrenceEndDate());
     if (Boolean.TRUE.equals(req.clearRecurrenceEndDate())) t.setRecurrenceEndDate(null);
 
+    applyPlannedDateStatusTransition(t);
+
     t.setUpdatedAt(Instant.now());
     return toDto(taskRepository.save(t), LocalDate.now());
   }
@@ -390,13 +403,7 @@ public class TaskService {
     Task t = requireTask(taskId, userId);
     t.setPlannedDate(plannedDate);
     t.setPlannedTime(plannedTime);
-    String currentCode = t.getStatus().getCode();
-    if (plannedDate != null && "BACKLOG".equals(currentCode)) {
-      t.setStatus(requireStatus("PLANIFICADA"));
-    }
-    if (plannedDate == null && "PLANIFICADA".equals(currentCode)) {
-      t.setStatus(requireStatus("PENDIENTE"));
-    }
+    applyPlannedDateStatusTransition(t);
     t.setUpdatedAt(Instant.now());
     return toDto(taskRepository.save(t), LocalDate.now());
   }
@@ -476,6 +483,27 @@ public class TaskService {
     if (!allowed.contains(to)) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid_status_transition");
     }
+  }
+
+  /** Sync status with planned date after create/update/schedule. */
+  private void applyPlannedDateStatusTransition(Task t) {
+    String currentCode = t.getStatus().getCode();
+    if (t.getPlannedDate() != null) {
+      if ("BACKLOG".equals(currentCode) || "PENDIENTE".equals(currentCode)) {
+        transitionStatus(t, "PLANIFICADA");
+      }
+    } else if ("PLANIFICADA".equals(currentCode)) {
+      transitionStatus(t, "BACKLOG");
+    }
+  }
+
+  private void transitionStatus(Task t, String targetCode) {
+    String from = t.getStatus().getCode();
+    if (from.equals(targetCode)) {
+      return;
+    }
+    validateTransition(from, targetCode);
+    t.setStatus(requireStatus(targetCode));
   }
 
   private TaskProject resolveProject(Long projectId, Long userId) {

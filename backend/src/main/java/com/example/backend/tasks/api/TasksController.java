@@ -44,6 +44,7 @@ public class TasksController {
   @GetMapping
   public PagedTasksResponse list(
       @RequestParam(required = false) String status,
+      @RequestParam(required = false, defaultValue = "false") boolean includeAll,
       @RequestParam(required = false) Long projectId,
       @RequestParam(required = false) Long categoryId,
       @RequestParam(required = false) Boolean important,
@@ -55,7 +56,7 @@ public class TasksController {
       Principal principal) {
     var user = currentUserService.requireUser(principal);
     return taskService.findFiltered(
-        user.getId(), status, projectId, categoryId,
+        user.getId(), status, includeAll, projectId, categoryId,
         important, urgent, recurring, q, page, size);
   }
 

@@ -13,12 +13,12 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
   Optional<Task> findByIdAndUserIdAndDeletedAtIsNull(Long id, Long userId);
 
-  // Paginated filtered list — all optional filters use status.code
+  // Paginated filtered list — specific status filter
   @Query(value = """
       SELECT t FROM Task t
       WHERE t.user.id = :userId
         AND t.deletedAt IS NULL
-        AND (:statusCode IS NULL OR t.status.code = :statusCode)
+        AND t.status.code = :statusCode
         AND (:projectId IS NULL OR t.project.id = :projectId)
         AND (:categoryId IS NULL OR t.category.id = :categoryId)
         AND (:important IS NULL OR t.important = :important)
@@ -31,7 +31,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
       SELECT COUNT(t) FROM Task t
       WHERE t.user.id = :userId
         AND t.deletedAt IS NULL
-        AND (:statusCode IS NULL OR t.status.code = :statusCode)
+        AND t.status.code = :statusCode
         AND (:projectId IS NULL OR t.project.id = :projectId)
         AND (:categoryId IS NULL OR t.category.id = :categoryId)
         AND (:important IS NULL OR t.important = :important)
@@ -39,9 +39,79 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
         AND (:isRecurring IS NULL OR t.recurring = :isRecurring)
         AND (:titleQuery IS NULL OR LOWER(t.title) LIKE :titleQuery)
       """)
-  Page<Task> findFiltered(
+  Page<Task> findFilteredByStatus(
       @Param("userId") Long userId,
       @Param("statusCode") String statusCode,
+      @Param("projectId") Long projectId,
+      @Param("categoryId") Long categoryId,
+      @Param("important") Boolean important,
+      @Param("urgent") Boolean urgent,
+      @Param("isRecurring") Boolean isRecurring,
+      @Param("titleQuery") String titleQuery,
+      Pageable pageable);
+
+  // Paginated filtered list — all statuses (no status filter)
+  @Query(value = """
+      SELECT t FROM Task t
+      WHERE t.user.id = :userId
+        AND t.deletedAt IS NULL
+        AND (:projectId IS NULL OR t.project.id = :projectId)
+        AND (:categoryId IS NULL OR t.category.id = :categoryId)
+        AND (:important IS NULL OR t.important = :important)
+        AND (:urgent IS NULL OR t.urgent = :urgent)
+        AND (:isRecurring IS NULL OR t.recurring = :isRecurring)
+        AND (:titleQuery IS NULL OR LOWER(t.title) LIKE :titleQuery)
+      ORDER BY t.plannedDate ASC NULLS LAST, t.plannedTime ASC NULLS LAST, t.id ASC
+      """,
+      countQuery = """
+      SELECT COUNT(t) FROM Task t
+      WHERE t.user.id = :userId
+        AND t.deletedAt IS NULL
+        AND (:projectId IS NULL OR t.project.id = :projectId)
+        AND (:categoryId IS NULL OR t.category.id = :categoryId)
+        AND (:important IS NULL OR t.important = :important)
+        AND (:urgent IS NULL OR t.urgent = :urgent)
+        AND (:isRecurring IS NULL OR t.recurring = :isRecurring)
+        AND (:titleQuery IS NULL OR LOWER(t.title) LIKE :titleQuery)
+      """)
+  Page<Task> findFilteredAll(
+      @Param("userId") Long userId,
+      @Param("projectId") Long projectId,
+      @Param("categoryId") Long categoryId,
+      @Param("important") Boolean important,
+      @Param("urgent") Boolean urgent,
+      @Param("isRecurring") Boolean isRecurring,
+      @Param("titleQuery") String titleQuery,
+      Pageable pageable);
+
+  // Paginated filtered list — default view excludes completed tasks
+  @Query(value = """
+      SELECT t FROM Task t
+      WHERE t.user.id = :userId
+        AND t.deletedAt IS NULL
+        AND t.status.code <> 'COMPLETADA'
+        AND (:projectId IS NULL OR t.project.id = :projectId)
+        AND (:categoryId IS NULL OR t.category.id = :categoryId)
+        AND (:important IS NULL OR t.important = :important)
+        AND (:urgent IS NULL OR t.urgent = :urgent)
+        AND (:isRecurring IS NULL OR t.recurring = :isRecurring)
+        AND (:titleQuery IS NULL OR LOWER(t.title) LIKE :titleQuery)
+      ORDER BY t.plannedDate ASC NULLS LAST, t.plannedTime ASC NULLS LAST, t.id ASC
+      """,
+      countQuery = """
+      SELECT COUNT(t) FROM Task t
+      WHERE t.user.id = :userId
+        AND t.deletedAt IS NULL
+        AND t.status.code <> 'COMPLETADA'
+        AND (:projectId IS NULL OR t.project.id = :projectId)
+        AND (:categoryId IS NULL OR t.category.id = :categoryId)
+        AND (:important IS NULL OR t.important = :important)
+        AND (:urgent IS NULL OR t.urgent = :urgent)
+        AND (:isRecurring IS NULL OR t.recurring = :isRecurring)
+        AND (:titleQuery IS NULL OR LOWER(t.title) LIKE :titleQuery)
+      """)
+  Page<Task> findFilteredExcludingCompleted(
+      @Param("userId") Long userId,
       @Param("projectId") Long projectId,
       @Param("categoryId") Long categoryId,
       @Param("important") Boolean important,

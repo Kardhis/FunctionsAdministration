@@ -3,6 +3,7 @@ import { apiFetch } from '../../../data/api.js'
 /** @param {object} params */
 export async function listTasks({
   status,
+  includeAll,
   projectId,
   categoryId,
   important,
@@ -14,6 +15,7 @@ export async function listTasks({
 } = {}) {
   const params = new URLSearchParams()
   if (status)                        params.set('status', status)
+  if (includeAll)                    params.set('includeAll', 'true')
   if (projectId != null)             params.set('projectId', projectId)
   if (categoryId != null)            params.set('categoryId', categoryId)
   if (important != null)             params.set('important', important)

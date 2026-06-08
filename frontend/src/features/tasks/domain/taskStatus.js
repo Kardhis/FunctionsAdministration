@@ -1,3 +1,6 @@
+export const STATUS_FILTER_ACTIVE = ''
+export const STATUS_FILTER_ALL = '__ALL__'
+
 export const TASK_STATUSES = [
   { value: 'BACKLOG',     label: 'Backlog',      tone: 'neutral' },
   { value: 'PENDIENTE',   label: 'Pendent',      tone: 'neutral' },
