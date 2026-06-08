@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import Card from '../../../components/Card.jsx'
 import Button from '../../../components/Button.jsx'
 import { useTasksStore } from '../store/tasksStore.js'
-import { getBacklog, completeTask, cancelTask, deleteTask, scheduleTask, createTask } from '../data/tasksRepo.js'
+import { getBacklog, completeTask, cancelTask, deleteTask, scheduleTask, createTask, updateTask } from '../data/tasksRepo.js'
+import { buildTaskUpdatePayload } from '../domain/taskPayload.js'
 import TaskCard from '../ui/TaskCard.jsx'
 import TaskFormModal from '../ui/TaskFormModal.jsx'
 import ConfirmActionModal from '../ui/ConfirmActionModal.jsx'
@@ -87,8 +88,7 @@ export default function TasksBacklogPage() {
         onClose={() => setEditing(null)}
         onSubmit={async (values) => {
           try {
-            const { updateTask } = await import('../data/tasksRepo.js')
-            await updateTask(editing.id, values)
+            await updateTask(editing.id, buildTaskUpdatePayload(values))
             await refresh(page)
             addToast('Tasca actualitzada')
             return { ok: true }

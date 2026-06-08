@@ -12,7 +12,8 @@ import {
 import TaskFormModal from '../ui/TaskFormModal.jsx'
 import TaskStatusBadge from '../ui/TaskStatusBadge.jsx'
 import ConfirmActionModal from '../ui/ConfirmActionModal.jsx'
-import { TASK_STATUSES, isFinal } from '../domain/taskStatus.js'
+import { TASK_STATUSES, STATUS_FILTER_ACTIVE, STATUS_FILTER_ALL, isFinal } from '../domain/taskStatus.js'
+import { buildTaskUpdatePayload } from '../domain/taskPayload.js'
 
 const PAGE_SIZE = 25
 
@@ -22,7 +23,7 @@ export default function TasksListPage() {
   const addToast    = useTasksStore((s) => s.addToast)
 
   // Filters
-  const [filterStatus,    setFilterStatus]    = useState('')
+  const [filterStatus,    setFilterStatus]    = useState(STATUS_FILTER_ACTIVE)
   const [filterProjectId, setFilterProjectId] = useState('')
   const [filterCategoryId,setFilterCategoryId]= useState('')
   const [filterImportant, setFilterImportant] = useState('')
@@ -48,7 +49,10 @@ export default function TasksListPage() {
     setError('')
     try {
       const data = await listTasks({
-        status:     filterStatus     || undefined,
+        status:     filterStatus !== STATUS_FILTER_ACTIVE && filterStatus !== STATUS_FILTER_ALL
+          ? filterStatus
+          : undefined,
+        includeAll: filterStatus === STATUS_FILTER_ALL,
         projectId:  filterProjectId  ? Number(filterProjectId)  : undefined,
         categoryId: filterCategoryId ? Number(filterCategoryId) : undefined,
         important:  filterImportant !== '' ? filterImportant === 'true' : undefined,
@@ -95,7 +99,7 @@ export default function TasksListPage() {
   }
 
   async function handleUpdate(values) {
-    const payload = buildPayload(values)
+    const payload = buildTaskUpdatePayload(values)
     try {
       await updateTask(editing.id, payload)
       await refresh()
@@ -194,7 +198,8 @@ export default function TasksListPage() {
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
             >
-              <option value="">Tots</option>
+              <option value={STATUS_FILTER_ACTIVE}>Actives</option>
+              <option value={STATUS_FILTER_ALL}>Tots</option>
               {TASK_STATUSES.map((s) => (
                 <option key={s.value} value={s.value}>{s.label}</option>
               ))}
