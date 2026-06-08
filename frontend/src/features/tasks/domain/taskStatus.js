@@ -23,6 +23,11 @@ export function isFinal(status) {
   return FINAL_STATUSES.has(status)
 }
 
+/** @param {string} status */
+export function canComplete(status) {
+  return !FINAL_STATUSES.has(status) && status !== 'BACKLOG'
+}
+
 /** @param {object} task */
 export function isOverdue(task) {
   if (!task.dueDate || FINAL_STATUSES.has(task.status)) return false

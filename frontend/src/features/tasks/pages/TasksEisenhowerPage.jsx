@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import Button from '../../../components/Button.jsx'
 import { useTasksStore } from '../store/tasksStore.js'
-import { getEisenhower, classifyTask, completeTask } from '../data/tasksRepo.js'
+import { getEisenhower, classifyTask, completeTask, updateTask } from '../data/tasksRepo.js'
+import TaskFormModal from '../ui/TaskFormModal.jsx'
 import TaskStatusBadge from '../ui/TaskStatusBadge.jsx'
-import { EISENHOWER_QUADRANTS } from '../domain/taskStatus.js'
+import { EISENHOWER_QUADRANTS, canComplete } from '../domain/taskStatus.js'
+import { buildTaskUpdatePayload } from '../domain/taskPayload.js'
 
 const QUADRANT_ACCENT = {
   importantUrgent:       'border-[color:var(--danger-border)] bg-[color:var(--danger-bg)]',
@@ -39,12 +41,15 @@ function fmtDate(iso) {
 }
 
 export default function TasksEisenhowerPage() {
-  const addToast = useTasksStore((s) => s.addToast)
+  const projects   = useTasksStore((s) => s.projects)
+  const categories = useTasksStore((s) => s.categories)
+  const addToast   = useTasksStore((s) => s.addToast)
 
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState('')
   const [data,    setData]    = useState(EMPTY_DATA)
   const [dragOverKey, setDragOverKey] = useState(null)
+  const [editing, setEditing] = useState(null)
 
   const draggedRef = useRef(null)
 
@@ -94,6 +99,19 @@ export default function TasksEisenhowerPage() {
     }
   }
 
+  async function handleUpdate(values) {
+    const payload = buildTaskUpdatePayload(values)
+    try {
+      await updateTask(editing.id, payload)
+      setEditing(null)
+      await refresh()
+      addToast('Tasca actualitzada')
+      return { ok: true }
+    } catch (e) {
+      return { ok: false, error: e.message }
+    }
+  }
+
   function handleDragStart(task, sourceKey) {
     draggedRef.current = { task, sourceKey }
   }
@@ -113,6 +131,16 @@ export default function TasksEisenhowerPage() {
 
   return (
     <div className="space-y-6">
+      <TaskFormModal
+        open={Boolean(editing)}
+        mode="edit"
+        initial={editing}
+        projects={projects}
+        categories={categories}
+        onClose={() => setEditing(null)}
+        onSubmit={handleUpdate}
+      />
+
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-text">Priorització</p>
@@ -172,6 +200,7 @@ export default function TasksEisenhowerPage() {
                     onComplete={handleComplete}
                     onUnclassify={handleUnclassify}
                     onMove={moveToQuadrant}
+                    onEdit={setEditing}
                   />
                 ))}
               </div>
@@ -190,14 +219,22 @@ export default function TasksEisenhowerPage() {
             {data.unclassified.map((t) => (
               <div
                 key={t.id}
-                draggable
-                onDragStart={() => handleDragStart(t, 'unclassified')}
-                onDragEnd={handleDragEnd}
-                className="flex cursor-grab flex-col gap-3 rounded-2xl border border-border bg-bg/60 p-3 active:cursor-grabbing sm:flex-row sm:items-center sm:justify-between"
+                className="flex cursor-default flex-col gap-3 rounded-2xl border border-border bg-bg/60 p-3 sm:flex-row sm:items-center sm:justify-between"
               >
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-text-h">{t.title}</p>
-                  <TaskStatusBadge status={t.status} className="mt-1" />
+                <div className="flex min-w-0 items-start gap-2">
+                  <DragHandle
+                    label={`Arrossegar "${t.title}"`}
+                    onDragStart={() => handleDragStart(t, 'unclassified')}
+                    onDragEnd={handleDragEnd}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setEditing(t)}
+                    className="min-w-0 rounded-lg text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)]"
+                  >
+                    <p className="text-sm font-medium text-text-h">{t.title}</p>
+                    <TaskStatusBadge status={t.status} className="mt-1" />
+                  </button>
                 </div>
                 <div className="flex shrink-0 flex-wrap gap-1.5">
                   {EISENHOWER_QUADRANTS.map((q) => (
@@ -223,10 +260,34 @@ export default function TasksEisenhowerPage() {
 }
 
 /**
+ * Drag handle for Eisenhower task items.
+ */
+function DragHandle({ onDragStart, onDragEnd, label }) {
+  return (
+    <div
+      draggable
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+      aria-label={label}
+      className="mt-0.5 shrink-0 cursor-grab rounded p-0.5 text-text/20 active:cursor-grabbing hover:text-text/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)]"
+    >
+      <svg aria-hidden className="h-4 w-3" fill="currentColor" viewBox="0 0 8 12">
+        <circle cx="2" cy="2" r="1.5" />
+        <circle cx="6" cy="2" r="1.5" />
+        <circle cx="2" cy="6" r="1.5" />
+        <circle cx="6" cy="6" r="1.5" />
+        <circle cx="2" cy="10" r="1.5" />
+        <circle cx="6" cy="10" r="1.5" />
+      </svg>
+    </div>
+  )
+}
+
+/**
  * Single draggable task inside a quadrant, with accessible keyboard fallback
  * to move it to the other quadrants.
  */
-function TaskItem({ task, sourceKey, accentColor, onDragStart, onDragEnd, onComplete, onUnclassify, onMove }) {
+function TaskItem({ task, sourceKey, accentColor, onDragStart, onDragEnd, onComplete, onUnclassify, onMove, onEdit }) {
   const [isDragging, setIsDragging] = useState(false)
   const targets = EISENHOWER_QUADRANTS.filter((q) => q.key !== sourceKey)
   const color = accentColor ?? 'var(--border-strong)'
@@ -243,18 +304,14 @@ function TaskItem({ task, sourceKey, accentColor, onDragStart, onDragEnd, onComp
 
   return (
     <div
-      draggable
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
       style={{ '--item-accent': color }}
       className={[
-        'group relative cursor-grab select-none overflow-hidden rounded-xl',
+        'group relative select-none overflow-hidden rounded-xl',
         'border border-[color:var(--border-strong)] bg-[color:var(--surface)]',
         'backdrop-blur-sm',
         'transition-all duration-200 ease-out',
         'hover:-translate-y-px hover:border-[color:var(--item-accent)]',
         'hover:bg-[color:var(--surface-2)] hover:shadow-[0_6px_24px_rgba(0,0,0,0.22)]',
-        'active:cursor-grabbing',
         isDragging
           ? 'rotate-[0.8deg] scale-[0.96] opacity-40 shadow-2xl'
           : 'opacity-100',
@@ -268,37 +325,53 @@ function TaskItem({ task, sourceKey, accentColor, onDragStart, onDragEnd, onComp
       />
 
       <div className="flex items-start gap-2 px-3 py-2.5 pl-4">
-        {/* Drag handle */}
-        <svg
-          aria-hidden
-          className="mt-[3px] h-4 w-3 shrink-0 text-text/20 transition-colors duration-200 group-hover:text-[color:var(--item-accent)]"
-          fill="currentColor"
-          viewBox="0 0 8 12"
-        >
-          <circle cx="2" cy="2" r="1.5" />
-          <circle cx="6" cy="2" r="1.5" />
-          <circle cx="2" cy="6" r="1.5" />
-          <circle cx="6" cy="6" r="1.5" />
-          <circle cx="2" cy="10" r="1.5" />
-          <circle cx="6" cy="10" r="1.5" />
-        </svg>
+        <DragHandle
+          label={`Arrossegar "${task.title}"`}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        />
 
         <div className="min-w-0 flex-1">
           {/* Title row + action buttons */}
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
-              <div className="flex items-baseline gap-2 min-w-0">
-                <p className="truncate text-sm font-semibold leading-snug text-text-h">
-                  {task.title}
-                </p>
-                {task.description && (
-                  <p className="min-w-0 flex-1 truncate text-xs text-text/70">
-                    {task.description}
+              <button
+                type="button"
+                onClick={() => onEdit(task)}
+                className="w-full rounded-lg text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)]"
+              >
+                <div className="flex items-baseline gap-2 min-w-0">
+                  <p className="truncate text-sm font-semibold leading-snug text-text-h">
+                    {task.title}
                   </p>
-                )}
-              </div>
+                  {task.description && (
+                    <p className="min-w-0 flex-1 truncate text-xs text-text/70">
+                      {task.description}
+                    </p>
+                  )}
+                </div>
+                <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                  <TaskStatusBadge status={task.status} />
+                  {task.plannedDate && (
+                    <span className="rounded-full bg-[color:var(--surface-3)] px-2 py-0.5 text-xs text-text/60 tabular-nums">
+                      {fmtDate(task.plannedDate)}{task.plannedTime ? ` ${task.plannedTime.slice(0, 5)}` : ''}
+                    </span>
+                  )}
+                  {task.recurring && (
+                    <span className="rounded-full bg-[color:var(--surface-3)] px-2 py-0.5 text-xs text-text/60">
+                      ↺ Recurrent
+                    </span>
+                  )}
+                  {task.overdue && (
+                    <span className="rounded-full bg-[color:var(--danger-bg)] px-2 py-0.5 text-xs font-semibold text-danger">
+                      ! Vencuda
+                    </span>
+                  )}
+                </div>
+              </button>
             </div>
             <div className="flex shrink-0 gap-0.5 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100">
+              {canComplete(task.status) && (
               <Button
                 type="button"
                 variant="secondary"
@@ -308,6 +381,7 @@ function TaskItem({ task, sourceKey, accentColor, onDragStart, onDragEnd, onComp
               >
                 ✓
               </Button>
+              )}
               <Button
                 type="button"
                 variant="secondary"
@@ -318,26 +392,6 @@ function TaskItem({ task, sourceKey, accentColor, onDragStart, onDragEnd, onComp
                 ×
               </Button>
             </div>
-          </div>
-
-          {/* Meta pills */}
-          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-            <TaskStatusBadge status={task.status} />
-            {task.plannedDate && (
-              <span className="rounded-full bg-[color:var(--surface-3)] px-2 py-0.5 text-xs text-text/60 tabular-nums">
-                {fmtDate(task.plannedDate)}{task.plannedTime ? ` ${task.plannedTime.slice(0, 5)}` : ''}
-              </span>
-            )}
-            {task.recurring && (
-              <span className="rounded-full bg-[color:var(--surface-3)] px-2 py-0.5 text-xs text-text/60">
-                ↺ Recurrent
-              </span>
-            )}
-            {task.overdue && (
-              <span className="rounded-full bg-[color:var(--danger-bg)] px-2 py-0.5 text-xs font-semibold text-danger">
-                ! Vencuda
-              </span>
-            )}
           </div>
 
           {/* Move-to buttons (revealed on hover / focus) */}

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import Card from '../../../components/Card.jsx'
 import Button from '../../../components/Button.jsx'
 import { useTasksStore } from '../store/tasksStore.js'
-import { getBacklog, completeTask, cancelTask, deleteTask, scheduleTask, createTask, updateTask } from '../data/tasksRepo.js'
+import { getBacklog, cancelTask, deleteTask, scheduleTask, createTask, updateTask } from '../data/tasksRepo.js'
 import { buildTaskUpdatePayload } from '../domain/taskPayload.js'
 import TaskCard from '../ui/TaskCard.jsx'
 import TaskFormModal from '../ui/TaskFormModal.jsx'
@@ -145,9 +145,6 @@ export default function TasksBacklogPage() {
                 <div className="flex shrink-0 flex-wrap gap-2">
                   <Button type="button" variant="primary" size="sm" onClick={() => handlePlanToday(t)}>Planificar avui</Button>
                   <Button type="button" variant="secondary" size="sm" onClick={() => setEditing(t)}>Editar</Button>
-                  <Button type="button" variant="secondary" size="sm" onClick={async () => {
-                    await completeTask(t.id); addToast('Tasca completada'); await refresh(page)
-                  }}>Completar</Button>
                   <Button type="button" variant="danger" size="sm" onClick={() => setDeleting(t)}>Eliminar</Button>
                 </div>
               </div>

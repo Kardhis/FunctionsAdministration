@@ -1,6 +1,6 @@
 import Button from '../../../components/Button.jsx'
 import TaskStatusBadge from './TaskStatusBadge.jsx'
-import { isFinal } from '../domain/taskStatus.js'
+import { isFinal, canComplete } from '../domain/taskStatus.js'
 
 function fmtDate(iso) {
   if (!iso) return null
@@ -44,7 +44,7 @@ export default function TaskCard({
     >
       <div className="flex items-start gap-3">
         {/* Complete checkbox / indicator */}
-        {onComplete && !final && (
+        {onComplete && canComplete(task.status) && (
           <button
             type="button"
             aria-label="Completar tasca"
@@ -157,7 +157,7 @@ export default function TaskCard({
               Editar
             </Button>
           )}
-          {onComplete && !final && (
+          {onComplete && canComplete(task.status) && (
             <Button type="button" variant="secondary" size="sm" onClick={() => onComplete(task)}>
               Completar
             </Button>

@@ -12,7 +12,7 @@ import {
 import TaskFormModal from '../ui/TaskFormModal.jsx'
 import TaskStatusBadge from '../ui/TaskStatusBadge.jsx'
 import ConfirmActionModal from '../ui/ConfirmActionModal.jsx'
-import { TASK_STATUSES, STATUS_FILTER_ACTIVE, STATUS_FILTER_ALL, isFinal } from '../domain/taskStatus.js'
+import { TASK_STATUSES, STATUS_FILTER_ACTIVE, STATUS_FILTER_ALL, isFinal, canComplete } from '../domain/taskStatus.js'
 import { buildTaskUpdatePayload } from '../domain/taskPayload.js'
 
 const PAGE_SIZE = 25
@@ -290,7 +290,7 @@ export default function TasksListPage() {
               {t.dueDate && <p className={['mt-0.5 text-xs', t.overdue && !isFinal(t.status) ? 'text-danger' : 'text-text'].join(' ')}>Límit: {fmtDate(t.dueDate)}</p>}
               <div className="mt-3 flex flex-wrap gap-2">
                 <Button type="button" variant="secondary" size="sm" className="min-h-11" onClick={() => setEditing(t)}>Editar</Button>
-                {!isFinal(t.status) && (
+                {canComplete(t.status) && (
                   <Button type="button" variant="secondary" size="sm" className="min-h-11" onClick={() => handleAction(completeTask, t, 'Tasca completada')}>Completar</Button>
                 )}
                 {isFinal(t.status) && (
@@ -359,7 +359,7 @@ export default function TasksListPage() {
                   <td className="px-2 py-2 text-center">
                     <div className="flex flex-wrap justify-center gap-1">
                       <Button type="button" variant="secondary" size="xs" onClick={() => setEditing(t)}>Editar</Button>
-                      {!isFinal(t.status) && (
+                      {canComplete(t.status) && (
                         <Button type="button" variant="secondary" size="xs" onClick={() => handleAction(completeTask, t, 'Tasca completada')}>Completar</Button>
                       )}
                       {!isFinal(t.status) && (
