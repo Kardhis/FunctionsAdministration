@@ -3,7 +3,7 @@ import Button from '../../../components/Button.jsx'
 import { useTasksStore } from '../store/tasksStore.js'
 import { getCalendarTasks, scheduleTask, completeTask } from '../data/tasksRepo.js'
 import TaskStatusBadge from '../ui/TaskStatusBadge.jsx'
-import { isFinal } from '../domain/taskStatus.js'
+import { isFinal, canComplete } from '../domain/taskStatus.js'
 
 function getWeekDates(baseDate) {
   const d = new Date(baseDate)
@@ -170,7 +170,7 @@ export default function TasksCalendarPage() {
                       </p>
                       <div className="mt-1 flex items-center justify-between">
                         <TaskStatusBadge status={t.status} />
-                        {!isFinal(t.status) && (
+                        {!isFinal(t.status) && canComplete(t.status) && (
                           <button
                             type="button"
                             className="text-[10px] text-text/60 hover:text-[color:var(--accent)] focus:outline-none"

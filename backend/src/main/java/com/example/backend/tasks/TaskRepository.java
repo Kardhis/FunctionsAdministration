@@ -84,12 +84,12 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
       @Param("titleQuery") String titleQuery,
       Pageable pageable);
 
-  // Paginated filtered list — default view excludes completed tasks
+  // Paginated filtered list — default view excludes final statuses
   @Query(value = """
       SELECT t FROM Task t
       WHERE t.user.id = :userId
         AND t.deletedAt IS NULL
-        AND t.status.code <> 'COMPLETADA'
+        AND t.status.code NOT IN ('COMPLETADA', 'CANCELADA')
         AND (:projectId IS NULL OR t.project.id = :projectId)
         AND (:categoryId IS NULL OR t.category.id = :categoryId)
         AND (:important IS NULL OR t.important = :important)
@@ -102,7 +102,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
       SELECT COUNT(t) FROM Task t
       WHERE t.user.id = :userId
         AND t.deletedAt IS NULL
-        AND t.status.code <> 'COMPLETADA'
+        AND t.status.code NOT IN ('COMPLETADA', 'CANCELADA')
         AND (:projectId IS NULL OR t.project.id = :projectId)
         AND (:categoryId IS NULL OR t.category.id = :categoryId)
         AND (:important IS NULL OR t.important = :important)
