@@ -1,0 +1,44 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 8
+  mail:
+    host: localhost
+    port: 3025
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration
+
+app:
+  jwt:
+    secret: test-jwt-secret-must-be-at-least-256-bits-for-hs256-safety-pad
+    expires-seconds: 3600
+  auth:
+    cookie-name: access_token
+    cookie-secure: false
+    cookie-same-site: Lax
+  demo:
+    seed-user: false
+  frontend:
+    base-url: http://localhost:5173
+  cors:
+    allowed-origins: http://localhost:5173
+  password-reset:
+    token-validity-seconds: 3600
+    mail-from: test@example.com
+    mail-subject: Test reset
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+logging:
+  level:
+    org.flywaydb: WARN

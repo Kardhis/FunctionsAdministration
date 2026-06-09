@@ -7,7 +7,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -22,6 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -121,5 +125,85 @@ class AuthControllerAuthEndpointsTest {
         .andExpect(status().isOk());
 
     verify(userRegistrationService, never()).register(any());
+  }
+
+  @Test
+  void loginRejectsUnknownUser() throws Exception {
+    when(userRepository.findByEmailIgnoreCase("missing@example.com")).thenReturn(Optional.empty());
+
+    mockMvc
+        .perform(
+            post("/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"email\":\"missing@example.com\",\"password\":\"password12\"}"))
+        .andExpect(status().isUnauthorized())
+        .andExpect(jsonPath("$.error").value("invalid_credentials"));
+
+    verify(passwordEncoder, never()).matches(anyString(), anyString());
+  }
+
+  @Test
+  void loginRejectsWrongPassword() throws Exception {
+    User u = mock(User.class);
+    when(u.isActive()).thenReturn(true);
+    when(u.getPasswordHash()).thenReturn("hash");
+    when(userRepository.findByEmailIgnoreCase("a@b.com")).thenReturn(Optional.of(u));
+    when(passwordEncoder.matches("wrong", "hash")).thenReturn(false);
+
+    mockMvc
+        .perform(
+            post("/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"email\":\"a@b.com\",\"password\":\"wrong\"}"))
+        .andExpect(status().isUnauthorized())
+        .andExpect(jsonPath("$.error").value("invalid_credentials"));
+
+    verify(jwtService, never()).createToken(anyString(), any());
+  }
+
+  @Test
+  void loginRejectsInactiveUser() throws Exception {
+    User u = mock(User.class);
+    when(userRepository.findByEmailIgnoreCase("inactive@example.com")).thenReturn(Optional.of(u));
+
+    mockMvc
+        .perform(
+            post("/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"email\":\"inactive@example.com\",\"password\":\"password12\"}"))
+        .andExpect(status().isForbidden())
+        .andExpect(jsonPath("$.error").value("account_inactive"));
+
+    verify(jwtService, never()).createToken(anyString(), any());
+  }
+
+  @Test
+  void meReturnsUserAndRefreshesCookie() throws Exception {
+    User u = mock(User.class);
+    when(u.getId()).thenReturn(1L);
+    when(u.getEmail()).thenReturn("a@b.com");
+    when(u.isActive()).thenReturn(true);
+    when(userRepository.findByEmailIgnoreCase("a@b.com")).thenReturn(Optional.of(u));
+    when(userRoleRepository.findRoleNamesByUserId(1L)).thenReturn(java.util.List.of("USER"));
+    when(jwtService.createToken("a@b.com", java.util.List.of("USER"))).thenReturn("fresh-jwt");
+
+    mockMvc
+        .perform(
+            get("/auth/me")
+                .principal(new UsernamePasswordAuthenticationToken("a@b.com", null)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.user").value("a@b.com"))
+        .andExpect(jsonPath("$.roles[0]").value("USER"))
+        .andExpect(header().string("Set-Cookie", containsString("access_token=fresh-jwt")));
+  }
+
+  @Test
+  void logoutClearsCookie() throws Exception {
+    mockMvc
+        .perform(post("/auth/logout"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.message").value("logout_ok"))
+        .andExpect(header().string("Set-Cookie", containsString("access_token=")))
+        .andExpect(header().string("Set-Cookie", containsString("Max-Age=0")));
   }
 }
