@@ -67,7 +67,9 @@ En producción: cookie `Secure`, OpenAPI desactivado, semilla demo desactivada.
 
 ## Tests y cobertura
 
-**Backend**
+Objetivos (testing-agent): **≥80%** cobertura global; **≥90%** en servicios, seguridad y validación.
+
+**Backend** (~177 tests; integración con Testcontainers requiere Docker)
 
 ```bash
 cd backend
@@ -77,7 +79,7 @@ mvn verify
 
 `mvn verify` genera informe JaCoCo en `backend/target/site/jacoco/`.
 
-**Frontend**
+**Frontend** (~280 tests)
 
 ```bash
 cd frontend
@@ -85,7 +87,9 @@ npm test
 npm run test:coverage
 ```
 
-Informe en `frontend/coverage/`.
+Informe en `frontend/coverage/`. Umbrales Vitest: 80% líneas/declaraciones, 70% branches.
+
+Ver también [docs/testing/coverage-baseline.md](docs/testing/coverage-baseline.md) y [docs/testing/coverage-report.md](docs/testing/coverage-report.md).
 
 ## Seguridad (notas)
 
