@@ -187,7 +187,6 @@ export default function HabitsOverviewPage() {
           })
           .filter((x) => x.id)
           .sort((a, b) => b.pct - a.pct)
-          .slice(0, 6)
         setObjectives(mapped)
       })
       .catch((e) => {
